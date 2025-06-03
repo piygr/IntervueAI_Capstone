@@ -10,15 +10,17 @@ IntervueAI is an AI-powered mock interview platform that allows candidates to up
 IntervueAI_Capstone/
 ├── README.md
 ├── requirements.txt
-├── run.py                     # Main entrypoint
+├── .env.local
+├── main.py                     # Main entrypoint
 ├── configs/
 │   └── config.yaml            # Model, path, port configs
 ├── agents/
 │   ├── __init__.py
-│   ├── macro_planner.py       # Subagent 1 - JD + Resume to Questionnaire
-│   ├── interview_loop.py      # Subagent 2 - Interview FSM Controller
-│   ├── scorer_summary.py      # Subagent 3 - Evaluation and summary
-│   └── session_manager.py     # Subagent 4 - Orchestrates session lifecycle
+    ├── interview_agent.py
+│   ├── macro_planner.py       # tentative Subagent 1 - JD + Resume to Questionnaire
+│   ├── interview_loop.py      # tentative Subagent 2 - Interview FSM Controller
+│   ├── scorer_summary.py      # tentative Subagent 3 - Evaluation and summary
+│   └── session_manager.py     # tentative Subagent 4 - Orchestrates session lifecycle
 ├── fsm/
 │   ├── __init__.py
 │   └── interview_states.py    # FSM states for the main interview loop
@@ -91,6 +93,30 @@ pnpm dev
 Frontend will run at:
 ```📍 http://localhost:3000```
 
+### 🗣️ 4. LiveKit Server – Local Development Setup (Optional)
+
+This project uses [LiveKit](https://livekit.io/) to enable real-time voice communication for interview agents. You can ignore this step and
+use livekit cloud by Signig up here [Livekit Cloud](https://livekit.io) 
+
+#### 🔧 Install LiveKit Server Self-hosting (locally)
+
+##### On Mac
+```
+brew install livekit-server
+```
+
+##### On other OS
+Refer here - [Livekit Server Self-hosting](https://docs.livekit.io/home/self-hosting/local/)
+
+#### ▶️ Run LiveKit Server in Dev Mode
+To start the server locally:
+```
+livekit-server --dev
+```
+This will:
+- Start the server on ws://localhost:7880
+- Print API_KEY and API_SECRET in your terminal (devkey / secret)
+- Serve the REST API at http://localhost:7880
 
 ## 🔗 End-to-End Flow
 
@@ -105,13 +131,13 @@ Create a .env.local file for the backend and agent:
 
 ```
 # .env.local
-AWS_ACCESS_KEY_ID=your_aws_access_key
-AWS_SECRET_ACCESS_KEY=your_aws_secret_key
-AWS_REGION=ap-south-1
-
-LIVEKIT_API_KEY=your_livekit_api_key
-LIVEKIT_API_SECRET=your_livekit_api_secret
-LIVEKIT_URL=https://your-livekit-server.com
+LIVEKIT_URL=ws://localhost:7880
+LIVEKIT_API_KEY=devkey
+LIVEKIT_API_SECRET=secret
+AWS_ACCESS_KEY_ID=<aws_access_key>
+AWS_SECRET_ACCESS_KEY=<aws_access_key_secret>
+AWS_REGION=<aws_region>
+GOOGLE_API_KEY=<google_api_key_for_running_llm>
 ```
 
 ## 📦 Recommended Tools
