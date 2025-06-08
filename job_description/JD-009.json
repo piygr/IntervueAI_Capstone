@@ -1,0 +1,21 @@
+{
+    "title": "AI Engineer – Computer Vision",
+    "company": "VisionaryAI",
+    "location": "Remote (India/EU)",
+    "description": "Join us to build advanced vision-based AI products used in retail and smart city infrastructure.",
+    "responsibilities": [
+      "Develop and deploy object detection and image classification models.",
+      "Work on edge deployment with TensorRT or ONNX.",
+      "Collaborate with data engineers to improve dataset quality.",
+      "Implement continuous training pipelines for model improvement.",
+      "Maintain accuracy and latency benchmarks."
+    ],
+    "requirements": [
+      "2+ years experience in computer vision projects.",
+      "Hands-on with YOLO, EfficientNet, or MobileNet.",
+      "Experience with OpenCV, PyTorch or TensorFlow.",
+      "Edge AI optimization experience is a strong plus.",
+      "Basic understanding of camera calibration and tracking algorithms."
+    ]
+  }
+  
