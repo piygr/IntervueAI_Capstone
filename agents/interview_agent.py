@@ -44,13 +44,38 @@ tts = aws.TTS(
 
 
 class Assistant(Agent):
-    def __init__(self) -> None:
+    def __init__(self, job_description: str, resume: str) -> None:
         # This project is configured to use Deepgram STT, OpenAI LLM and Cartesia TTS plugins
         # Other great providers exist like Cerebras, ElevenLabs, Groq, Play.ht, Rime, and more
         # Learn more and pick the best one for your app:
         # https://docs.livekit.io/agents/plugins
+        instructions = f"""
+You are an AI interview agent conducting a structured job interview.
+
+You will be given a **job description** and a **candidate's resume** in JSON format. Use this information to prepare and ask **10 interview questions**, starting with general or introductory topics and gradually progressing to more technical or role-specific areas.
+
+Conduct the interview in an **interactive manner**:
+- Ask one question at a time.
+- Wait for the candidate’s response before proceeding to the next.
+- Do **not mention or reference** the job description or resume explicitly.
+- Frame each question naturally, as a human interviewer would.
+
+**Guidelines:**
+- Tailor questions based on the candidate’s past roles, projects, and skills.
+- Align the focus of the questions with the job’s requirements, but keep the language conversational.
+- Ask a mix of behavioral, situational, and technical questions.
+- Keep the tone professional and engaging.
+- Do not answer the questions yourself.
+
+Here is the job description:
+{job_description}
+
+Here is the candidate's resume:
+{resume}
+"""
+
         super().__init__(
-            instructions="You are an interviewer agent.",
+            instructions=instructions,
             stt=stt,
             tts=tts,
             #turn_detection=EnglishModel,
@@ -77,7 +102,8 @@ async def entrypoint(ctx: JobContext):
     session_id = ctx.room.name.replace('interview-', '')
 
     ### Fetching session details eg. JD, Resume ####
-    logger.info(fetch_session(session_id))
+    session_details = fetch_session(session_id)
+    # logger.info(fetch_session(session_id))
     ### 
 
     # Wait for the first participant to connect
@@ -95,7 +121,15 @@ async def entrypoint(ctx: JobContext):
         metrics.log_metrics(agent_metrics)
         usage_collector.collect(agent_metrics)
 
-    agent = Assistant()
+    jd_id = session_details.get("JD")
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    jd_path = os.path.join(script_dir, "..", "job_description", f"{jd_id}.txt")
+
+    with open(jd_path, "r", encoding="utf-8") as file:
+        jd_text = file.read()
+
+    agent = Assistant(job_description=jd_text, resume=session_details.get("resume"))
     
     #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
 
