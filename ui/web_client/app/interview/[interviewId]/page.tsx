@@ -14,7 +14,7 @@ import {
   useVoiceAssistant,
 } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Room, RoomEvent } from "livekit-client";
+import { Room, RoomEvent, AudioCaptureOptions } from "livekit-client";
 import { useCallback, useEffect, useState } from "react";
 
 export default function InterviewPage( {params} : {params : {interviewId: string}}) {
@@ -27,9 +27,16 @@ export default function InterviewPage( {params} : {params : {interviewId: string
   const [room] = useState(new Room());
 
   const onConnectButtonClicked = useCallback(async () => {
+    const audioCaptureOptions: AudioCaptureOptions = {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+      // Optional: Enable voice isolation if supported by the browser
+      voiceIsolation: true
+    };
 
     await room.connect(serverUrl, roomToken);
-    await room.localParticipant.setMicrophoneEnabled(true);
+    await room.localParticipant.setMicrophoneEnabled(true, audioCaptureOptions);
   }, [room]);
   
 
@@ -59,8 +66,16 @@ const SimpleVoiceAssistant = ({room, serverUrl, participantToken}: {room: Room, 
   //const [room] = useState(new Room());
 
   const onConnectButtonClicked = useCallback(async () => {
+    const audioCaptureOptions: AudioCaptureOptions = {
+      echoCancellation: true,
+      noiseSuppression: true,
+      autoGainControl: true,
+      // Optional: Enable voice isolation if supported by the browser
+      voiceIsolation: true
+    };
+
     await room.connect(serverUrl, participantToken);
-    await room.localParticipant.setMicrophoneEnabled(true);
+    await room.localParticipant.setMicrophoneEnabled(true, audioCaptureOptions);
   }, [room]);
 
   useEffect(() => {
