@@ -5,7 +5,6 @@ from fastapi.responses import JSONResponse
 from livekit import api
 import uuid
 import os
-import subprocess
 from dotenv import load_dotenv
 import logging
 import sys
