@@ -1,0 +1,21 @@
+{
+    "title": "Full Stack Developer – MERN Stack",
+    "company": "SkillHub",
+    "location": "Gurgaon, India (Onsite)",
+    "description": "SkillHub is hiring a MERN stack developer to build and scale its ed-tech platform for video-based learning.",
+    "responsibilities": [
+      "Build scalable UI components in React.",
+      "Develop REST APIs with Express and MongoDB.",
+      "Integrate third-party services like Stripe and SendGrid.",
+      "Write unit tests using Jest and Enzyme.",
+      "Ensure responsive design and accessibility standards."
+    ],
+    "requirements": [
+      "2+ years of experience with the MERN stack.",
+      "Solid understanding of RESTful APIs and JWT-based authentication.",
+      "Experience with Git, Agile development, and code reviews.",
+      "Working knowledge of CI/CD pipelines.",
+      "Basic DevOps understanding (Heroku or AWS preferred)."
+    ]
+  }
+  

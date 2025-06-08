@@ -1,0 +1,21 @@
+{
+    "title": "Full Stack Developer",
+    "company": "NextWave Technologies",
+    "location": "Bangalore, India (Hybrid)",
+    "description": "We're seeking a Full Stack Developer with a strong grasp of modern JavaScript/TypeScript frameworks to build scalable web applications.",
+    "responsibilities": [
+      "Design and develop full-stack applications using React and Node.js.",
+      "Collaborate with product teams to define and build features.",
+      "Implement CI/CD workflows for efficient deployment.",
+      "Write reusable, testable, and efficient code.",
+      "Optimize performance across web and backend systems."
+    ],
+    "requirements": [
+      "3+ years of experience in full stack development.",
+      "Strong experience with React.js, Node.js, and Express.",
+      "Knowledge of PostgreSQL or MongoDB.",
+      "Familiarity with RESTful APIs and GraphQL.",
+      "Good understanding of Docker, Git, and cloud platforms (AWS/GCP)."
+    ]
+  }
+  

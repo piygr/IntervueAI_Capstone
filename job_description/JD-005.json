@@ -1,0 +1,21 @@
+{
+    "title": "AI Engineer – NLP & Large Language Models",
+    "company": "Cognize AI",
+    "location": "Bangalore, India (Onsite)",
+    "description": "We are looking for an AI Engineer to build and fine-tune NLP and transformer-based models for our enterprise chatbot platform.",
+    "responsibilities": [
+      "Develop and deploy transformer-based NLP models.",
+      "Fine-tune open-source LLMs using domain-specific corpora.",
+      "Implement vector search using FAISS or similar tools.",
+      "Work with cross-functional teams to integrate models into products.",
+      "Maintain and monitor model performance in production."
+    ],
+    "requirements": [
+      "3+ years experience in applied NLP or ML.",
+      "Proficiency with HuggingFace Transformers, PyTorch, and spaCy.",
+      "Experience with LLMs like GPT, Mistral, or LLaMA.",
+      "Understanding of vector databases like Pinecone or Weaviate.",
+      "Solid Python and data preprocessing skills."
+    ]
+  }
+  
