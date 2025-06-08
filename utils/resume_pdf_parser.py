@@ -16,7 +16,7 @@ api_key = os.getenv("GOOGLE_API_KEY")
 client = genai.Client(api_key=api_key)
 
 
-async def parse_pdf(file: UploadFile) -> str:
+async def parse_resume_pdf(file: UploadFile) -> str:
     """
     Parse a PDF file and return the text content in markdown format.
     """
