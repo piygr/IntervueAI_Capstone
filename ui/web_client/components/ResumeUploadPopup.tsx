@@ -19,7 +19,7 @@ const ResumeUploadPopup = ({ jdId, onClose }: { jdId: string; onClose: () => voi
     formData.append('jobId', jdId);
 
     try {
-      const res = await fetch('http://localhost:8000/api/start-interview', {
+      const res = await fetch(process.env.API_HOST + '/start-interview', {
         method: 'POST',
         body: formData
       });

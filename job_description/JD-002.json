@@ -1,0 +1,16 @@
+{
+    "title": "Frontend Developer (React)",
+    "company": "TechNova Labs",
+    "location": "Remote - India",
+    "description": "We are looking for a skilled React developer with experience in building modern web applications.",
+    "responsibilities": [
+      "Develop reusable components in React",
+      "Collaborate with backend teams on API integration",
+      "Write clean, testable code with unit tests"
+    ],
+    "requirements": [
+      "2+ years of experience with React",
+      "Familiarity with Git, RESTful APIs",
+      "Understanding of browser rendering and performance"
+    ]
+  }

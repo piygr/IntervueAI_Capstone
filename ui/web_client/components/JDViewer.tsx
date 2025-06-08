@@ -1,33 +1,48 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import JDCard from './JDCard';
 import ResumeUploadPopup from './ResumeUploadPopup';
 
+import { useSearchParams } from 'next/navigation';
 const JDViewer = () => {
-  const [showPopup, setShowPopup] = useState(false);
 
+  const searchParams = useSearchParams();
+  const jdId = searchParams.get('jdId') || 'JD-001';
+
+  const [showPopup, setShowPopup] = useState(false);
   const mockJD = {
-    title: 'Frontend Developer (React)',
-    company: 'TechNova Labs',
-    location: 'Remote - India',
-    description: `We are looking for a skilled React developer with experience in building modern web applications.`,
-    responsibilities: [
-      'Develop reusable components in React',
-      'Collaborate with backend teams on API integration',
-      'Write clean, testable code with unit tests'
-    ],
-    requirements: [
-      '2+ years of experience with React',
-      'Familiarity with Git, RESTful APIs',
-      'Understanding of browser rendering and performance'
-    ]
+    title: '',
+    company: '',
+    location: '',
+    description: '',
+    responsibilities: [] as string[],
+    requirements: [] as string[]
   };
+
+  const [jd, setJd] = useState(mockJD);
+
+  useEffect( () => {
+    if(jdId) {
+      //fetch
+      fetch(process.env.API_HOST + '/jobs?jdId=' + jdId).then( (res) => {
+        res.json().then( (resp) => {
+          if(resp.jobs && resp.jobs.length > 0) {
+            setJd(resp.jobs[0]);
+          }
+        });
+      });
+    }
+    else {
+      //let job = 
+      //setJd(job);
+    }
+  }, [jdId]);
 
   return (
     <div className="jd-viewer-container">
-      <JDCard jd={mockJD} onApplyClick={() => setShowPopup(true)} />
+      <JDCard jd={jd} onApplyClick={() => setShowPopup(true)} />
       {showPopup && (
         <ResumeUploadPopup 
-          jdId={"JD-001"} 
+          jdId={jdId} 
           onClose={() => setShowPopup(false)} 
         />
       )}

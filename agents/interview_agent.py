@@ -124,7 +124,7 @@ async def entrypoint(ctx: JobContext):
     jd_id = session_details.get("JD")
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    jd_path = os.path.join(script_dir, "..", "job_description", f"{jd_id}.txt")
+    jd_path = os.path.join(script_dir, "..", "job_description", f"{jd_id}.json")
 
     with open(jd_path, "r", encoding="utf-8") as file:
         jd_text = file.read()
