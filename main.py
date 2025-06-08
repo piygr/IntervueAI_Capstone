@@ -2,8 +2,6 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend_api.resume_handler import router as resume_router
-from backend_api.livekit_token import router as livekit_router
 from backend_api.start_interview import router as st_router
 app = FastAPI()
 
@@ -17,8 +15,6 @@ app.add_middleware(
 )
 
 # Include backend APIs
-#app.include_router(resume_router)
-app.include_router(livekit_router)
 app.include_router(st_router)
 
 @app.get("/")

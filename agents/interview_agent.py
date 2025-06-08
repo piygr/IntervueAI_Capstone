@@ -53,7 +53,7 @@ class Assistant(Agent):
             stt=stt,
             tts=tts,
             #turn_detection=EnglishModel,
-            #llm=llm
+            llm=llm
         )
 
     async def on_enter(self):
@@ -66,8 +66,12 @@ def prewarm(proc: JobProcess):
 
 
 async def entrypoint(ctx: JobContext):
+
+    await ctx.connect(
+        auto_subscribe=AutoSubscribe.AUDIO_ONLY,
+    )
     logger.info(f"connecting to room {ctx.room.name}")
-    await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
+    
 
     # Wait for the first participant to connect
     participant = await ctx.wait_for_participant()
@@ -84,17 +88,9 @@ async def entrypoint(ctx: JobContext):
         metrics.log_metrics(agent_metrics)
         usage_collector.collect(agent_metrics)
 
-    #agent = Agent(
-    #    instructions="You are a friendly voice assistant built by LiveKit."
-    #)
     agent = Assistant()
-    '''Agent(
-        instructions="You are a friendly voice assistant built by LiveKit.",
-        stt=stt,
-        tts=tts
-    )'''
-
-    print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
+    
+    #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
 
     session = AgentSession(
         vad=ctx.proc.userdata["vad"],
@@ -109,7 +105,7 @@ async def entrypoint(ctx: JobContext):
 
     try:
         logger.info("Waiting for participant to join (max 30s)...")
-        participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=30)
+        #participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=300)
         logger.info(f"Participant joined: {participant.identity}")
     except asyncio.TimeoutError:
         logger.warning("No participant joined within 30 seconds. Shutting down agent.")
