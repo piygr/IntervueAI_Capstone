@@ -9,7 +9,7 @@ import subprocess
 from dotenv import load_dotenv
 import logging
 import sys
-from utils.pdf_parser import parse_pdf
+from utils.resume_pdf_parser import parse_resume_pdf
 from utils.utils import update_session
 
 logging.basicConfig(level=logging.INFO)
@@ -46,7 +46,7 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
     print(f"Interview session created: room={room_name}, jobId={jobId}")
     print("interview_id: ", interview_id)
 
-    resume_text = await parse_pdf(resume)
+    resume_text = await parse_resume_pdf(resume)
 
     session_dict = dict(room=room_name, JD=f"{jobId}", resume=resume_text)
     update_session(interview_id, session_dict)
