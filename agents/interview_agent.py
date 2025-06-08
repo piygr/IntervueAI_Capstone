@@ -22,6 +22,7 @@ from livekit.plugins import (
 )
 #from livekit.plugins.turn_detector.english import EnglishModel
 
+from utils.utils import fetch_session
 
 import os
 
@@ -71,7 +72,13 @@ async def entrypoint(ctx: JobContext):
         auto_subscribe=AutoSubscribe.AUDIO_ONLY,
     )
     logger.info(f"connecting to room {ctx.room.name}")
-    
+    logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
+
+    session_id = ctx.room.name.replace('interview-', '')
+
+    ### Fetching session details eg. JD, Resume ####
+    logger.info(fetch_session(session_id))
+    ### 
 
     # Wait for the first participant to connect
     participant = await ctx.wait_for_participant()
@@ -113,11 +120,6 @@ async def entrypoint(ctx: JobContext):
         return  # Exits the entrypoint, safely ends the subprocess
 
     await session.start(room=ctx.room, agent=agent)
-
-    #ctx.room.on("transcription_received", on_transcription_received)
-
-    #await session.say("How are you doing today?")
-    #transcript = session.stt.
 
 if __name__ == "__main__":
     cli.run_app(

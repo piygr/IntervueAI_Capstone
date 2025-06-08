@@ -9,6 +9,7 @@ import subprocess
 from dotenv import load_dotenv
 import logging
 import sys
+from utils.utils import update_session
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv('.env.local')
@@ -42,23 +43,10 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
 
     # Log or store the resume, jobId, and room_name if needed
     print(f"Interview session created: room={room_name}, jobId={jobId}")
+    print("interview_id: ", interview_id)
 
-    env = os.environ.copy()
-    #env["ROOM_NAME"] = room_name
-    env["INTERVIEW_ID"] = interview_id
-    env["RESUME_TEXT"] = ""
-    env["JD"] = f"{jobId} data"
-
-    #log_file = open(f"logs/agent_{room_name}.log", "w")
-    subprocess.Popen([
-        "/Users/piyushgrover/.pyenv/versions/interview-agent-env/bin/python",
-        "agents/interview_agent.py",
-        "dev",
-        "--room",
-        room_name
-    ], env=env,
-    stderr=sys.stderr,
-    stdout=sys.stdout)
+    session_dict = dict(room=room_name, JD=f"{jobId}")
+    update_session(interview_id, session_dict)
 
     return JSONResponse(content={
         "participantToken": token,
