@@ -11,7 +11,8 @@ import sys
 from utils.resume_pdf_parser import parse_resume_pdf
 from utils.utils import update_session
 
-logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("start-interview")
+
 load_dotenv('.env.local')
 
 router = APIRouter(prefix="/api")
@@ -23,13 +24,12 @@ LIVEKIT_SERVER_URL = os.getenv("LIVEKIT_URL")
 print(LIVEKIT_API_KEY, LIVEKIT_SERVER_URL)
 
 @router.post("/start-interview")
-async def start_interview(resume: UploadFile, jobId: str = Form(...)):
-    # Generate a unique interview room name
-    interview_id = str(uuid.uuid4())
-    room_name = f"interview-{interview_id}"
+async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
+    logger.info(f"Starting interview for JD: {jobId}")
+    room_name = f"interview-{interviewId}"
 
     token = api.AccessToken() \
-    .with_identity(interview_id) \
+    .with_identity(interviewId) \
     .with_name("Candidate") \
     .with_grants(api.VideoGrants(
         room_join=True,
@@ -43,12 +43,10 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
 
     # Log or store the resume, jobId, and room_name if needed
     print(f"Interview session created: room={room_name}, jobId={jobId}")
-    print("interview_id: ", interview_id)
+    print("interview_id: ", interviewId)
 
-    resume_text = await parse_resume_pdf(resume)
-
-    session_dict = dict(room=room_name, JD=f"{jobId}", resume=resume_text)
-    update_session(interview_id, session_dict)
+    session_dict = dict(room=room_name)
+    update_session(interviewId, session_dict)
 
     return JSONResponse(content={
         "participantToken": token,

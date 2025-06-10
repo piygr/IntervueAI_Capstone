@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from backend_api.start_interview import router as st_router
 from backend_api.jd import router as jd_router
+from backend_api.resume_handler import router as resume_handler_router
 
 app = FastAPI()
 
@@ -19,6 +20,7 @@ app.add_middleware(
 # Include backend APIs
 app.include_router(st_router)
 app.include_router(jd_router)
+app.include_router(resume_handler_router)
 
 @app.get("/")
 def root():
