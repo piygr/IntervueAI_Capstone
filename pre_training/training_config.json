@@ -1,0 +1,61 @@
+{
+    "model_name": "microsoft/phi-2",
+    "dataset": {
+        "type": "huggingface",
+        "name": "wikitext",
+        "config": "wikitext-2-raw-v1",
+        "path": null,
+        "preprocessing": [
+            {
+                "type": "filter",
+                "condition": "len(x['text']) > 50"
+            },
+            {
+                "type": "map",
+                "function": "{'text': x['text'].strip()}"
+            },
+            {
+                "type": "shuffle",
+                "seed": 42
+            }
+        ],
+        "split": {
+            "train": 0.8,
+            "validation": 0.1,
+            "test": 0.1
+        }
+    },
+    "training": {
+        "output_dir": "./smolLM2-trained",
+        "num_train_epochs": 3,
+        "per_device_train_batch_size": 4,
+        "gradient_accumulation_steps": 4,
+        "learning_rate": 2e-5,
+        "max_steps": 1000,
+        "save_steps": 100,
+        "logging_steps": 10,
+        "warmup_steps": 100,
+        "weight_decay": 0.01,
+        "max_length": 512,
+        "early_stopping_patience": 3,
+        "fp16": true,
+        "gradient_checkpointing": true,
+        "optim": "adamw_torch",
+        "lr_scheduler_type": "cosine",
+        "max_grad_norm": 1.0
+    },
+    "evaluation": {
+        "metrics": ["perplexity", "rouge", "bleu"],
+        "eval_steps": 100,
+        "save_best_model": true,
+        "metric_for_best_model": "eval_loss",
+        "greater_is_better": false
+    },
+    "generation": {
+        "max_length": 100,
+        "temperature": 0.7,
+        "top_p": 0.9,
+        "do_sample": true,
+        "num_return_sequences": 1
+    }
+} 

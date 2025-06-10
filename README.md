@@ -41,6 +41,14 @@ IntervueAI_Capstone/
     ├── logger.py              # Unified logger
     ├── schema.py              # Dataclasses or Pydantic models for Q&A, Plan, Report
     └── helpers.py             # Misc utilities
+│
+├── pre_training/              # Directory containing pre-training files 
+│   └── README.md              # Read me info specific for pretrainig part
+│   ├── models/            
+│       └── llama3.py  
+
+
+
 ```
 
 
