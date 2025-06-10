@@ -1,0 +1,21 @@
+{
+    "title": "Prompt Engineer – QA & Evaluation",
+    "company": "LucidPrompt",
+    "location": "Remote (Part-time/Contract)",
+    "description": "We’re seeking a Prompt Engineer focused on QA and evaluation tasks to validate our LLM-based assistants across domains.",
+    "responsibilities": [
+      "Manually test and grade prompt outputs for accuracy, tone, and hallucination.",
+      "Design prompts and counter-prompts for different scenarios.",
+      "Log model regressions and contribute to evaluation datasets.",
+      "Use tools like PromptLayer and Trulens for testing workflows.",
+      "Support few-shot and chain-of-thought prompt design."
+    ],
+    "requirements": [
+      "Familiarity with OpenAI and Anthropic LLMs.",
+      "Strong attention to detail and analytical skills.",
+      "Experience with JSONL formats and prompt templating.",
+      "Previous QA or technical writing background is a plus.",
+      "Python knowledge optional but helpful."
+    ]
+  }
+  

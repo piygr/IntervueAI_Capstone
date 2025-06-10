@@ -22,6 +22,7 @@ from livekit.plugins import (
 )
 #from livekit.plugins.turn_detector.english import EnglishModel
 
+from utils.utils import fetch_session
 
 import os
 
@@ -43,17 +44,42 @@ tts = aws.TTS(
 
 
 class Assistant(Agent):
-    def __init__(self) -> None:
+    def __init__(self, job_description: str, resume: str) -> None:
         # This project is configured to use Deepgram STT, OpenAI LLM and Cartesia TTS plugins
         # Other great providers exist like Cerebras, ElevenLabs, Groq, Play.ht, Rime, and more
         # Learn more and pick the best one for your app:
         # https://docs.livekit.io/agents/plugins
+        instructions = f"""
+You are an AI interview agent conducting a structured job interview.
+
+You will be given a **job description** and a **candidate's resume** in JSON format. Use this information to prepare and ask **10 interview questions**, starting with general or introductory topics and gradually progressing to more technical or role-specific areas.
+
+Conduct the interview in an **interactive manner**:
+- Ask one question at a time.
+- Wait for the candidate's response before proceeding to the next.
+- Do **not mention or reference** the job description or resume explicitly.
+- Frame each question naturally, as a human interviewer would.
+
+**Guidelines:**
+- Tailor questions based on the candidate's past roles, projects, and skills.
+- Align the focus of the questions with the job's requirements, but keep the language conversational.
+- Ask a mix of behavioral, situational, and technical questions.
+- Keep the tone professional and engaging.
+- Do not answer the questions yourself.
+
+Here is the job description:
+{job_description}
+
+Here is the candidate's resume:
+{resume}
+"""
+
         super().__init__(
-            instructions="You are an interviewer agent.",
+            instructions=instructions,
             stt=stt,
             tts=tts,
             #turn_detection=EnglishModel,
-            #llm=llm
+            llm=llm
         )
 
     async def on_enter(self):
@@ -66,8 +92,19 @@ def prewarm(proc: JobProcess):
 
 
 async def entrypoint(ctx: JobContext):
+
+    await ctx.connect(
+        auto_subscribe=AutoSubscribe.AUDIO_ONLY,
+    )
     logger.info(f"connecting to room {ctx.room.name}")
-    await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
+    logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
+
+    session_id = ctx.room.name.replace('interview-', '')
+
+    ### Fetching session details eg. JD, Resume ####
+    session_details = fetch_session(session_id)
+    # logger.info(fetch_session(session_id))
+    ### 
 
     # Wait for the first participant to connect
     participant = await ctx.wait_for_participant()
@@ -84,17 +121,17 @@ async def entrypoint(ctx: JobContext):
         metrics.log_metrics(agent_metrics)
         usage_collector.collect(agent_metrics)
 
-    #agent = Agent(
-    #    instructions="You are a friendly voice assistant built by LiveKit."
-    #)
-    agent = Assistant()
-    '''Agent(
-        instructions="You are a friendly voice assistant built by LiveKit.",
-        stt=stt,
-        tts=tts
-    )'''
+    jd_id = session_details.get("JD")
 
-    print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    jd_path = os.path.join(script_dir, "..", "job_description", f"{jd_id}.json")
+
+    with open(jd_path, "r", encoding="utf-8") as file:
+        jd_text = file.read()
+
+    agent = Assistant(job_description=jd_text, resume=session_details.get("resume"))
+    
+    #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
 
     session = AgentSession(
         vad=ctx.proc.userdata["vad"],
@@ -109,7 +146,7 @@ async def entrypoint(ctx: JobContext):
 
     try:
         logger.info("Waiting for participant to join (max 30s)...")
-        participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=30)
+        #participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=300)
         logger.info(f"Participant joined: {participant.identity}")
     except asyncio.TimeoutError:
         logger.warning("No participant joined within 30 seconds. Shutting down agent.")
@@ -117,11 +154,6 @@ async def entrypoint(ctx: JobContext):
         return  # Exits the entrypoint, safely ends the subprocess
 
     await session.start(room=ctx.room, agent=agent)
-
-    #ctx.room.on("transcription_received", on_transcription_received)
-
-    #await session.say("How are you doing today?")
-    #transcript = session.stt.
 
 if __name__ == "__main__":
     cli.run_app(

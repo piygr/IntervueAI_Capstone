@@ -5,9 +5,11 @@ from fastapi.responses import JSONResponse
 from livekit import api
 import uuid
 import os
-import subprocess
 from dotenv import load_dotenv
 import logging
+import sys
+from utils.resume_pdf_parser import parse_resume_pdf
+from utils.utils import update_session
 
 logging.basicConfig(level=logging.INFO)
 load_dotenv('.env.local')
@@ -41,16 +43,12 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
 
     # Log or store the resume, jobId, and room_name if needed
     print(f"Interview session created: room={room_name}, jobId={jobId}")
+    print("interview_id: ", interview_id)
 
-    env = os.environ.copy()
-    env["room_name"] = room_name
-    env["interview_id"] = interview_id
+    resume_text = await parse_resume_pdf(resume)
 
-    '''subprocess.Popen([
-        "/Users/piyushgrover/.pyenv/versions/interview-agent-env/bin/python",
-        "agents/interview_agent.py",
-        "dev"
-    ], env=env)'''
+    session_dict = dict(room=room_name, JD=f"{jobId}", resume=resume_text)
+    update_session(interview_id, session_dict)
 
     return JSONResponse(content={
         "participantToken": token,

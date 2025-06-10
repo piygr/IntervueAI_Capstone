@@ -1,0 +1,21 @@
+{
+    "title": "Backend Developer – Go & Microservices",
+    "company": "QuantMesh",
+    "location": "Mumbai, India",
+    "description": "We're looking for a backend engineer proficient in Golang and distributed systems to develop our high-throughput analytics platform.",
+    "responsibilities": [
+      "Design microservices in Go for real-time data processing.",
+      "Implement and maintain gRPC APIs.",
+      "Ensure service reliability using Prometheus and Grafana.",
+      "Collaborate with frontend and DevOps teams.",
+      "Optimize performance under large-scale data loads."
+    ],
+    "requirements": [
+      "2+ years of Go programming experience.",
+      "Experience with Kubernetes, Docker, and Kafka.",
+      "Strong understanding of REST, gRPC, and event-driven architectures.",
+      "Exposure to cloud-native design patterns.",
+      "Experience with time-series databases (e.g., InfluxDB) is a plus."
+    ]
+  }
+  

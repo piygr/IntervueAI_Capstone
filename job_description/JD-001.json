@@ -1,0 +1,42 @@
+{
+    "title": "Principal Android Engineer",
+    "company": "Kaizen Gaming",
+    "location": "Remote / Multiple Locations",
+    "description": "Kaizen Gaming, the team behind Betano, is a major GameTech company operating in 19 markets. With over 2,700 team members from 40+ nationalities, the company aims to leverage cutting-edge technology to provide top-tier experiences to millions of customers. As a Principal Android Engineer, you will lead the technical roadmap for accelerator teams, innovate with emerging technologies, and ensure high-quality engineering practices.",
+    "responsibilities": [
+      "Define, implement, and maintain scalable architectures for Android applications.",
+      "Lead the creation and delivery of the technical roadmap for accelerator teams.",
+      "Provide architectural foresight to anticipate and mitigate technical challenges.",
+      "Drive innovation by evaluating emerging technologies and prototyping solutions.",
+      "Develop high-performance, real-time Android applications with complex UI using Kotlin and Jetpack Compose.",
+      "Ensure adherence to coding best practices, including Dagger2, Kotlin Flows & Coroutines, and standard design patterns.",
+      "Conduct rigorous code reviews to uphold quality and compliance with established standards.",
+      "Optimize application performance to ensure a seamless user experience.",
+      "Collaborate cross-functionally with product managers, designers, and teams using tools like Jira/Confluence.",
+      "Mentor junior engineers and promote knowledge sharing across teams.",
+      "Lead critical initiatives while managing risks and uncertainties.",
+      "Provide post-deployment ownership, including system monitoring with Firebase/Google Analytics.",
+      "Maintain CI/CD pipelines using Bitrise and GitLab.",
+      "Advocate for unit testing (JUnit) and UI testing to ensure app reliability.",
+      "Align technical decisions with business goals and customer needs.",
+      "Leverage data-driven insights to guide decision-making.",
+      "Manage technical debt while ensuring scalability and maintainability."
+    ],
+    "requirements": [
+      "10+ years of experience in Android development using Kotlin.",
+      "Proficiency in Jetpack Compose, Kotlin Flows & Coroutines, Dagger2, ViewBinding, Firebase, and custom navigation libraries.",
+      "Expertise in architectural patterns: MVC, MVP, MVVM.",
+      "Strong knowledge of CI/CD tools (Bitrise), code quality tools (Detekt), and translation management systems (Transifex).",
+      "Experience with Agile methodologies like Scrum and Kanban.",
+      "Experience in pair programming and collaborative problem-solving.",
+      "Ability to design scalable systems for large-scale applications.",
+      "Strong leadership with a 'get things done' attitude.",
+      "High accountability for project outcomes and team success.",
+      "Excellent communication skills for aligning technical and business goals.",
+      "Resilience in managing change and uncertainty.",
+      "Hands-on experience building real-time apps with complex UIs for millions of users.",
+      "Proven ability to architect scalable systems and manage cross-team dependencies.",
+      "Familiarity with Firebase tools like Crashlytics and Analytics."
+    ]
+  }
+  
