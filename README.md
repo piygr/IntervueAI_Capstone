@@ -80,8 +80,8 @@ This agent listens in a LiveKit room and conducts the mock interview using TTS a
 Ensure AWS credentials are set in your .env.local or environment variables.
 
 ```
-# Start the agent subprocess manually
-python agents/interview_agent.py dev
+# Start the agent subprocess manually from the project_root directory
+python -m agents.interview_agent dev
 ```
 
 This will load the entrypoint() function, connect to a LiveKit room, and start voice interactions when a participant joins.

@@ -1,0 +1,80 @@
+About the job
+
+We are Kaizen Gaming
+
+Kaizen Gaming, the team powering Betano, is one of the biggest GameTech companies in the world, operating in 19 markets. We always aim to leverage cutting-edge technology, providing the best experience to our millions of customers who trust us for their entertainment.
+
+We are a diverse team of more than 2.700 Kaizeners, from 40+ nationalities spreading across 3 continents.
+
+Our #oneteam is proud to be among the Best Workplaces in Europe and certified Great Place to Work across our offices. Here, there’ll be no average day for you. Ready to Press Play on Potential?
+
+
+Let’s start with the role
+
+We are seeking a highly experienced Principal Engineer specializing in Android development, with over 10 years of hands-on experience. The ideal candidate will have a strong background in creating real-time applications with complex UIs, technical leadership, and architectural foresight. In this role, you will own and deliver the technical roadmap for our accelerator teams while driving innovation and ensuring the adoption of high-quality engineering practices.
+
+
+As a Principal Android Engineer you will:
+
+Technical Leadership
+
+    Define, implement, and maintain scalable architectures for Android applications.
+    Lead the creation and delivery of the technical roadmap for accelerator teams.
+    Provide architectural foresight to anticipate and mitigate technical challenges.
+    Drive innovation by evaluating emerging technologies and prototyping solutions.
+
+Development & Code Quality
+
+    Develop high-performance, real-time Android applications with complex UI using Kotlin and Jetpack Compose.
+    Ensure adherence to coding best practices, including dependency injection (Dagger2), reactive programming (Kotlin Flows & Coroutines), and design patterns (MVC, MVP, MVVM).
+    Conduct rigorous code reviews to uphold quality and compliance with established standards.
+    Optimize application performance to ensure a seamless user experience.
+
+Collaboration & Mentorship
+
+    Collaborate cross-functionally with product managers, designers (Figma), and other teams using tools like Jira/Confluence.
+    Mentor junior engineers and promote knowledge sharing across teams.
+    Lead critical initiatives while effectively managing risks and uncertainties.
+
+Monitoring & Support
+
+    Provide post-deployment ownership, including monitoring system health using Firebase/Google Analytics.
+    Maintain robust CI/CD pipelines using Bitrise and GitLab for seamless deployments.
+    Advocate for unit testing (JUnit) and UI testing frameworks to ensure reliability.
+
+Strategic Influence
+
+    Align technical decisions with business goals and customer needs.
+    Leverage data-driven insights to inform and guide decision-making.
+    Manage technical debt while ensuring system scalability and maintainability.
+
+
+What you’ll bring:
+
+Technical Skills
+
+    Extensive experience (10+ years) in Android development using Kotlin.
+    Proficiency in Jetpack Compose, Kotlin Flows & Coroutines, Dagger2, ViewBinding, Firebase, and in-house navigation libraries.
+    Expertise in architectural patterns such as MVC, MVP, MVVM.
+    Strong knowledge of CI/CD tools (Bitrise), code quality tools (Detekt), and translation management systems (Transifex).
+    Familiarity with Agile methodologies, including Scrum and Kanban.
+
+Supportive Processes
+
+    Experience in pair programming for collaborative problem-solving.
+    Proven ability to design scalable systems for large-scale applications.
+
+Soft Skills
+
+    Strong leadership capabilities paired with a "get things done" mindset.
+    High degree of personal accountability for project outcomes and team success.
+    Effective communication skills to align technical strategies with business goals.
+    Resilience in managing changes and uncertainties.
+
+Preferred Experience
+
+    Hands-on experience developing real-time applications with complex UIs for millions of users.
+    Proven track record of architecting scalable systems while managing dependencies across teams.
+    Familiarity with Firebase services (Crashlytics, Analytics) for monitoring production systems.
+
+This role offers an exciting opportunity to lead cutting-edge Android development projects while shaping the technical vision of our organization.

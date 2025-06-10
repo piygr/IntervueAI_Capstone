@@ -1,0 +1,21 @@
+{
+    "title": "Prompt Engineer",
+    "company": "Verba Labs",
+    "location": "Remote (Global)",
+    "description": "We're hiring a Prompt Engineer to craft, test, and optimize prompts for generative AI systems serving enterprise customers.",
+    "responsibilities": [
+      "Design and refine prompts for chat-based LLMs.",
+      "Conduct A/B testing and human evaluations for prompt effectiveness.",
+      "Collaborate with ML engineers to guide prompt architecture.",
+      "Maintain prompt libraries and performance benchmarks.",
+      "Provide insight into failure cases and hallucination risks."
+    ],
+    "requirements": [
+      "Experience working with OpenAI, Claude, or Gemini models.",
+      "Understanding of prompt chaining, instruction tuning, and retrieval-augmented generation (RAG).",
+      "Background in linguistics or psychology is a plus.",
+      "Ability to write clear and concise instructions for language models.",
+      "Basic familiarity with Python and LangChain or LlamaIndex."
+    ]
+  }
+  
