@@ -10,26 +10,52 @@ const ResumeUploadPopup = ({ jdId, onClose }: { jdId: string; onClose: () => voi
   const [serverUrl, setServerUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [error, setError] = useState<{ message: string; score?: number } | null>(null);
 
   const handleResumeUpload = async () => {
     if (!file) return;
     setIsUploading(true);
+    setError(null);
 
-    const formData = new FormData();
-    formData.append('resume', file);
-    formData.append('jobId', jdId);
+    const resumeHandlerFormData = new FormData();
+    resumeHandlerFormData.append('resume', file);
+    resumeHandlerFormData.append('jobId', jdId);
 
     try {
-      const res = await fetch(process.env.API_HOST + '/start-interview', {
+      // First check resume match
+      const matchRes = await fetch(process.env.API_HOST + '/handle-resume', {
         method: 'POST',
-        body: formData
+        body: resumeHandlerFormData
       });
 
-      const data = await res.json();
-      setRoomToken(data.participantToken);
-      setServerUrl(data.serverUrl);
+      const matchData = await matchRes.json();
+
+      if (matchData.status === 'failure') {
+        setError({
+          message: matchData.message,
+          score: matchData.score
+        });
+        setIsUploading(false);
+        return;
+      }
+
+      // If resume matches, proceed with interview setup
+      const interviewFormData = new FormData();
+      interviewFormData.append('interviewId', matchData.interviewId);
+      interviewFormData.append('jobId', jdId);
+      const interviewRes = await fetch(process.env.API_HOST + '/start-interview', {
+        method: 'POST',
+        body: interviewFormData
+      });
+
+      const interviewData = await interviewRes.json();
+      setRoomToken(interviewData.participantToken);
+      setServerUrl(interviewData.serverUrl);
     } catch (err) {
       console.error('Upload failed:', err);
+      setError({
+        message: 'Failed to process resume. Please try again.'
+      });
     } finally {
       setIsUploading(false);
     }
@@ -43,6 +69,26 @@ const ResumeUploadPopup = ({ jdId, onClose }: { jdId: string; onClose: () => voi
       router.push(url);
     }
   }, [roomToken, serverUrl, jdId, router]);
+
+  if (error) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-40">
+        <div className="bg-white p-6 rounded-xl shadow-md w-[380px] space-y-5 text-center">
+          <h3 className="text-lg font-bold text-gray-900">Resume Not a Good Match</h3>
+          <p className="text-gray-700">{error.message}</p>
+          {error.score && (
+            <p className="text-sm text-gray-500">Match Score: {error.score.toFixed(1)}/10</p>
+          )}
+          <button
+            onClick={onClose}
+            className="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-semibold"
+          >
+            Try Another Job
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
