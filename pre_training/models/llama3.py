@@ -14,7 +14,7 @@ class LLama3Config:
     intermediate_size: int = 2816  # Adjusted for 1B parameter target
     num_hidden_layers: int = 12  # Reduced for 1B parameter target
     num_attention_heads: int = 16  # Adjusted for 1B parameter target
-    num_key_value_heads: int = 16  # Adjusted for 1B parameter target
+    num_key_value_heads: int = 8  # Adjusted for 1B parameter target
     hidden_act: str = "silu"
     max_position_embeddings: int = 2048
     initializer_range: float = 0.02
@@ -123,17 +123,18 @@ class LLama3Attention(nn.Module):
         output_attentions: bool = False,
         use_cache: bool = False,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
-        bsz, q_len, _ = hidden_states.size()
+        # hidden_states (x)
+        bsz, seq_len, _ = hidden_states.size() # (B, T, D)
 
-        query_states = self.q_proj(hidden_states)
-        key_states = self.k_proj(hidden_states)
-        value_states = self.v_proj(hidden_states)
+        query_states = self.q_proj(hidden_states) # (B, T, D) -> (B, T, H * D/H)
+        key_states = self.k_proj(hidden_states) # (B, T, D) -> (B, T, H_kv * D/H)
+        value_states = self.v_proj(hidden_states) # (B, T, D) -> (B, T, H_kv * D/H)
 
-        query_states = query_states.view(bsz, q_len, self.num_heads, self.head_dim).transpose(1, 2)
-        key_states = key_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
-        value_states = value_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
+        query_states = query_states.view(bsz, seq_len, self.num_heads, self.head_dim).transpose(1, 2) # (B, T, H * D/H) -> (B, T, H , D/H) -> (B, H, T, D/H)
+        key_states = key_states.view(bsz, seq_len, self.num_key_value_heads, self.head_dim).transpose(1, 2) # (B, T, H_kv * D/H) -> (B, T, H_kv , D/H) -> (B, H_kv, T, D/H)
+        value_states = value_states.view(bsz, seq_len, self.num_key_value_heads, self.head_dim).transpose(1, 2) # (B, T, H_kv * D/H) -> (B, T, H_kv , D/H) -> (B, H_kv, T, D/H)
 
-        kv_seq_len = key_states.shape[-2]
+        kv_seq_len = key_states.shape[-2] # should be same as seq_len
         if past_key_value is not None:
             kv_seq_len += past_key_value[0].shape[-2]
         
@@ -147,20 +148,24 @@ class LLama3Attention(nn.Module):
         past_key_value = (key_states, value_states) if use_cache else None
 
         # Repeat k/v heads if n_kv_heads < n_heads
-        key_states = self._repeat_kv(key_states, self.num_key_value_groups)
-        value_states = self._repeat_kv(value_states, self.num_key_value_groups)
+        key_states = self._repeat_kv(key_states, self.num_key_value_groups) # (B, H_kv, T, D/H) -> (B, H, T, D/H)
+        value_states = self._repeat_kv(value_states, self.num_key_value_groups) # (B, H_kv, T, D/H) -> (B, H, T, D/H)
 
-        attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim)
+        attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim) # (B, H, T, D/H) * (B, H, D/H, T) -> (B, H, T, T)
 
-        set_trace()
         if attention_mask is not None:
+            if attention_mask.dim() == 2:
+                attention_mask = attention_mask[:, None, None, :]  # expand
+            attention_mask = attention_mask.to(dtype=attn_weights.dtype)  # float32
+            attention_mask = (1.0 - attention_mask) * -10000.0  # large negative values
             attn_weights = attn_weights + attention_mask
+            # attn_weights.masked_fill_(attention_mask==0, float('-inf'))
 
         attn_weights = F.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
         attn_output = torch.matmul(attn_weights, value_states)
 
         attn_output = attn_output.transpose(1, 2).contiguous()
-        attn_output = attn_output.reshape(bsz, q_len, self.hidden_size)
+        attn_output = attn_output.reshape(bsz, seq_len, self.hidden_size)
 
         attn_output = self.o_proj(attn_output)
 
@@ -407,13 +412,13 @@ class LLama3ForCausalLM(nn.Module):
 def create_llama3_1b() -> LLama3ForCausalLM:
     """Creates a 1B parameter version of Llama3"""
     config = LLama3Config(
-        vocab_size=32000,
-        hidden_size=1024,
-        intermediate_size=2816,
-        num_hidden_layers=12,
-        num_attention_heads=16,
-        num_key_value_heads=16,
-        max_position_embeddings=2048,
+        # vocab_size=32000,
+        # hidden_size=1024,
+        # intermediate_size=2816,
+        # # num_hidden_layers=12,
+        # # num_attention_heads=16,
+        # # num_key_value_heads=16,
+        # max_position_embeddings=2048,
     )
     return LLama3ForCausalLM(config)
 
