@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Optional, Tuple, List, Dict, Any
 from dataclasses import dataclass
+from pdb import set_trace 
 
 @dataclass
 class LLama3Config:
@@ -30,6 +31,9 @@ class LLama3Config:
     use_swiglu: bool = True  # Llama3 uses SwiGLU activation
     use_rotary_embeddings: bool = True
     use_grouped_query_attention: bool = True
+    output_attentions=False
+    output_hidden_states=False
+    use_return_dict=False
 
 class RotaryEmbedding(nn.Module):
     """Rotary Position Embedding"""
@@ -148,6 +152,7 @@ class LLama3Attention(nn.Module):
 
         attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim)
 
+        set_trace()
         if attention_mask is not None:
             attn_weights = attn_weights + attention_mask
 
