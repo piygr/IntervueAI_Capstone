@@ -32,6 +32,14 @@ class TextDataset(Dataset):
     def __getitem__(self, idx):
         item = {key: val[idx] for key, val in self.encodings.items()}
         item['labels'] = item['input_ids'].clone()
+        
+        # Create attention mask with proper shape for attention mechanism
+        # Convert attention mask to float and expand it to match attention weights shape
+        # attention_mask = item['attention_mask'].float()
+        # attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)  # Add head and sequence dimensions
+        # attention_mask = (1.0 - attention_mask) * -10000.0  # Convert to additive mask
+        # item['attention_mask'] = attention_mask
+        
         return item
     
     def __len__(self):
