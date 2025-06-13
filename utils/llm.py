@@ -4,6 +4,7 @@ import asyncio
 import os
 from dotenv import load_dotenv
 from google import genai
+import re
 
 logger = logging.getLogger("llm")
 
@@ -30,10 +31,16 @@ async def call_llm_with_timeout(client, prompt, timeout=10):
             timeout=timeout
         )
         logger.info("LLM generation completed")
-        return response
+        return extract_json_string(response.text)
     except TimeoutError:
-        logger.info("LLM generation timed out!")
+        logger.error("LLM generation timed out!")
         raise
     except Exception as e:
-        logger.info(f"Error in LLM generation: {e}")
+        logger.error(f"Error in LLM generation: {str(e)}")
         raise
+
+
+def extract_json_string(raw_output: str) -> str:
+    # Remove leading/trailing code block markers like ```json or ```
+    cleaned = re.sub(r"^```(?:json)?\s*|```$", "", raw_output.strip(), flags=re.MULTILINE)
+    return cleaned.strip()

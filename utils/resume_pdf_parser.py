@@ -8,7 +8,7 @@ from google import genai
 
 from utils.llm import call_llm_with_timeout
 
-logger = logging.getLogger("pdf_parser")
+logger = logging.getLogger("resume_pdf_parser")
 
 load_dotenv(dotenv_path=".env.local")
 
@@ -77,10 +77,10 @@ Here is the resume:
 """
 
         response = await call_llm_with_timeout(client, prompt)
-        raw = response.text.strip()
-        logger.info(f"LLM output: {raw.strip()}")
-        return raw.strip()
+        raw = response.strip()
+        logger.info(f"LLM output: {raw}")
+        return raw
 
     except Exception as e:
-        logger.info(f"⚠️ llm failed to parse resume: {e}")
-        return ""
+        logger.error(f"⚠️ llm failed to parse resume: {repr(e)}")
+        return "error"
