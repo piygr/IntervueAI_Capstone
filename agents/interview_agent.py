@@ -179,52 +179,52 @@ class Transcriber(Agent):
         raise StopResponse()
     
 
-class MultiUserTranscriber:
+class SingleUserTranscriber:
     def __init__(self, ctx: JobContext):
         self.ctx = ctx
-        self._sessions: dict[str, AgentSession] = {}
-        self._tasks: set[asyncio.Task] = set()
+        self._session: AgentSession = None
+        self._task: asyncio.Task = None
 
     def start(self):
         self.ctx.room.on("participant_connected", self.on_participant_connected)
         self.ctx.room.on("participant_disconnected", self.on_participant_disconnected)
 
     async def aclose(self):
-        await utils.aio.cancel_and_wait(*self._tasks)
+        await utils.aio.cancel_and_wait(*self._task)
 
-        await asyncio.gather(*[self._close_session(session) for session in self._sessions.values()])
+        await asyncio.gather(*[self._close_session(self._session)])
 
         self.ctx.room.off("participant_connected", self.on_participant_connected)
         self.ctx.room.off("participant_disconnected", self.on_participant_disconnected)
 
     def on_participant_connected(self, participant: rtc.RemoteParticipant):
-        if participant.identity in self._sessions:
+        if self._session is not None:
             return
 
         logger.info(f"starting session for {participant.identity}")
         task = asyncio.create_task(self._start_session(participant))
-        self._tasks.add(task)
+        self._task = task
 
         def on_task_done(task: asyncio.Task):
             try:
-                self._sessions[participant.identity] = task.result()
+                self._session = task.result()
             finally:
-                self._tasks.discard(task)
+                self._task = None
 
         task.add_done_callback(on_task_done)
 
     def on_participant_disconnected(self, participant: rtc.RemoteParticipant):
-        if (session := self._sessions.pop(participant.identity)) is None:
+        if self._session is None:
             return
 
         logger.info(f"closing session for {participant.identity}")
-        task = asyncio.create_task(self._close_session(session))
-        self._tasks.add(task)
-        task.add_done_callback(lambda _: self._tasks.discard(task))
+        task = asyncio.create_task(self._close_session(self._session))
+        self._task = task
+        task.add_done_callback(lambda _: setattr(self, '_task', None))
 
     async def _start_session(self, participant: rtc.RemoteParticipant) -> AgentSession:
-        if participant.identity in self._sessions:
-            return self._sessions[participant.identity]
+        if self._session is not None:
+            return self._session
 
         session = AgentSession(
             vad=self.ctx.proc.userdata["vad"],
@@ -259,7 +259,7 @@ class MultiUserTranscriber:
 
 
 async def entrypoint2(ctx: JobContext):
-    transcriber = MultiUserTranscriber(ctx)
+    transcriber = SingleUserTranscriber(ctx)
     transcriber.start()
 
     await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
