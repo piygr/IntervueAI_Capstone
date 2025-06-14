@@ -115,7 +115,7 @@ const ResumeUploadPopup = ({ jdId, onClose }: { jdId: string; onClose: () => voi
               onClick={handleResumeUpload}
               disabled={!file || isUploading}
               className={`px-4 py-2 rounded-md text-white text-sm font-semibold ${
-                file ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-400 cursor-not-allowed'
+                (file && !isUploading) ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-gray-400 cursor-not-allowed'
               } transition-colors`}
             >
               {isUploading ? 'Uploading...' : 'Upload & Start Interview'}
