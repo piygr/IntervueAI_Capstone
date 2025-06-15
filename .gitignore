@@ -210,3 +210,5 @@ cython_debug/
 
 # session logs
 session_logs/
+
+.vscode/
