@@ -106,7 +106,7 @@ def train_model(model_type="custom-llama3-1b"):
     val_dataset = TextDataset(val_texts, tokenizer)
 
     # === Step 8: Initialize wandb ===
-    os.environ["WANDB_MODE"] = "offline"
+    os.environ["WANDB_MODE"] = "online"
     run = wandb.init(project="llama3-training", name=f"{model_type}-pretraining", 
     #                  config = {
     #     "model_type": model_type,
@@ -141,8 +141,8 @@ def train_model(model_type="custom-llama3-1b"):
         weight_decay=0.01,  # L2 regularization
         learning_rate=2e-5,
         max_grad_norm=1.0,  # Gradient clipping
-        # report_to="wandb",
-        report_to="none",
+        report_to="wandb",
+        # report_to="none",
     )
     
     # Initialize trainer
