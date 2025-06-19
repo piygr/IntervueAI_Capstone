@@ -10,7 +10,7 @@ import logging
 import sys
 from utils.resume_pdf_parser import parse_resume_pdf
 from utils.interview_planner import generate_interview_plan
-from utils.session import update_session
+from utils.session import update_session, fetch_session
 
 logger = logging.getLogger("start-interview")
 
@@ -48,7 +48,8 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
     with open(jd_path, "r", encoding="utf-8") as file:
         jd_json = file.read()
 
-    resume_json = await parse_resume_pdf(resume)
+    session_dict = fetch_session(interviewId)
+    resume_json = session_dict.get('resume')
     
     if resume_json:
         interview_plan = await generate_interview_plan(jd_json, resume_json, 45)
@@ -58,7 +59,7 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
                                 resume=resume_json, 
                                 interview_plan=interview_plan)
             
-            update_session(interview_id, session_dict)
+            update_session(interviewId, session_dict)
 
             return JSONResponse(content={
                 "participantToken": token,

@@ -48,11 +48,11 @@ class Interviewer:
             prompt = self.system_prompt.format(memory=memory, interview_phase=interview_phase)
             #logger.info(prompt)
             response = await call_llm_with_timeout(client, prompt)
-            raw = response.text.strip()
-            cleaned = re.sub(r"```json|```", "", raw).strip()
-            raw_json = json.loads(cleaned)
-            logger.info(f"LLM output: {raw_json}")
-            return raw_json
+            #raw = response.text.strip()
+            #cleaned = re.sub(r"```json|```", "", raw).strip()
+            response_json = json.loads(response)
+            logger.info(f"LLM output: {response_json}")
+            return response_json
 
         except Exception as e:
             logger.info(f"⚠️ llm failed to parse resume: {e}")

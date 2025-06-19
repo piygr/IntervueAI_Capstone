@@ -45,7 +45,15 @@ async def parse_resume_pdf(file: UploadFile) -> Tuple[bool, str]:
         # logger.info(f"Resume Markdown: {md_text}")
         logger.info(f"✅ Resume parsed to markdown successfully")
 
-        return await call_llm(md_text)
+        success, resume_parsed = await call_llm(md_text)
+        if resume_parsed:
+          #text = resume_parsed.strip()
+          #cleaned = re.sub(r"```json|```", "", text).strip()
+          resume_parsed_json = json.loads(resume_parsed)
+          return success, resume_parsed_json
+        else:
+            logger.error("LLM failed to parse resume.")
+            return success, None
 
     except Exception as e:
         logger.error(f"❌ Unexpected error while parsing PDF: {e}")
