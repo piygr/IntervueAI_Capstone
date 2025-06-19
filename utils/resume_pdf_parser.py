@@ -27,9 +27,9 @@ async def parse_resume_pdf(file: UploadFile) -> str:
 
     resume_parsed = await call_llm(md_text)
     if resume_parsed:
-      text = resume_parsed.strip()
-      cleaned = re.sub(r"```json|```", "", text).strip()
-      resume_parsed_json = json.loads(cleaned)
+      #text = resume_parsed.strip()
+      #cleaned = re.sub(r"```json|```", "", text).strip()
+      resume_parsed_json = json.loads(resume_parsed)
       return resume_parsed_json
     else:
         logger.error("LLM failed to parse resume.")
@@ -91,5 +91,5 @@ Here is the resume:
         return raw
 
     except Exception as e:
-        logger.error(f"⚠️ llm failed to parse resume: {e}")
+        logger.error(f"⚠️ llm failed to parse resume: {repr(e)}")
         return ""

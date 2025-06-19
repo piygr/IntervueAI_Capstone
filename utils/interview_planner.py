@@ -26,9 +26,7 @@ async def generate_interview_plan(jd_json, resume_json, scheduled_interview_dura
 
                 prompt = system_prompt.format(jd=jd_json, resume=resume_json, scheduled_duration_in_minutes=scheduled_interview_duration_in_minutes)
                 interview_plan = await call_llm(prompt)
-                text = interview_plan.strip()
-                cleaned = re.sub(r"```json|```", "", text).strip()
-                interview_plan_json = json.loads(cleaned)
+                interview_plan_json = json.loads(interview_plan)
                 return interview_plan_json
             
     return {}
@@ -37,9 +35,9 @@ async def generate_interview_plan(jd_json, resume_json, scheduled_interview_dura
 async def call_llm(prompt: str) -> str:
     try:
         response = await call_llm_with_timeout(client, prompt)
-        raw = response.text.strip()
-        logger.info(f"LLM output: {raw.strip()}")
-        return raw.strip()
+        
+        logger.info(f"LLM output: {response}")
+        return response
 
     except Exception as e:
         logger.info(f"⚠️ llm failed to create intervue plan: {e}")

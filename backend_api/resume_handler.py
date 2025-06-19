@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from utils.jd_resume_matcher import compare_jd_resume
 from utils.resume_pdf_parser import parse_resume_pdf
-from utils.utils import update_session
+from utils.session import update_session
 load_dotenv()
 
 # Environment variables or secure config
