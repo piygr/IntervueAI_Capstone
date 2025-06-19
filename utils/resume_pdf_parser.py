@@ -5,7 +5,7 @@ import logging
 import fitz
 from dotenv import load_dotenv
 from google import genai
-
+import re, json
 from utils.llm import call_llm_with_timeout
 
 logger = logging.getLogger("resume_pdf_parser")
@@ -25,7 +25,15 @@ async def parse_resume_pdf(file: UploadFile) -> str:
     doc = fitz.open(stream=file_bytes, filetype="pdf")  # Create a PyMuPDF Document
     md_text = pymupdf4llm.to_markdown(doc) 
 
-    return await call_llm(md_text)
+    resume_parsed = await call_llm(md_text)
+    if resume_parsed:
+      text = resume_parsed.strip()
+      cleaned = re.sub(r"```json|```", "", text).strip()
+      resume_parsed_json = json.loads(cleaned)
+      return resume_parsed_json
+    else:
+        logger.error("LLM failed to parse resume.")
+        return None
 
 
 async def call_llm(resume_parsed: str) -> str:
@@ -43,6 +51,7 @@ Also, rate each skill on a scale of 1 to 5, based on how strongly it is reflecte
 Return the result in the following structured JSON format:
 
 {{
+  "candidate_name": "Gaurav Harsh",
   "experience": "10 years",
   "skills": [{{"name": "Kotlin", "rating": 5}}],
   "projects": [
@@ -82,5 +91,5 @@ Here is the resume:
         return raw
 
     except Exception as e:
-        logger.error(f"⚠️ llm failed to parse resume: {repr(e)}")
-        return "error"
+        logger.error(f"⚠️ llm failed to parse resume: {e}")
+        return ""
