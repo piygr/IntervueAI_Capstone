@@ -8,7 +8,7 @@ import logging
 import fitz
 from dotenv import load_dotenv
 from google import genai
-
+import re, json
 from utils.llm import call_llm_with_timeout
 
 logger = logging.getLogger("resume_pdf_parser")
@@ -78,6 +78,7 @@ Also, rate each skill on a scale of 1 to 5, based on how strongly it is reflecte
 Return the result in the following structured JSON format:
 
 {{
+  "candidate_name": "Gaurav Harsh",
   "experience": "10 years",
   "skills": [{{"name": "Kotlin", "rating": 5}}],
   "projects": [

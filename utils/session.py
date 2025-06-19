@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 
 def update_session(session_id, new_data):
-    folder_path = "session_logs"
+    folder_path = "logs/sessions"
     filename = f"{session_id}.json"
     # Ensure folder exists
     os.makedirs(folder_path, exist_ok=True)
@@ -34,7 +34,7 @@ def update_session(session_id, new_data):
 
 
 def fetch_session(session_id):
-    folder_path = "session_logs"
+    folder_path = "logs/sessions"
     filename = f"{session_id}.json"
     
     file_path = os.path.join(folder_path, filename)

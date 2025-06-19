@@ -20,25 +20,28 @@ from livekit.agents import (
     llm,
     utils
 )
+
 from livekit.agents.llm.chat_context import ChatContext, ChatMessage
 from livekit.plugins import (
     openai,
     silero,
     aws,
-    google
+    google,
+    noise_cancellation
 )
 #from livekit.plugins.turn_detector.english import EnglishModel
 
-from utils.utils import fetch_session
-
+from utils.session import fetch_session
+from agents.coordinator import Coordinator
 import os
 
 load_dotenv(dotenv_path=".env.local")
 logger = logging.getLogger("voice-agent")
 
 llm_model = google.LLM(
-        model="gemini-2.0-flash",
-    )
+    model="gemini-2.0-flash",
+)
+
 stt = aws.STT()
 tts = aws.TTS(
     voice="Kajal",
@@ -97,7 +100,7 @@ Here is the candidate's resume:
 def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
 
-
+'''
 async def entrypoint(ctx: JobContext):
 
     await ctx.connect(
@@ -162,13 +165,14 @@ async def entrypoint(ctx: JobContext):
 
     await session.start(room=ctx.room, agent=agent)
 
-
+'''
 
 class Transcriber(Agent):
     def __init__(self, *, participant_identity: str):
         super().__init__(
             instructions="not-needed",
-            stt=stt
+            stt=stt,
+            tts=tts
         )
         self.participant_identity = participant_identity
 
@@ -178,7 +182,7 @@ class Transcriber(Agent):
         self.session.say("I am listening...")
         raise StopResponse()
     
-
+'''
 class SingleUserTranscriber:
     def __init__(self, ctx: JobContext):
         self.ctx = ctx
@@ -271,13 +275,104 @@ async def entrypoint2(ctx: JobContext):
         await transcriber.aclose()
 
     ctx.add_shutdown_callback(cleanup)
-    
+
+'''
+
+async def entrypoint(ctx: JobContext):
+
+    await ctx.connect(
+        auto_subscribe=AutoSubscribe.AUDIO_ONLY,
+    )
+    logger.info(f"connecting to room {ctx.room.name}")
+    logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
+
+    session_id = ctx.room.name.replace('interview-', '')
+
+    ### Fetching session details eg. JD, Resume ####
+    session_details = fetch_session(session_id)
+    # logger.info(fetch_session(session_id))
+    ### 
+
+    # Wait for the first participant to connect
+    participant = await ctx.wait_for_participant()
+    logger.info(f"starting voice assistant for participant {participant.identity}")
+
+    usage_collector = metrics.UsageCollector()
+
+    # Log metrics and collect usage data
+    def on_metrics_collected(agent_metrics: metrics.AgentMetrics):
+        metrics.log_metrics(agent_metrics)
+        usage_collector.collect(agent_metrics)
+
+    agent = Coordinator(
+        participant_identity=participant.identity,
+        interview_plan=session_details.get("interview_plan")
+    )
+    #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
+
+    session = AgentSession(
+        vad=ctx.proc.userdata["vad"],
+        # minimum delay for endpointing, used when turn detector believes the user is done with their turn
+        min_endpointing_delay=1,
+        # maximum delay for endpointing, used when turn detector does not believe the user is done with their turn
+        max_endpointing_delay=5.0,
+        allow_interruptions=True,
+        min_interruption_words=5
+    )
+
+    # Trigger the on_metrics_collected function when metrics are collected
+    session.on("metrics_collected", on_metrics_collected)
+
+    try:
+        logger.info("Waiting for participant to join (max 30s)...")
+        #participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=300)
+        logger.info(f"Participant joined: {participant.identity}")
+    except asyncio.TimeoutError:
+        logger.warning("No participant joined within 30 seconds. Shutting down agent.")
+        await ctx.close()
+        return  # Exits the entrypoint, safely ends the subprocess
+
+    await session.start(
+        room=ctx.room, 
+        agent=agent,
+        room_input_options=RoomInputOptions(
+            text_enabled=False,
+            #noise_cancellation=noise_cancellation.BVC()
+        ),
+        room_output_options=RoomOutputOptions(
+            transcription_enabled=True,
+            audio_enabled=True,
+        )
+    )
+
+    from livekit.agents import UserInputTranscribedEvent
+    from livekit.agents import ConversationItemAddedEvent
+    from livekit.agents.llm import ImageContent, AudioContent
+
+    #@session.on("user_input_transcribed")
+    def on_user_input_transcribed(event: UserInputTranscribedEvent):
+        print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
+        session.say("Test message", allow_interruptions=False)
+
+    #@session.on("conversation_item_added")
+    def on_conversation_item_added(event: ConversationItemAddedEvent):
+        print(f"Conversation item added from {event.item.role}: {event.item.text_content}. interrupted: {event.item.interrupted}")
+        # to iterate over all types of content:
+        for content in event.item.content:
+            if isinstance(content, str):
+                print(f" - text: {content}")
+            elif isinstance(content, ImageContent):
+                # image is either a rtc.VideoFrame or URL to the image
+                print(f" - image: {content.image}")
+            elif isinstance(content, AudioContent):
+                # frame is a list[rtc.AudioFrame]
+                print(f" - audio: {content.frame}, transcript: {content.transcript}")
 
 
 if __name__ == "__main__":
     cli.run_app(
         WorkerOptions(
-            entrypoint_fnc=entrypoint2,
+            entrypoint_fnc=entrypoint,
             prewarm_fnc=prewarm,
         ),
     )

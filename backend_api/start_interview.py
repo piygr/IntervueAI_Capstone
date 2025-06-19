@@ -1,7 +1,7 @@
 # File: backend_api/start_interview.py
 
 from fastapi import APIRouter, UploadFile, Form, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from livekit import api
 import uuid
 import os
@@ -9,7 +9,8 @@ from dotenv import load_dotenv
 import logging
 import sys
 from utils.resume_pdf_parser import parse_resume_pdf
-from utils.utils import update_session
+from utils.interview_planner import generate_interview_plan
+from utils.session import update_session
 
 logger = logging.getLogger("start-interview")
 
@@ -36,20 +37,41 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
         room=room_name,
     )).to_jwt()
 
-    # Generate LiveKit access token for candidate
-    #token = AccessToken(LIVEKIT_API_KEY, LIVEKIT_API_SECRET, identity=interview_id)
-    #token.add_grant(VideoGrant(room_join=True, room=room_name))
-    #participant_token = token.to_jwt()
-
+    
     # Log or store the resume, jobId, and room_name if needed
     print(f"Interview session created: room={room_name}, jobId={jobId}")
     print("interview_id: ", interviewId)
 
-    session_dict = dict(room=room_name)
-    update_session(interviewId, session_dict)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    jd_path = os.path.join(script_dir, "..", "job_description", f"{jobId}.json")
 
-    return JSONResponse(content={
-        "participantToken": token,
-        "serverUrl": LIVEKIT_SERVER_URL,
-        "roomName": room_name
-    })
+    with open(jd_path, "r", encoding="utf-8") as file:
+        jd_json = file.read()
+
+    resume_json = await parse_resume_pdf(resume)
+    
+    if resume_json:
+        interview_plan = await generate_interview_plan(jd_json, resume_json, 45)
+        if interview_plan:
+            session_dict = dict(room=room_name, 
+                                JD=f"{jobId}", 
+                                resume=resume_json, 
+                                interview_plan=interview_plan)
+            
+            update_session(interview_id, session_dict)
+
+            return JSONResponse(content={
+                "participantToken": token,
+                "serverUrl": LIVEKIT_SERVER_URL,
+                "roomName": room_name
+            })
+        else:
+            return JSONResponse(
+                status_code=500,
+                content="Error creatig interview plan"
+            )
+    else:
+        return JSONResponse(
+                status_code=500,
+                content="Error parsing the resume"
+            )
