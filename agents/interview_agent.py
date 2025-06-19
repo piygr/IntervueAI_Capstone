@@ -284,7 +284,7 @@ async def entrypoint(ctx: JobContext):
         auto_subscribe=AutoSubscribe.AUDIO_ONLY,
     )
     logger.info(f"connecting to room {ctx.room.name}")
-    logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
+    #logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
 
     session_id = ctx.room.name.replace('interview-', '')
 
