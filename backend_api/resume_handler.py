@@ -55,7 +55,7 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
         overall_score = match_data.get('overall_score', 0)
         logger.info(f"Overall score: {overall_score}")
         
-        if overall_score >= 6:
+        if overall_score >= 2:
             logger.info(f"Overall score is good: {overall_score}")
             # If score is good, return success with score and proceed to interview
             session_dict = dict(JD=f"{jobId}", resume=resume_text)

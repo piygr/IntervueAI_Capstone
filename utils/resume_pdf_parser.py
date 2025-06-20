@@ -87,6 +87,8 @@ Return the result in the following structured JSON format:
 
 {{
   "candidate_name": "Gaurav Harsh",
+  "candidate_first_name": "Gaurav",
+  "candidate_email": "gaurav.harsh@gmail.com",
   "experience": "10 years",
   "skills": [{{"name": "Kotlin", "rating": 5}}],
   "projects": [

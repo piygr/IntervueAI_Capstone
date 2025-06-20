@@ -11,6 +11,7 @@ import sys
 from utils.resume_pdf_parser import parse_resume_pdf
 from utils.interview_planner import generate_interview_plan
 from utils.session import update_session, fetch_session
+import json
 
 logger = logging.getLogger("start-interview")
 
@@ -44,9 +45,11 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
     jd_path = os.path.join(script_dir, "..", "job_description", f"{jobId}.json")
-
+    jd_json = {}
     with open(jd_path, "r", encoding="utf-8") as file:
-        jd_json = file.read()
+        jd_text = file.read()
+        if jd_text:
+            jd_json = json.loads(jd_text)
 
     session_dict = fetch_session(interviewId)
     resume_json = session_dict.get('resume')
@@ -54,10 +57,20 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
     if resume_json:
         interview_plan = await generate_interview_plan(jd_json, resume_json, 45)
         if interview_plan:
+            interview_context = dict(
+                candidate_first_name=resume_json.get('candidate_first_name', ''),
+                candidate_name=resume_json.get('candidate_name', ''),
+                candidate_email=resume_json.get('candidate_email', ''),
+                company_name=jd_json.get('company', ''),
+                jd_role=jd_json.get('title', '')
+            )
+            interview_context = json.loads(json.dumps(interview_context))
+            
             session_dict = dict(room=room_name, 
                                 JD=f"{jobId}", 
                                 resume=resume_json, 
-                                interview_plan=interview_plan)
+                                interview_plan=interview_plan,
+                                interview_context=interview_context)
             
             update_session(interviewId, session_dict)
 
