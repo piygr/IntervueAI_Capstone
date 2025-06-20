@@ -26,8 +26,14 @@ async def generate_interview_plan(jd_json, resume_json, scheduled_interview_dura
 
                 prompt = system_prompt.format(jd=jd_json, resume=resume_json, scheduled_duration_in_minutes=scheduled_interview_duration_in_minutes)
                 interview_plan = await call_llm(prompt)
-                interview_plan_json = json.loads(interview_plan)
-                return interview_plan_json
+                if interview_plan:
+                    try:
+                        interview_plan_json = json.loads(interview_plan)
+                        return interview_plan_json
+                    except Exception as e:
+                         logger.debug(interview_plan)
+                         logger.error(f"Error parsing json interview plan: {e}")
+                         return interview_plan
             
     return {}
 

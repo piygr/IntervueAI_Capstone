@@ -129,19 +129,16 @@ class Coordinator(Agent):
             else:
                 full_output += str(chunk)
 
-        logger.info(full_output)
-        #return full_output
         try:
             logger.info(full_output)
             if full_output:
-                async with self._lock:
-                    json_object = json.loads(extract_json_string(full_output))
-                    if json_object.get('agent_action') not in ['stay_silent'] \
-                        or (time.time() - self.agent_last_conversation) > 10:
-                        self.agent_last_conversation = time.time()
-                        return json_object.get('agent_action_message')
-                    else:
-                        return ""
+                json_object = json.loads(extract_json_string(full_output))
+                if json_object.get('agent_action') not in ['stay_silent'] \
+                    or (time.time() - self.agent_last_conversation) > 10:
+                    self.agent_last_conversation = time.time()
+                    return json_object.get('agent_action_message')
+                else:
+                    return ""
             else:
                 return ""
         except Exception as e:

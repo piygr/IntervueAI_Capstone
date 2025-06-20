@@ -100,7 +100,6 @@ Here is the candidate's resume:
 def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
 
-'''
 async def entrypoint(ctx: JobContext):
 
     await ctx.connect(
@@ -182,7 +181,6 @@ class Transcriber(Agent):
         self.session.say("I am listening...")
         raise StopResponse()
     
-'''
 class SingleUserTranscriber:
     def __init__(self, ctx: JobContext):
         self.ctx = ctx
@@ -306,10 +304,10 @@ async def entrypoint(ctx: JobContext):
 
     agent = Coordinator(
         participant_identity=participant.identity,
-        interview_plan=session_details.get("interview_plan")
+        interview_plan=session_details.get("interview_plan"),
+        interview_context=session_details.get("interview_context")
     )
-    #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
-
+    
     session = AgentSession(
         vad=ctx.proc.userdata["vad"],
         # minimum delay for endpointing, used when turn detector believes the user is done with their turn
@@ -344,29 +342,6 @@ async def entrypoint(ctx: JobContext):
             audio_enabled=True,
         )
     )
-
-    from livekit.agents import UserInputTranscribedEvent
-    from livekit.agents import ConversationItemAddedEvent
-    from livekit.agents.llm import ImageContent, AudioContent
-
-    #@session.on("user_input_transcribed")
-    def on_user_input_transcribed(event: UserInputTranscribedEvent):
-        print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
-        session.say("Test message", allow_interruptions=False)
-
-    #@session.on("conversation_item_added")
-    def on_conversation_item_added(event: ConversationItemAddedEvent):
-        print(f"Conversation item added from {event.item.role}: {event.item.text_content}. interrupted: {event.item.interrupted}")
-        # to iterate over all types of content:
-        for content in event.item.content:
-            if isinstance(content, str):
-                print(f" - text: {content}")
-            elif isinstance(content, ImageContent):
-                # image is either a rtc.VideoFrame or URL to the image
-                print(f" - image: {content.image}")
-            elif isinstance(content, AudioContent):
-                # frame is a list[rtc.AudioFrame]
-                print(f" - audio: {content.frame}, transcript: {content.transcript}")
 
 
 if __name__ == "__main__":
