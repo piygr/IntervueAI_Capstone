@@ -107,7 +107,7 @@ def train_model(model_type="custom-llama3-1b"):
 
     # === Step 8: Initialize wandb ===
     os.environ["WANDB_MODE"] = "online"
-    run = wandb.init(project="llama3-training", name=f"{model_type}-pretraining", 
+    wandb_run = wandb.init(project="llama3-training", name=f"{model_type}-pretraining", 
     #                  config = {
     #     "model_type": model_type,
     #     "learning_rate": 2e-5,
@@ -170,7 +170,7 @@ def train_model(model_type="custom-llama3-1b"):
     tokenizer.save_pretrained("./llama3_final_model")
     
     # Close wandb
-    run.finish()
+    wandb_run.finish()
 
 if __name__ == "__main__":
     import argparse
