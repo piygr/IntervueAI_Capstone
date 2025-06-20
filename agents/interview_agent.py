@@ -100,199 +100,18 @@ Here is the candidate's resume:
 def prewarm(proc: JobProcess):
     proc.userdata["vad"] = silero.VAD.load()
 
-'''
 async def entrypoint(ctx: JobContext):
 
     await ctx.connect(
         auto_subscribe=AutoSubscribe.AUDIO_ONLY,
     )
     logger.info(f"connecting to room {ctx.room.name}")
-    logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
-
+    
     session_id = ctx.room.name.replace('interview-', '')
 
     ### Fetching session details eg. JD, Resume ####
     session_details = fetch_session(session_id)
-    # logger.info(fetch_session(session_id))
-    ### 
-
-    # Wait for the first participant to connect
-    participant = await ctx.wait_for_participant()
-    logger.info(f"starting voice assistant for participant {participant.identity}")
-
-    usage_collector = metrics.UsageCollector()
-
-    #def on_transcription_received(segments):
-    #    print("received transcription")
-    #    print(segments)
-
-    # Log metrics and collect usage data
-    def on_metrics_collected(agent_metrics: metrics.AgentMetrics):
-        metrics.log_metrics(agent_metrics)
-        usage_collector.collect(agent_metrics)
-
-    jd_id = session_details.get("JD")
-
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    jd_path = os.path.join(script_dir, "..", "job_description", f"{jd_id}.json")
-
-    with open(jd_path, "r", encoding="utf-8") as file:
-        jd_text = file.read()
-
-    agent = Assistant(job_description=jd_text, resume=session_details.get("resume"))
     
-    #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
-
-    session = AgentSession(
-        vad=ctx.proc.userdata["vad"],
-        # minimum delay for endpointing, used when turn detector believes the user is done with their turn
-        min_endpointing_delay=0.5,
-        # maximum delay for endpointing, used when turn detector does not believe the user is done with their turn
-        max_endpointing_delay=5.0
-    )
-
-    # Trigger the on_metrics_collected function when metrics are collected
-    session.on("metrics_collected", on_metrics_collected)
-
-    try:
-        logger.info("Waiting for participant to join (max 30s)...")
-        #participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=300)
-        logger.info(f"Participant joined: {participant.identity}")
-    except asyncio.TimeoutError:
-        logger.warning("No participant joined within 30 seconds. Shutting down agent.")
-        await ctx.close()
-        return  # Exits the entrypoint, safely ends the subprocess
-
-    await session.start(room=ctx.room, agent=agent)
-
-'''
-
-class Transcriber(Agent):
-    def __init__(self, *, participant_identity: str):
-        super().__init__(
-            instructions="not-needed",
-            stt=stt,
-            tts=tts
-        )
-        self.participant_identity = participant_identity
-
-    async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
-        user_transcript = new_message.text_content
-        logger.info(f"{self.participant_identity} -> {user_transcript}")
-        self.session.say("I am listening...")
-        raise StopResponse()
-    
-'''
-class SingleUserTranscriber:
-    def __init__(self, ctx: JobContext):
-        self.ctx = ctx
-        self._session: AgentSession = None
-        self._task: asyncio.Task = None
-
-    def start(self):
-        self.ctx.room.on("participant_connected", self.on_participant_connected)
-        self.ctx.room.on("participant_disconnected", self.on_participant_disconnected)
-
-    async def aclose(self):
-        await utils.aio.cancel_and_wait(*self._task)
-
-        await asyncio.gather(*[self._close_session(self._session)])
-
-        self.ctx.room.off("participant_connected", self.on_participant_connected)
-        self.ctx.room.off("participant_disconnected", self.on_participant_disconnected)
-
-    def on_participant_connected(self, participant: rtc.RemoteParticipant):
-        if self._session is not None:
-            return
-
-        logger.info(f"starting session for {participant.identity}")
-        task = asyncio.create_task(self._start_session(participant))
-        self._task = task
-
-        def on_task_done(task: asyncio.Task):
-            try:
-                self._session = task.result()
-            finally:
-                self._task = None
-
-        task.add_done_callback(on_task_done)
-
-    def on_participant_disconnected(self, participant: rtc.RemoteParticipant):
-        if self._session is None:
-            return
-
-        logger.info(f"closing session for {participant.identity}")
-        task = asyncio.create_task(self._close_session(self._session))
-        self._task = task
-        task.add_done_callback(lambda _: setattr(self, '_task', None))
-
-    async def _start_session(self, participant: rtc.RemoteParticipant) -> AgentSession:
-        if self._session is not None:
-            return self._session
-
-        session = AgentSession(
-            vad=self.ctx.proc.userdata["vad"],
-            tts=tts
-        )
-        room_io = RoomIO(
-            agent_session=session,
-            room=self.ctx.room,
-            participant=participant,
-            input_options=RoomInputOptions(
-                # text input is not supported for multiple room participants
-                # if needed, register the text stream handler by yourself
-                # and route the text to different sessions based on the participant identity
-                text_enabled=False,
-            ),
-            output_options=RoomOutputOptions(
-                transcription_enabled=True,
-                audio_enabled=True,
-            ),
-        )
-        await room_io.start()
-        await session.start(
-            agent=Transcriber(
-                participant_identity=participant.identity
-            )
-        )
-        return session
-
-    async def _close_session(self, sess: AgentSession) -> None:
-        await sess.drain()
-        await sess.aclose()
-
-
-async def entrypoint2(ctx: JobContext):
-    transcriber = SingleUserTranscriber(ctx)
-    transcriber.start()
-
-    await ctx.connect(auto_subscribe=AutoSubscribe.AUDIO_ONLY)
-    for participant in ctx.room.remote_participants.values():
-        # handle all existing participants
-        transcriber.on_participant_connected(participant)
-
-    async def cleanup():
-        await transcriber.aclose()
-
-    ctx.add_shutdown_callback(cleanup)
-
-'''
-
-async def entrypoint(ctx: JobContext):
-
-    await ctx.connect(
-        auto_subscribe=AutoSubscribe.AUDIO_ONLY,
-    )
-    logger.info(f"connecting to room {ctx.room.name}")
-    #logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
-
-    session_id = ctx.room.name.replace('interview-', '')
-
-    ### Fetching session details eg. JD, Resume ####
-    session_details = fetch_session(session_id)
-    # logger.info(fetch_session(session_id))
-    ### 
-
     # Wait for the first participant to connect
     participant = await ctx.wait_for_participant()
     logger.info(f"starting voice assistant for participant {participant.identity}")
@@ -306,10 +125,10 @@ async def entrypoint(ctx: JobContext):
 
     agent = Coordinator(
         participant_identity=participant.identity,
-        interview_plan=session_details.get("interview_plan")
+        interview_plan=session_details.get("interview_plan"),
+        interview_context=session_details.get("interview_context")
     )
-    #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
-
+    
     session = AgentSession(
         vad=ctx.proc.userdata["vad"],
         # minimum delay for endpointing, used when turn detector believes the user is done with their turn
@@ -344,29 +163,6 @@ async def entrypoint(ctx: JobContext):
             audio_enabled=True,
         )
     )
-
-    from livekit.agents import UserInputTranscribedEvent
-    from livekit.agents import ConversationItemAddedEvent
-    from livekit.agents.llm import ImageContent, AudioContent
-
-    #@session.on("user_input_transcribed")
-    def on_user_input_transcribed(event: UserInputTranscribedEvent):
-        print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
-        session.say("Test message", allow_interruptions=False)
-
-    #@session.on("conversation_item_added")
-    def on_conversation_item_added(event: ConversationItemAddedEvent):
-        print(f"Conversation item added from {event.item.role}: {event.item.text_content}. interrupted: {event.item.interrupted}")
-        # to iterate over all types of content:
-        for content in event.item.content:
-            if isinstance(content, str):
-                print(f" - text: {content}")
-            elif isinstance(content, ImageContent):
-                # image is either a rtc.VideoFrame or URL to the image
-                print(f" - image: {content.image}")
-            elif isinstance(content, AudioContent):
-                # frame is a list[rtc.AudioFrame]
-                print(f" - audio: {content.frame}, transcript: {content.transcript}")
 
 
 if __name__ == "__main__":
