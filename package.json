@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@uiw/react-textarea-code-editor": "^3.1.1",
+    "react-resizable-panels": "^3.0.3",
+    "react-split": "^2.0.14"
+  }
+}

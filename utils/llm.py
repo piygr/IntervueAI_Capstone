@@ -14,7 +14,7 @@ load_dotenv()
 # api_key = os.getenv("GEMINI_API_KEY")
 # client = genai.Client(api_key=api_key)
 
-async def call_llm_with_timeout(client, prompt, timeout=10):
+async def call_llm_with_timeout(client, prompt, timeout=30):
     """Generate content using llm with a timeout"""
     logger.info("Starting LLM generation...")
     try:
