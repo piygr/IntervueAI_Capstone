@@ -51,12 +51,12 @@ Also, rate each skill on a scale of 1 to 5, based on how strongly it is reflecte
 Return the result in the following structured JSON format:
 
 {{
-  "candidate_name": "Gaurav Harsh",
-  "candidate_first_name": "Gaurav",
-  "candidate_email": "gaurav.harsh@gmail.com",
-  "experience": "10 years",
-  "skills": [{{"name": "Kotlin", "rating": 5}}],
-  "projects": [
+  "candidate_name": "", // Name of the candidate 
+  "candidate_first_name": "", // First name of the candidate
+  "candidate_email": "",  // Email of the candidate
+  "experience": "10 years", //Candidate's professional experience in number of years
+  "skills": [{{"name": "Kotlin", "rating": 5}}],  // Skills with rating
+  "projects": [   //List of projects that Candidate has undertaken
     {{
       "title": "Multi Modal Listing (MML)",
       "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
@@ -66,8 +66,8 @@ Return the result in the following structured JSON format:
         "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
     }}
   ],
-  "organizations": ["Carousell", "VMWare"],
-  "certifications_or_extras": {{
+  "organizations": ["Carousell", "VMWare"], //List of organizations candidate has worked in 
+  "certifications_or_extras": {{  //Certifications, patents, or any other achievements 
     "patents": [
       {{
         "title": "Reserving physical resources based upon a physical identifier",
@@ -75,8 +75,8 @@ Return the result in the following structured JSON format:
         "patent_number": "US10547712"
       }}
     ],
-    "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
-    "journals_or_publications": [
+    "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",  //Most recent education or degree
+    "journals_or_publications": [ //List of pulications and journals 
       "Navigation Drawer using Jetpack Compose",
       "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
     ]
