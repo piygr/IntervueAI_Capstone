@@ -27,12 +27,12 @@ router = APIRouter(prefix="/api")
 async def start_interview(resume: UploadFile, jobId: str = Form(...)):
     logger.info(f"Received resume for JD: {jobId}")
     interview_id = str(uuid.uuid4())
-    resume_text = await parse_resume_pdf(resume)
+    success, resume_text = await parse_resume_pdf(resume)
 
-    if resume_text == "error":
+    if not success:
         return JSONResponse(content={
             "status": "failure",
-            "message": "Error parsing resume. Please try again."
+            "message": f"Error parsing resume. Please try again. {resume_text}"
         })
 
     script_dir = os.path.dirname(os.path.abspath(__file__))

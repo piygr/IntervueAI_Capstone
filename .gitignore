@@ -212,3 +212,6 @@ pre_training/wandb/*
 
 # session logs
 session_logs/
+
+test.*
+*.pdf
