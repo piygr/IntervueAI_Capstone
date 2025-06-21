@@ -25,6 +25,7 @@ from livekit.agents import (
     ModelSettings
 )
 from livekit.agents.llm.chat_context import ChatContext, ChatMessage
+
 from livekit.plugins import (
     openai,
     silero,
@@ -38,6 +39,7 @@ from utils.session import fetch_session
 from utils.memory import MemoryManager, ConversationItem, InterviewPlan
 
 import os, json
+import random
 import time
 from agents.interviewer import Interviewer
 
@@ -91,7 +93,9 @@ class Coordinator(Agent):
         self.current_qn_index = -1
         self.agent_last_conversation = 0
         self.user_last_coversation = 0
-        
+        self.silence_watchdog_task = None
+        self._cancel_interview_task = None
+        self._lock = asyncio.Lock()
     
     async def llm_node(
         self,
@@ -125,16 +129,19 @@ class Coordinator(Agent):
             else:
                 full_output += str(chunk)
 
+        logger.info(full_output)
+        #return full_output
         try:
             logger.info(full_output)
             if full_output:
-                json_object = json.loads(extract_json_string(full_output))
-                if json_object.get('agent_action') not in ['stay_silent'] \
-                    or (time.time() - self.agent_last_conversation) > 10:
-                    self.agent_last_conversation = time.time()
-                    return json_object.get('agent_action_message')
-                else:
-                    return ""
+                async with self._lock:
+                    json_object = json.loads(extract_json_string(full_output))
+                    if json_object.get('agent_action') not in ['stay_silent'] \
+                        or (time.time() - self.agent_last_conversation) > 10:
+                        self.agent_last_conversation = time.time()
+                        return json_object.get('agent_action_message')
+                    else:
+                        return ""
             else:
                 return ""
         except Exception as e:
@@ -143,8 +150,63 @@ class Coordinator(Agent):
         
 
     async def on_enter(self):
-        self.session.generate_reply(instructions="Greet the candidate and wish luck for the interview")
+        self.session.on("user_input_transcribed", self.user_input_transcribed)
+        self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
+        self.session.generate_reply(instructions="Greet the candidate and wish him/her luck for the interview")
     
+    #async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
+        #self.user_last_coversation = time.time()
+
+    def user_input_transcribed(self, event: UserInputTranscribedEvent):
+        if event.is_final:
+            print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
+            self.user_last_coversation = time.time()
+
+    async def _monitor_silence(self):
+        while True:
+            await asyncio.sleep(10)
+
+            # If agent or user is currently speaking, skip
+            # If both have been silent for over 10 seconds
+            async with self._lock:
+                now = time.time()
+                if self._cancel_interview_task is None and \
+                now - max(self.agent_last_conversation, self.user_last_coversation) > random.randint(15, 20):
+                    l = ["Are you there?", "Could you please tell me what you are thinking?", "Let me know if you need clarification."]
+                    msg = l[random.randint(0, len(l)-1)]
+                    await self.session.say(msg)
+                    self.agent_last_conversation = now
+                    if now - self.user_last_coversation > 60:
+                        self._cancel_interview_task = asyncio.create_task(self._cancel_interview)
+
+    async def _cancel_interview(self):
+        async with self._lock:
+            self.session.say("Looks like you are away, I am cancelling the interview for now. Please connect again later.", allow_interruptions=False)
+            self.silence_watchdog_task.cancel()
+            self.session.aclose()
+
+    '''async def tts_node(
+        self, text: AsyncIterable[str], model_settings: ModelSettings
+    ) -> (
+        AsyncGenerator[rtc.AudioFrame, None]
+        | Coroutine[Any, Any, AsyncIterable[rtc.AudioFrame]]
+        | Coroutine[Any, Any, None]
+    ):
+        llm_resp = ""
+        async for chunk in text:
+            llm_resp += chunk
+        
+        message = ""
+        try:
+            if llm_resp:
+                llm_resp_json = json.loads(extract_json_string(llm_resp))
+                message = llm_resp_json.get("agent_action_message")
+        except Exception as e:
+            logger.error(f"Error in json parsing in tts_node: {e}")
+
+        logger.info(f"tts_node: {message}")
+        yield message'''
+
 """
     async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
         #async with self._lock:
