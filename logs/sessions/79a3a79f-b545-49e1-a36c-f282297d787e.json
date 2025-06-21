@@ -1,0 +1,153 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Anubhav Srivastava",
+    "candidate_first_name": "Anubhav",
+    "candidate_email": "anubhav.bits@gmail.com",
+    "experience": "7+ years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Mobile Development",
+        "rating": 5
+      },
+      {
+        "name": "Architecture",
+        "rating": 4
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Refactoring",
+        "rating": 4
+      },
+      {
+        "name": "Testing",
+        "rating": 4
+      },
+      {
+        "name": "Agile Development",
+        "rating": 3
+      },
+      {
+        "name": "Problem Solving",
+        "rating": 4
+      },
+      {
+        "name": "Mentoring",
+        "rating": 3
+      },
+      {
+        "name": "System Design",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T12:19:12.157709",
+  "room": "interview-79a3a79f-b545-49e1-a36c-f282297d787e",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience building RESTful APIs using Django REST Framework (DRF). What are some of the challenges you faced, and how did you overcome them?",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to optimizing database queries in Django applications, particularly with PostgreSQL.",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you implement authentication and authorization in your Django applications, and what security best practices do you follow?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with writing unit and integration tests in Python/Django. What tools or frameworks do you use?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given a list of integers, write a function to find the second largest number. Discuss its time complexity.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Have you used Celery or other message queue systems? Describe a scenario where you found it particularly useful.",
+        "evaluation_category": "Message Queues",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Based on your experience at Carousell, how have you improved the performance of backend systems that serve a high volume of requests?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your understanding of CI/CD pipelines and their importance in backend development.",
+        "evaluation_category": "DevOps",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Anubhav",
+    "candidate_name": "Anubhav Srivastava",
+    "candidate_email": "anubhav.bits@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Aditya Kumar",
+    "experience": "5 years",
+    "skills": [
+      {
+        "name": "JavaScript",
+        "rating": 5
+      },
+      {
+        "name": "React",
+        "rating": 5
+      },
+      {
+        "name": "Angular",
+        "rating": 5
+      },
+      {
+        "name": "React Native",
+        "rating": 4
+      },
+      {
+        "name": "Redux",
+        "rating": 3
+      },
+      {
+        "name": "Redux-Saga",
+        "rating": 3
+      },
+      {
+        "name": "Node.js",
+        "rating": 3
+      },
+      {
+        "name": "MongoDB",
+        "rating": 3
+      },
+      {
+        "name": "MySQL",
+        "rating": 3
+      },
+      {
+        "name": "Postman",
+        "rating": 3
+      },
+      {
+        "name": "Tailwind CSS",
+        "rating": 3
+      },
+      {
+        "name": "Jenkins",
+        "rating": 3
+      },
+      {
+        "name": "HTML",
+        "rating": 4
+      },
+      {
+        "name": "CSS",
+        "rating": 4
+      },
+      {
+        "name": "Python",
+        "rating": 3
+      },
+      {
+        "name": "AWS",
+        "rating": 3
+      },
+      {
+        "name": "GCP",
+        "rating": 3
+      },
+      {
+        "name": "Azure",
+        "rating": 3
+      },
+      {
+        "name": "Docker",
+        "rating": 3
+      },
+      {
+        "name": "DS & Algo",
+        "rating": 3
+      },
+      {
+        "name": "System Design",
+        "rating": 3
+      },
+      {
+        "name": "Micro-frontend Architecture",
+        "rating": 4
+      },
+      {
+        "name": "Microservices Architecture",
+        "rating": 3
+      },
+      {
+        "name": "B2B SaaS",
+        "rating": 4
+      },
+      {
+        "name": "Team Leadership",
+        "rating": 4
+      },
+      {
+        "name": "E-commerce",
+        "rating": 4
+      },
+      {
+        "name": "Payment Systems Integration",
+        "rating": 4
+      },
+      {
+        "name": "D3.js",
+        "rating": 3
+      },
+      {
+        "name": "RESTful APIs",
+        "rating": 4
+      },
+      {
+        "name": "OAuth",
+        "rating": 4
+      },
+      {
+        "name": "Machine Learning",
+        "rating": 3
+      },
+      {
+        "name": "C/C++",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "Animo - World's First AI Actors Marketplace",
+        "description": "Fine-tuned machine learning models, automated dataset generation (2M+ synthetic annotated images), launched an end-to-end scaled platform with payments, notifications, alerts, queue, and model architecture, onboarded clients, and spearheaded a B2B SaaS revenue stream."
+      },
+      {
+        "title": "Arzooo - B2B Electronics E-Commerce",
+        "description": "Led a team to develop and maintain React Native Android and iOS apps, streamlined launch processes, optimized CodePush, reduced crash rates, enhanced user experience, implemented end-to-end reporting and analytics monitoring, and implemented micro-frontend architecture."
+      },
+      {
+        "title": "Whitehat Jr.",
+        "description": "Facilitated requirement gathering meetings, mentored team members, developed dynamic coach marks, and built a chatbot system."
+      },
+      {
+        "title": "Perpule (Delvit Solutions Pvt. Ltd.)",
+        "description": "Led a team in the payments domain, architected and implemented POS (Point of Sale) software using Angular 6, integrated third-party payment systems, developed a Promotions engine, and migrated the dashboard from Angular 1.5x to Angular 7."
+      },
+      {
+        "title": "Nowfloats Technologies",
+        "description": "Developed a responsive dashboard on Angular 6, integrated 50 social listings/channels with detailed analytics using custom filters, utilized D3 charts framework, and worked with RESTful APIs and integrated OAuth."
+      }
+    ],
+    "organizations": [
+      "Animo",
+      "Arzooo",
+      "Whitehat Jr.",
+      "Perpule (Delvit Solutions Pvt. Ltd.)",
+      "Nowfloats Technologies",
+      "DELHI TECHNOLOGICAL UNIVERSITY"
+    ],
+    "certifications_or_extras": {
+      "education": "B.Tech Engg. Physics, DELHI TECHNOLOGICAL UNIVERSITY, 2014 - 2018",
+      "journals_or_publications": []
+    }
+  },
+  "timestamp": "2025-06-20T21:05:00.541410",
+  "room": "interview-83e10ecc-a026-413f-8d30-59a6ba3b375b",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Explain your experience with Django and DRF, focusing on projects where you built RESTful APIs.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a time when you had to optimize a slow database query in PostgreSQL. What steps did you take?",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "How do you ensure secure authentication and authorization in your APIs?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "What is your experience with Celery and message queues? How have you used them in past projects?",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain the difference between authentication and authorization.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Describe your experience with writing unit and integration tests in Python.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given a list of integers, write a function to find the sum of all even numbers in the list.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How would you monitor and improve the performance of a Django application in a production environment?",
+        "evaluation_category": "System Design",
+        "evaluation_depth": "medium"
+      }
+    ]
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Ankit Choubey",
+    "candidate_first_name": "Ankit",
+    "candidate_email": "ankit.choubey007@gmail.com",
+    "experience": "8 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Mobile Development",
+        "rating": 5
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "REST APIs",
+        "rating": 3
+      },
+      {
+        "name": "Data Structures",
+        "rating": 3
+      },
+      {
+        "name": "Algorithms",
+        "rating": 3
+      },
+      {
+        "name": "System Design",
+        "rating": 3
+      },
+      {
+        "name": "Refactoring",
+        "rating": 4
+      },
+      {
+        "name": "Testing",
+        "rating": 4
+      },
+      {
+        "name": "Architecture",
+        "rating": 4
+      },
+      {
+        "name": "Agile Methodologies",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T21:12:25.327090",
+  "room": "interview-81898814-c97b-42ba-834e-dd4e9c5eee05",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience building RESTful APIs with Django and DRF.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you optimize database queries in Django, especially with PostgreSQL?",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to implementing authentication and authorization in a Django application.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with Celery and message queues.",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain how you would handle a sudden surge in traffic to one of your APIs.",
+        "evaluation_category": "System Design",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "How do you ensure the quality of your code through testing?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given a list of integers, write a function to find the largest product of any three numbers.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Have you used any AWS services in your projects? Which ones?",
+        "evaluation_category": "Cloud Services",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Ankit",
+    "candidate_name": "Ankit Choubey",
+    "candidate_email": "ankit.choubey007@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "JD": "JD-003",
+  "resume": {
+    "candidate_name": "Ashish Deshpande",
+    "experience": "4.5 years",
+    "skills": [
+      {
+        "name": "React",
+        "rating": 5
+      },
+      {
+        "name": "Node.js",
+        "rating": 4
+      },
+      {
+        "name": "Angular",
+        "rating": 4
+      },
+      {
+        "name": "JavaScript",
+        "rating": 5
+      },
+      {
+        "name": "HTML5",
+        "rating": 4
+      },
+      {
+        "name": "CSS3",
+        "rating": 4
+      },
+      {
+        "name": "Redux",
+        "rating": 3
+      },
+      {
+        "name": "Webpack",
+        "rating": 4
+      },
+      {
+        "name": "ECMAScript 6",
+        "rating": 3
+      },
+      {
+        "name": "JQuery",
+        "rating": 3
+      },
+      {
+        "name": "Express.js",
+        "rating": 3
+      },
+      {
+        "name": "Nginx",
+        "rating": 2
+      },
+      {
+        "name": "Docker",
+        "rating": 2
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "SVN",
+        "rating": 2
+      },
+      {
+        "name": "MongoDB",
+        "rating": 2
+      },
+      {
+        "name": "AEM",
+        "rating": 1
+      },
+      {
+        "name": "Rally",
+        "rating": 1
+      },
+      {
+        "name": "Perforce",
+        "rating": 1
+      },
+      {
+        "name": "Swarm",
+        "rating": 1
+      },
+      {
+        "name": "Typescript",
+        "rating": 3
+      },
+      {
+        "name": "Bootstrap",
+        "rating": 3
+      },
+      {
+        "name": "React Native",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "react-excel-renderer",
+        "description": "Published an npm module to render and display excel sheets on web pages"
+      },
+      {
+        "title": "hdfs-uploader",
+        "description": "Developed both front-end(React) and back-end(Node) of a webapp that can be used to upload files to hdfs"
+      },
+      {
+        "title": "remote-shell-file-executor",
+        "description": "Developed a node module that allows user with appropriate credentials to ssh to a machine and execute a shell script remotely"
+      },
+      {
+        "title": "Holidify",
+        "description": "Developed a web application that works as a one-stop-shop to a user going on a holiday using Angular 2. It allowed users to store all holiday related information (booking tickets, hotels, flights etc) under one application"
+      },
+      {
+        "title": "Office Hours",
+        "description": "A react-native application that measures the number of hours spent in office and notifies user after mandatory hours are completed"
+      },
+      {
+        "title": "Employee Management Portal",
+        "description": "An Angular based SPA that deals with simple day-to-day activities of employee"
+      }
+    ],
+    "organizations": [
+      "Amdocs",
+      "Hashmap Inc.",
+      "Xoriant Corporation",
+      "University of Pune"
+    ],
+    "certifications_or_extras": {
+      "education": "Bachelor in Engineering (Computer Science), University of Pune"
+    }
+  },
+  "timestamp": "2025-06-20T18:41:53.921149",
+  "room": "interview-c317f339-181c-4a71-a01d-8316799ebbb6",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe a complex feature you recently developed using React and Node.js. What were the main challenges and how did you overcome them?",
+        "evaluation_category": "Full Stack Development",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Explain the differences between RESTful APIs and GraphQL. When would you choose one over the other?",
+        "evaluation_category": "API Design",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you approach performance optimization for a web application's frontend?",
+        "evaluation_category": "Frontend Performance",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your experience with CI/CD pipelines. Which tools have you used, and what are the key benefits in your opinion?",
+        "evaluation_category": "DevOps",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with database technologies like PostgreSQL or MongoDB.",
+        "evaluation_category": "Database",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Explain the concept of event delegation in JavaScript and provide a use case.",
+        "evaluation_category": "JavaScript Fundamentals",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How familiar are you with testing in React? What kind of tests have you written?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "light"
+      }
+    ]
+  }
+}

@@ -1,0 +1,187 @@
+{
+  "JD": "JD-003",
+  "resume": {
+    "candidate_name": "Ashish Deshpande",
+    "experience": "4.5 years",
+    "skills": [
+      {
+        "name": "React JS",
+        "rating": 5
+      },
+      {
+        "name": "Node JS",
+        "rating": 4
+      },
+      {
+        "name": "Angular JS",
+        "rating": 4
+      },
+      {
+        "name": "Webpack",
+        "rating": 3
+      },
+      {
+        "name": "Javascript",
+        "rating": 4
+      },
+      {
+        "name": "CSS3",
+        "rating": 3
+      },
+      {
+        "name": "HTML5",
+        "rating": 3
+      },
+      {
+        "name": "ECMAScript6",
+        "rating": 3
+      },
+      {
+        "name": "JQuery",
+        "rating": 2
+      },
+      {
+        "name": "Express JS",
+        "rating": 2
+      },
+      {
+        "name": "Nginx",
+        "rating": 2
+      },
+      {
+        "name": "Docker",
+        "rating": 2
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "SVN",
+        "rating": 2
+      },
+      {
+        "name": "Mongo DB",
+        "rating": 2
+      },
+      {
+        "name": "AEM",
+        "rating": 1
+      },
+      {
+        "name": "Rally",
+        "rating": 1
+      },
+      {
+        "name": "Perforce",
+        "rating": 1
+      },
+      {
+        "name": "Swarm",
+        "rating": 1
+      },
+      {
+        "name": "Typescript",
+        "rating": 3
+      },
+      {
+        "name": "Redux",
+        "rating": 2
+      },
+      {
+        "name": "Bootstrap",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "react-excel-renderer",
+        "description": "Published an npm module to render and display excel sheets on web pages"
+      },
+      {
+        "title": "hdfs-uploader",
+        "description": "Developed both front-end(React) and back-end(Node) of a webapp that can be used to upload files to hdfs"
+      },
+      {
+        "title": "remote-shell-file-executor",
+        "description": "Developed a node module that allows user with appropriate credentials to ssh to a machine and execute a shell script remotely"
+      },
+      {
+        "title": "Holidify",
+        "description": "Developed a web application that works as a one-stop-shop to a user going on a holiday using Angular 2. It allowed users to store all holiday related information (booking tickets, hotels, flights etc) under one application"
+      },
+      {
+        "title": "Office Hours",
+        "description": "A react-native application that measures the number of hours spent in office and notifies user after mandatory hours are completed"
+      },
+      {
+        "title": "Employee Management Portal",
+        "description": "An Angular based SPA that deals with simple day-to-day activities of employee"
+      }
+    ],
+    "organizations": [
+      "Amdocs",
+      "Hashmap Inc.",
+      "Xoriant Corporation",
+      "University of Pune"
+    ],
+    "certifications_or_extras": {
+      "education": "Bachelor in Engineering (Computer Science), University of Pune",
+      "achievements": [
+        "Developed and deployed a product, a learning application named \"School In a Box\" in an Australian University that digitizes every form of teaching and eradicates use of book/paper/pen"
+      ]
+    }
+  },
+  "timestamp": "2025-06-20T13:42:19.762646",
+  "room": "interview-d41c603b-1587-4ce5-b22c-da0aed246395",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience with React.js and its core principles.",
+        "evaluation_category": "React JS",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to state management in React applications. What are some common patterns you use?",
+        "evaluation_category": "React JS",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with Node.js and Express.",
+        "evaluation_category": "Node JS",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain how you handle asynchronous operations in Node.js.",
+        "evaluation_category": "Node JS",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you approach testing React and Node.js applications?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Explain your experience with RESTful APIs or GraphQL.",
+        "evaluation_category": "API Design",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with Docker and CI/CD pipelines.",
+        "evaluation_category": "DevOps",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "How do you optimize the performance of a web application, both on the front-end and back-end?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a challenging full-stack project you worked on and the technical challenges you faced.",
+        "evaluation_category": "Problem Solving",
+        "evaluation_depth": "deep"
+      }
+    ]
+  }
+}

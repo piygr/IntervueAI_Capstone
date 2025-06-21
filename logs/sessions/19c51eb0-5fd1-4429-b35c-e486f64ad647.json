@@ -1,0 +1,192 @@
+{
+  "JD": "JD-003",
+  "resume": {
+    "candidate_name": "Ashish Deshpande",
+    "experience": "4.5 years",
+    "skills": [
+      {
+        "name": "React",
+        "rating": 5
+      },
+      {
+        "name": "Node.js",
+        "rating": 4
+      },
+      {
+        "name": "Angular",
+        "rating": 4
+      },
+      {
+        "name": "JavaScript",
+        "rating": 4
+      },
+      {
+        "name": "HTML5",
+        "rating": 3
+      },
+      {
+        "name": "CSS3",
+        "rating": 3
+      },
+      {
+        "name": "Webpack",
+        "rating": 3
+      },
+      {
+        "name": "Typescript",
+        "rating": 2
+      },
+      {
+        "name": "Redux",
+        "rating": 2
+      },
+      {
+        "name": "ECMAScript6",
+        "rating": 3
+      },
+      {
+        "name": "JQuery",
+        "rating": 2
+      },
+      {
+        "name": "Express.js",
+        "rating": 2
+      },
+      {
+        "name": "Nginx",
+        "rating": 1
+      },
+      {
+        "name": "Docker",
+        "rating": 1
+      },
+      {
+        "name": "Git",
+        "rating": 2
+      },
+      {
+        "name": "SVN",
+        "rating": 1
+      },
+      {
+        "name": "MongoDB",
+        "rating": 1
+      },
+      {
+        "name": "AEM",
+        "rating": 1
+      },
+      {
+        "name": "Rally",
+        "rating": 1
+      },
+      {
+        "name": "Perforce",
+        "rating": 1
+      },
+      {
+        "name": "Swarm",
+        "rating": 1
+      },
+      {
+        "name": "Bootstrap",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "react-excel-renderer",
+        "description": "Published an npm module to render and display excel sheets on web pages"
+      },
+      {
+        "title": "hdfs-uploader",
+        "description": "Developed both front-end(React) and back-end(Node) of a webapp that can be used to upload files to hdfs"
+      },
+      {
+        "title": "remote-shell-file-executor",
+        "description": "Developed a node module that allows user with appropriate credentials to ssh to a machine and execute a shell script remotely"
+      },
+      {
+        "title": "Holidify",
+        "description": "Developed a web application that works as a one-stop-shop to a user going on a holiday using Angular 2. It allowed users to store all holiday related information (booking tickets, hotels, flights etc) under one application"
+      },
+      {
+        "title": "Office Hours",
+        "description": "A react-native application that measures the number of hours spent in office and notifies user after mandatory hours are completed"
+      },
+      {
+        "title": "Employee Management Portal",
+        "description": "An Angular based SPA that deals with simple day-to-day activities of employee"
+      }
+    ],
+    "organizations": [
+      "Amdocs",
+      "Hashmap Inc.",
+      "Xoriant Corporation",
+      "University of Pune"
+    ],
+    "certifications_or_extras": {
+      "education": "Bachelor in Engineering (Computer Science), University of Pune",
+      "achievements": [
+        "Developed and deployed a product, a learning application named School In a Box in an Australian University that digitizes every form of teaching and eradicates use of book/paper/pen"
+      ],
+      "languages": [
+        "React JS",
+        "Node JS",
+        "Angular JS"
+      ]
+    }
+  },
+  "timestamp": "2025-06-20T13:50:44.365338",
+  "room": "interview-19c51eb0-5fd1-4429-b35c-e486f64ad647",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience with React.js. What are some of the challenges you've faced and how did you overcome them?",
+        "evaluation_category": "React.js",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain the difference between state and props in React.",
+        "evaluation_category": "React.js Fundamentals",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "How have you used Node.js and Express.js to build RESTful APIs?",
+        "evaluation_category": "Node.js & Express.js",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a time you had to optimize the performance of a web application. What steps did you take?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to implementing CI/CD pipelines. What tools have you used?",
+        "evaluation_category": "CI/CD",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you handle errors and exceptions in Node.js?",
+        "evaluation_category": "Error Handling",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Given an array of integers, write a function to find the maximum sum of a contiguous subarray.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Explain the differences between REST and GraphQL.",
+        "evaluation_category": "API Design",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Describe your experience with databases like PostgreSQL or MongoDB.",
+        "evaluation_category": "Database",
+        "evaluation_depth": "medium"
+      }
+    ]
+  }
+}

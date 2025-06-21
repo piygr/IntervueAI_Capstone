@@ -1,0 +1,195 @@
+{
+  "JD": "JD-003",
+  "resume": {
+    "candidate_name": "Ashish Deshpande",
+    "experience": "4.5 years",
+    "skills": [
+      {
+        "name": "ReactJS",
+        "rating": 5
+      },
+      {
+        "name": "AngularJS",
+        "rating": 4
+      },
+      {
+        "name": "NodeJS",
+        "rating": 4
+      },
+      {
+        "name": "Redux",
+        "rating": 3
+      },
+      {
+        "name": "Webpack",
+        "rating": 4
+      },
+      {
+        "name": "JavaScript",
+        "rating": 5
+      },
+      {
+        "name": "CSS3",
+        "rating": 4
+      },
+      {
+        "name": "HTML5",
+        "rating": 4
+      },
+      {
+        "name": "ECMAScript6",
+        "rating": 4
+      },
+      {
+        "name": "JQuery",
+        "rating": 3
+      },
+      {
+        "name": "ExpressJS",
+        "rating": 3
+      },
+      {
+        "name": "Nginx",
+        "rating": 2
+      },
+      {
+        "name": "Docker",
+        "rating": 2
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "SVN",
+        "rating": 2
+      },
+      {
+        "name": "MongoDB",
+        "rating": 2
+      },
+      {
+        "name": "AEM",
+        "rating": 2
+      },
+      {
+        "name": "Rally",
+        "rating": 2
+      },
+      {
+        "name": "Perforce",
+        "rating": 2
+      },
+      {
+        "name": "Swarm",
+        "rating": 2
+      },
+      {
+        "name": "Typescript",
+        "rating": 3
+      },
+      {
+        "name": "UI Design",
+        "rating": 4
+      },
+      {
+        "name": "API Development",
+        "rating": 3
+      },
+      {
+        "name": "Telecom Domain Knowledge",
+        "rating": 2
+      },
+      {
+        "name": "React Native",
+        "rating": 3
+      },
+      {
+        "name": "Bootstrap",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "react-excel-renderer",
+        "description": "Published an npm module to render and display excel sheets on web pages"
+      },
+      {
+        "title": "hdfs-uploader",
+        "description": "Developed both front-end(React) and back-end(Node) of a webapp that can be used to upload files to hdfs"
+      },
+      {
+        "title": "remote-shell-file-executor",
+        "description": "Developed a node module that allows user with appropriate credentials to ssh to a machine and execute a shell script remotely"
+      },
+      {
+        "title": "Holidify",
+        "description": "Developed a web application that works as a one-stop-shop to a user going on a holiday using Angular 2. It allowed users to store all holiday related information (booking tickets, hotels, flights etc) under one application"
+      },
+      {
+        "title": "Office Hours",
+        "description": "A react-native application that measures the number of hours spent in office and notifies user after mandatory hours are completed"
+      },
+      {
+        "title": "Employee Management Portal",
+        "description": "An Angular based SPA that deals with simple day-to-day activities of employee"
+      }
+    ],
+    "organizations": [
+      "Amdocs",
+      "Hashmap Inc.",
+      "Xoriant Corporation",
+      "University of Pune"
+    ],
+    "certifications_or_extras": {
+      "education": "Bachelor in Engineering (Computer Science), University of Pune"
+    }
+  },
+  "timestamp": "2025-06-20T14:39:29.780681",
+  "room": "interview-357c7145-52de-4b3d-86f1-f0d2c905b8b9",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe a complex feature you developed using React and Node.js. What were the key challenges, and how did you overcome them?",
+        "evaluation_category": "Full Stack Development",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Explain the difference between state and props in React.",
+        "evaluation_category": "ReactJS",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How would you implement a debouncing function in JavaScript?",
+        "evaluation_category": "JavaScript",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with CI/CD. What tools have you used, and what are the benefits?",
+        "evaluation_category": "DevOps",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain the differences between RESTful APIs and GraphQL.",
+        "evaluation_category": "API Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you approach optimizing the performance of a web application?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain the concept of CORS and how you would handle it in a Node.js application.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a situation where you had to make a trade-off between different technical approaches. What factors did you consider?",
+        "evaluation_category": "Problem Solving",
+        "evaluation_depth": "light"
+      }
+    ]
+  }
+}

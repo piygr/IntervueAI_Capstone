@@ -1,0 +1,168 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Sagar Sumbe",
+    "candidate_first_name": "Sagar",
+    "candidate_email": "sumbesagar@gmail.com",
+    "experience": "9 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "SQL",
+        "rating": 3
+      },
+      {
+        "name": "Data Structures",
+        "rating": 3
+      },
+      {
+        "name": "Algorithms",
+        "rating": 3
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Architecture",
+        "rating": 4
+      },
+      {
+        "name": "Agile Methodologies",
+        "rating": 3
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "Firebase",
+        "rating": 3
+      },
+      {
+        "name": "Data Science",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      },
+      {
+        "title": "Expense Tracker",
+        "description": "Android expense tracker written in Kotlin using Clean Architecture, Coroutines, Flows, and Room DB."
+      },
+      {
+        "title": "Plant Disease Detection",
+        "description": "Android app that uses TensorFlow Lite to detect plant diseases in real-time. The app won 1st place at the 2019 Google Hackathon."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare",
+      "PESIT",
+      "VTU"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T09:28:44.978553",
+  "room": "interview-a9f4c9fb-3354-47fc-8f82-ca514c28bbde",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Explain your experience with Django and DRF in building backend APIs.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a challenging database optimization you've handled. What strategies did you employ?",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "How do you implement authentication and authorization in RESTful APIs?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to writing unit and integration tests for backend applications.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Have you worked with Celery or other message queue systems? If so, describe a use case.",
+        "evaluation_category": "Message Queues",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Explain the difference between authorization and authentication.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given a scenario where you need to cache frequently accessed data, how would you implement it using Redis?",
+        "evaluation_category": "Caching",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you approach debugging performance bottlenecks in a Django application?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with CI/CD pipelines in the context of backend deployments.",
+        "evaluation_category": "DevOps",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Sagar",
+    "candidate_name": "Sagar Sumbe",
+    "candidate_email": "sumbesagar@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

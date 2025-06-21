@@ -1,0 +1,149 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Anupam Chugh",
+    "candidate_first_name": "Anupam",
+    "candidate_email": "anupamchugh7@gmail.com",
+    "experience": "8+ years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Refactoring",
+        "rating": 4
+      },
+      {
+        "name": "Architectural Design Patterns",
+        "rating": 4
+      },
+      {
+        "name": "Server-side Development",
+        "rating": 3
+      },
+      {
+        "name": "On-device AI",
+        "rating": 3
+      },
+      {
+        "name": "Technical Leadership",
+        "rating": 3
+      },
+      {
+        "name": "Mentoring",
+        "rating": 3
+      },
+      {
+        "name": "Public Speaking",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      },
+      {
+        "title": "Technical Talk on Kotlin DSL",
+        "description": "Presented a technical talk on Kotlin DSLs at the GDG Cloud Kolkata event, sharing insights and practical applications."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare",
+      "GDG Cloud Kolkata"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T20:54:35.291976",
+  "room": "interview-1272b6b6-c0ca-4876-ac38-de81cb73d38f",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience developing RESTful APIs using Django and DRF.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain how you would optimize a slow database query in a Django application using PostgreSQL.",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "How have you implemented authentication and authorization in your previous projects?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with Celery and message queues. What use cases have you implemented?",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you approach writing unit and integration tests for backend APIs?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given a scenario where you need to store large files uploaded by users, how would you leverage AWS S3 in your Django application?",
+        "evaluation_category": "Cloud Services",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Explain your understanding of architectural design patterns and how you've applied them in backend development.",
+        "evaluation_category": "Architectural Design",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Anupam",
+    "candidate_name": "Anupam Chugh",
+    "candidate_email": "anupamchugh7@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

@@ -1,0 +1,184 @@
+{
+  "JD": "JD-002",
+  "resume": {
+    "candidate_name": "Ashish Deshpande",
+    "experience": "4.5 years",
+    "skills": [
+      {
+        "name": "React JS",
+        "rating": 5
+      },
+      {
+        "name": "Node JS",
+        "rating": 4
+      },
+      {
+        "name": "Angular JS",
+        "rating": 4
+      },
+      {
+        "name": "Webpack",
+        "rating": 3
+      },
+      {
+        "name": "Javascript",
+        "rating": 4
+      },
+      {
+        "name": "CSS3",
+        "rating": 3
+      },
+      {
+        "name": "HTML5",
+        "rating": 3
+      },
+      {
+        "name": "ECMAScript6",
+        "rating": 3
+      },
+      {
+        "name": "JQuery",
+        "rating": 2
+      },
+      {
+        "name": "Express JS",
+        "rating": 2
+      },
+      {
+        "name": "Nginx",
+        "rating": 2
+      },
+      {
+        "name": "Docker",
+        "rating": 2
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "SVN",
+        "rating": 2
+      },
+      {
+        "name": "Mongo DB",
+        "rating": 2
+      },
+      {
+        "name": "AEM",
+        "rating": 2
+      },
+      {
+        "name": "Rally",
+        "rating": 2
+      },
+      {
+        "name": "Perforce",
+        "rating": 2
+      },
+      {
+        "name": "Swarm",
+        "rating": 2
+      },
+      {
+        "name": "Typescript",
+        "rating": 3
+      },
+      {
+        "name": "Redux",
+        "rating": 3
+      },
+      {
+        "name": "Bootstrap",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "react-excel-renderer",
+        "description": "Published an npm module to render and display excel sheets on web pages"
+      },
+      {
+        "title": "hdfs-uploader",
+        "description": "Developed both front-end(React) and back-end(Node) of a webapp that can be used to upload files to hdfs"
+      },
+      {
+        "title": "remote-shell-file-executor",
+        "description": "Developed a node module that allows user with appropriate credentials to ssh to a machine and execute a shell script remotely"
+      },
+      {
+        "title": "Holidify",
+        "description": "Developed a web application that works as a one-stop-shop to a user going on a holiday using Angular 2. It allowed users to store all holiday related information (booking tickets, hotels, flights etc) under one application"
+      },
+      {
+        "title": "Office Hours",
+        "description": "A react-native application that measures the number of hours spent in office and notifies user after mandatory hours are completed"
+      },
+      {
+        "title": "Employee Management Portal",
+        "description": "An Angular based SPA that deals with simple day-to-day activities of employee"
+      }
+    ],
+    "organizations": [
+      "Amdocs",
+      "Hashmap Inc.",
+      "Xoriant Corporation",
+      "University of Pune"
+    ],
+    "certifications_or_extras": {
+      "education": "Bachelor in Engineering (Computer Science), University of Pune"
+    }
+  },
+  "timestamp": "2025-06-20T18:20:11.893520",
+  "room": "interview-b68ea0df-0a2a-4f2e-8d8d-54b0ab80687c",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience with React, focusing on complex component development.",
+        "evaluation_category": "React JS",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain how you would handle state management in a large React application. What are the pros and cons of different approaches?",
+        "evaluation_category": "React JS, State Management",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Describe your experience with API integration in React applications.",
+        "evaluation_category": "API Integration",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you ensure the performance of a React application?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain the concept of virtual DOM and how React uses it.",
+        "evaluation_category": "React Fundamentals",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a situation where you had to debug a complex issue in a React application. What was your approach?",
+        "evaluation_category": "Problem Solving",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain the difference between controlled and uncontrolled components in React.",
+        "evaluation_category": "React Fundamentals",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "How do you approach writing unit tests for React components?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with Git in a collaborative development environment.",
+        "evaluation_category": "Version Control",
+        "evaluation_depth": "light"
+      }
+    ]
+  }
+}

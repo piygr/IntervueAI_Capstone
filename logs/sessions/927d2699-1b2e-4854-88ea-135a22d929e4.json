@@ -1,0 +1,162 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Ankit Choubey",
+    "candidate_first_name": "Ankit",
+    "candidate_email": "ankit.choubey007@gmail.com",
+    "experience": "9 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Mobile Development",
+        "rating": 5
+      },
+      {
+        "name": "Git",
+        "rating": 4
+      },
+      {
+        "name": "Data Structures",
+        "rating": 3
+      },
+      {
+        "name": "Algorithms",
+        "rating": 3
+      },
+      {
+        "name": "Microservices",
+        "rating": 3
+      },
+      {
+        "name": "Architecture Design",
+        "rating": 4
+      },
+      {
+        "name": "Refactoring",
+        "rating": 4
+      },
+      {
+        "name": "Testing",
+        "rating": 4
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Carousel Feed",
+        "description": "Revamped Carousell's main feed by migrating from MVP to MVVM architecture with Jetpack Compose and Kotlin. Improved UI performance, resulting in a 25% increase in impressions per user."
+      },
+      {
+        "title": "Trust badge",
+        "description": "Developed a new feature displaying seller trustworthiness, leading to a 15% increase in transactions for sellers with the badge."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare",
+      "PESIT, VTU"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T09:32:19.405193",
+  "room": "interview-927d2699-1b2e-4854-88ea-135a22d929e4",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience building RESTful APIs with Django REST Framework (DRF).",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How have you optimized database queries in Django applications?",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to implementing authentication and authorization in a Django-based API.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with Celery and message queues. What use cases have you implemented?",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you approach writing unit and integration tests for backend APIs?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your experience with PostgreSQL or Redis.",
+        "evaluation_category": "Database Knowledge",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Describe a challenging bug you encountered while developing a backend application and how you resolved it.",
+        "evaluation_category": "Problem Solving",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "How do you collaborate with DevOps teams for deployment and infrastructure management?",
+        "evaluation_category": "DevOps Collaboration",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Ankit",
+    "candidate_name": "Ankit Choubey",
+    "candidate_email": "ankit.choubey007@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

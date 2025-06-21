@@ -1,0 +1,141 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Apoorva Krishnan",
+    "candidate_first_name": "Apoorva",
+    "candidate_email": "apoorva.krishnan.91@gmail.com",
+    "experience": "9 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 3
+      },
+      {
+        "name": "Mobile Development",
+        "rating": 5
+      },
+      {
+        "name": "Data Structures and Algorithms",
+        "rating": 3
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "SQL",
+        "rating": 2
+      },
+      {
+        "name": "System Design",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T11:36:15.007965",
+  "room": "interview-85df529e-5cd6-4f4e-a36a-c7c16684e221",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Explain your experience with Django and DRF, focusing on API development.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How have you optimized database queries in previous projects?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your approach to implementing authentication and authorization in a RESTful API.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "What is your experience with writing unit and integration tests for backend applications?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain how you would use Celery to solve an asynchronous task in a Django application.",
+        "evaluation_category": "Message Queues",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Have you used Redis for caching or session management? If so, describe a specific use case.",
+        "evaluation_category": "Caching",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Describe a scenario where you had to collaborate with a DevOps team for deployment.",
+        "evaluation_category": "Collaboration",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "How do you ensure RESTful API principles are followed in your API design?",
+        "evaluation_category": "API Design",
+        "evaluation_depth": "medium"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Apoorva",
+    "candidate_name": "Apoorva Krishnan",
+    "candidate_email": "apoorva.krishnan.91@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

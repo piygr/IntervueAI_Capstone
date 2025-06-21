@@ -1,0 +1,159 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Anupam Chugh",
+    "candidate_first_name": "Anupam",
+    "candidate_email": "anupamchugh7@gmail.com",
+    "experience": "9 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 3
+      },
+      {
+        "name": "Architectural Best Practices",
+        "rating": 4
+      },
+      {
+        "name": "Team Leadership",
+        "rating": 3
+      },
+      {
+        "name": "Mentoring",
+        "rating": 3
+      },
+      {
+        "name": "Technical Guidance",
+        "rating": 3
+      },
+      {
+        "name": "System Design",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "User Growth Experiments",
+        "description": "Conducted A/B testing for user growth experiments."
+      },
+      {
+        "title": "Search And Recommendation Algorithm Improvement",
+        "description": "Led a team to improve search and recommendation algorithms using AI/ML."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      },
+      {
+        "title": "Workspace ONE Intelligent Hub Android Application",
+        "description": "Worked on various features of the Hub application."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare",
+      "PESIT, VTU"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T09:22:43.657224",
+  "room": "interview-34bf4063-4f05-487c-b73c-8c8929bb13bb",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Explain your experience with Django and DRF.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience optimizing database queries.",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How have you implemented authentication and authorization in past projects?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your experience with writing unit and integration tests.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Describe your experience with PostgreSQL and Redis.",
+        "evaluation_category": "Database Technologies",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How familiar are you with RESTful API principles?",
+        "evaluation_category": "API Design",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Explain a scenario where you used Celery or a message queue system.",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a situation where you had to improve system performance under high load.",
+        "evaluation_category": "System Design",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain how you would design a rate limiter for an API.",
+        "evaluation_category": "System Design",
+        "evaluation_depth": "deep"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Anupam",
+    "candidate_name": "Anupam Chugh",
+    "candidate_email": "anupamchugh7@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Anand Pillai",
+    "candidate_first_name": "Anand",
+    "candidate_email": "anand.pillai@example.com",
+    "experience": "8 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Refactoring",
+        "rating": 4
+      },
+      {
+        "name": "Architectural Design",
+        "rating": 4
+      },
+      {
+        "name": "Technical Leadership",
+        "rating": 3
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "Agile Methodologies",
+        "rating": 3
+      },
+      {
+        "name": "Testing",
+        "rating": 4
+      },
+      {
+        "name": "Mobile Application Development",
+        "rating": 5
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T09:40:16.347044",
+  "room": "interview-87a1f1f3-0dde-4006-932b-c22d6b8d5d39",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience building RESTful APIs using Django and DRF.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How have you optimized database queries and application performance in past projects?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to implementing authentication and authorization in a Django application.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with PostgreSQL and Redis. What are the use cases where you would prefer one over the other?",
+        "evaluation_category": "Database",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your experience with writing unit and integration tests in Python.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How would you design a rate limiter for an API endpoint?",
+        "evaluation_category": "System Design",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "What is your experience with Celery and message queues? Can you give an example of when you used them?",
+        "evaluation_category": "Message Queues",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Have you worked with AWS services like S3 and Lambda? If so, how have you used them in your projects?",
+        "evaluation_category": "Cloud Services",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Anand",
+    "candidate_name": "Anand Pillai",
+    "candidate_email": "anand.pillai@example.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

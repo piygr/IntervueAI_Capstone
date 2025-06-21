@@ -1,0 +1,145 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Gaurav Harsh",
+    "candidate_first_name": "Gaurav",
+    "candidate_email": "gaurav.harsh@gmail.com",
+    "experience": "10 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "AI",
+        "rating": 4
+      },
+      {
+        "name": "Server-side Development",
+        "rating": 3
+      },
+      {
+        "name": "On-device AI",
+        "rating": 3
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "Refactoring",
+        "rating": 5
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "Test Coverage",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD Pipelines",
+        "rating": 4
+      },
+      {
+        "name": "Architectural Design",
+        "rating": 4
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Technical Leadership",
+        "rating": 4
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-21T09:56:33.957709",
+  "room": "interview-e95eb65b-d359-4ab0-8deb-d8a4cb08fc96",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Explain your experience developing backend APIs using Django and DRF.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience optimizing database queries in PostgreSQL.",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How have you implemented authentication and authorization in your previous projects?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Walk me through your experience with writing unit and integration tests for backend services.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your experience using Celery or other message queue systems.",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How would you approach a situation where a critical API endpoint experiences a sudden spike in traffic?",
+        "evaluation_category": "Problem Solving",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given a list of integers, write a function to find the largest product of any three integers in the list. Explain your approach.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Describe a time you collaborated with a DevOps team for deployment pipelines. What challenges did you face?",
+        "evaluation_category": "Collaboration",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Gaurav",
+    "candidate_name": "Gaurav Harsh",
+    "candidate_email": "gaurav.harsh@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

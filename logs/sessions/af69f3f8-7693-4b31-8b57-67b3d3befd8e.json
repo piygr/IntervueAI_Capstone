@@ -1,0 +1,134 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Siddharth Jogi",
+    "candidate_first_name": "Siddharth",
+    "candidate_email": "siddharthjogi@gmail.com",
+    "experience": "7 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 3
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Software Architecture",
+        "rating": 4
+      },
+      {
+        "name": "Agile Methodologies",
+        "rating": 3
+      },
+      {
+        "name": "Technical Leadership",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMWare",
+      "PESIT, VTU"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T09:24:00.492865",
+  "room": "interview-af69f3f8-7693-4b31-8b57-67b3d3befd8e",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience building RESTful APIs using Django REST Framework.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How have you optimized database queries in Django applications?",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to implementing authentication and authorization in a Django application.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a situation where you used Celery or another message queue system.",
+        "evaluation_category": "Message Queues",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How do you approach writing unit and integration tests for backend APIs?",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your experience with PostgreSQL.",
+        "evaluation_category": "Database",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Explain your experience with Redis.",
+        "evaluation_category": "Caching",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Describe a challenging technical problem you solved recently in a backend project.",
+        "evaluation_category": "Problem Solving",
+        "evaluation_depth": "deep"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Siddharth",
+    "candidate_name": "Siddharth Jogi",
+    "candidate_email": "siddharthjogi@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

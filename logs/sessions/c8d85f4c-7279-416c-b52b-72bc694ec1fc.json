@@ -1,0 +1,229 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Ashish Deshpande",
+    "candidate_first_name": "Ashish",
+    "candidate_email": "ashishd751@gmail.com",
+    "experience": "4.5 years",
+    "skills": [
+      {
+        "name": "React JS",
+        "rating": 5
+      },
+      {
+        "name": "Angular JS",
+        "rating": 4
+      },
+      {
+        "name": "Node JS",
+        "rating": 4
+      },
+      {
+        "name": "Redux",
+        "rating": 3
+      },
+      {
+        "name": "Webpack",
+        "rating": 4
+      },
+      {
+        "name": "Javascript",
+        "rating": 4
+      },
+      {
+        "name": "CSS3",
+        "rating": 4
+      },
+      {
+        "name": "HTML5",
+        "rating": 4
+      },
+      {
+        "name": "ECMAScript6",
+        "rating": 3
+      },
+      {
+        "name": "JQuery",
+        "rating": 3
+      },
+      {
+        "name": "Express JS",
+        "rating": 3
+      },
+      {
+        "name": "Nginx",
+        "rating": 2
+      },
+      {
+        "name": "Docker",
+        "rating": 2
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "SVN",
+        "rating": 2
+      },
+      {
+        "name": "Mongo DB",
+        "rating": 2
+      },
+      {
+        "name": "AEM",
+        "rating": 1
+      },
+      {
+        "name": "Rally",
+        "rating": 1
+      },
+      {
+        "name": "Perforce",
+        "rating": 1
+      },
+      {
+        "name": "Swarm",
+        "rating": 1
+      },
+      {
+        "name": "Typescript",
+        "rating": 3
+      },
+      {
+        "name": "UI Design",
+        "rating": 3
+      },
+      {
+        "name": "API Development",
+        "rating": 3
+      },
+      {
+        "name": "Telecom Domain Knowledge",
+        "rating": 2
+      },
+      {
+        "name": "Technical Training",
+        "rating": 2
+      },
+      {
+        "name": "Responsive Web Design",
+        "rating": 3
+      },
+      {
+        "name": "NPM Module Development",
+        "rating": 3
+      },
+      {
+        "name": "Web-HDFS",
+        "rating": 2
+      },
+      {
+        "name": "Code Splitting",
+        "rating": 2
+      },
+      {
+        "name": "Chunking",
+        "rating": 2
+      },
+      {
+        "name": "Tree Shaking",
+        "rating": 2
+      }
+    ],
+    "projects": [
+      {
+        "title": "react-excel-renderer",
+        "description": "Published an npm module to render and display excel sheets on web pages"
+      },
+      {
+        "title": "hdfs-uploader",
+        "description": "Developed both front-end(React) and back-end(Node) of a webapp that can be used to upload files to hdfs"
+      },
+      {
+        "title": "remote-shell-file-executor",
+        "description": "Developed a node module that allows user with appropriate credentials to ssh to a machine and execute a shell script remotely"
+      },
+      {
+        "title": "Holidify",
+        "description": "Developed a web application that works as a one-stop-shop to a user going on a holiday using Angular 2. It allowed users to store all holiday related information (booking tickets, hotels, flights etc) under one application"
+      },
+      {
+        "title": "Office Hours",
+        "description": "A react-native application that measures the number of hours spent in office and notifies user after mandatory hours are completed"
+      },
+      {
+        "title": "Employee Management Portal",
+        "description": "An Angular based SPA that deals with simple day-to-day activities of employee"
+      }
+    ],
+    "organizations": [
+      "Amdocs",
+      "Hashmap Inc.",
+      "Xoriant Corporation",
+      "University of Pune"
+    ],
+    "certifications_or_extras": {
+      "education": "Bachelor in Engineering (Computer Science), University of Pune"
+    }
+  },
+  "timestamp": "2025-06-21T00:30:54.603877",
+  "room": "interview-c8d85f4c-7279-416c-b52b-72bc694ec1fc",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Explain your experience with Django and DRF, highlighting projects where you've used them extensively.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe a time when you had to optimize a slow database query. What steps did you take?",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "How have you implemented authentication and authorization in your previous projects?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to writing unit and integration tests for backend APIs.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with PostgreSQL and Redis, including use cases for each.",
+        "evaluation_category": "Database Technologies",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "What are the key principles of RESTful API design?",
+        "evaluation_category": "API Design",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Have you worked with Celery or other message queue systems? Explain your experience.",
+        "evaluation_category": "Message Queues",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given an array of integers, write a function to find the maximum sum of a contiguous subarray.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Explain the difference between authentication and authorization.",
+        "evaluation_category": "Security",
+        "evaluation_depth": "light"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Ashish",
+    "candidate_name": "Ashish Deshpande",
+    "candidate_email": "ashishd751@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

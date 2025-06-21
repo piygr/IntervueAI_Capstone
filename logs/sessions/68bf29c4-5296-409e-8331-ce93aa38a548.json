@@ -1,0 +1,150 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Siddharth Patwardhan",
+    "candidate_first_name": "Siddharth",
+    "candidate_email": "siddu.dr@gmail.com",
+    "experience": "8 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Mobile Application Development",
+        "rating": 5
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Refactoring",
+        "rating": 4
+      },
+      {
+        "name": "Architectural Design",
+        "rating": 4
+      },
+      {
+        "name": "Leadership",
+        "rating": 3
+      },
+      {
+        "name": "Agile Development",
+        "rating": 3
+      },
+      {
+        "name": "Problem-solving",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMware"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T11:45:38.109018",
+  "room": "interview-68bf29c4-5296-409e-8331-ce93aa38a548",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience building RESTful APIs using Django and DRF.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to optimizing database queries in Django.",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "How have you implemented authentication and authorization in your past projects?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with writing unit and integration tests in Python.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your experience using Celery and message queues in a distributed system.",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "How have you improved application performance in your previous backend projects?",
+        "evaluation_category": "Performance Optimization",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain how you approach debugging and troubleshooting complex backend issues.",
+        "evaluation_category": "Problem-solving",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with PostgreSQL and Redis. What are some use-cases of each?",
+        "evaluation_category": "Database Technologies",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Given an array of integers, write an algorithm to find the largest sum of a contiguous subarray.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "deep"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Siddharth",
+    "candidate_name": "Siddharth Patwardhan",
+    "candidate_email": "siddu.dr@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}

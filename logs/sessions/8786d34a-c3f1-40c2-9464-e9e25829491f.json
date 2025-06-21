@@ -1,0 +1,145 @@
+{
+  "JD": "JD-004",
+  "resume": {
+    "candidate_name": "Anubhav Singh",
+    "candidate_first_name": "Anubhav",
+    "candidate_email": "anubhav.singh.08@gmail.com",
+    "experience": "9 years",
+    "skills": [
+      {
+        "name": "Kotlin",
+        "rating": 5
+      },
+      {
+        "name": "Android Development",
+        "rating": 5
+      },
+      {
+        "name": "Java",
+        "rating": 4
+      },
+      {
+        "name": "AI/ML",
+        "rating": 3
+      },
+      {
+        "name": "Mobile Development",
+        "rating": 5
+      },
+      {
+        "name": "Architectural Design",
+        "rating": 4
+      },
+      {
+        "name": "CI/CD",
+        "rating": 4
+      },
+      {
+        "name": "Jetpack Compose",
+        "rating": 4
+      },
+      {
+        "name": "Room DB",
+        "rating": 4
+      },
+      {
+        "name": "Git",
+        "rating": 3
+      },
+      {
+        "name": "REST APIs",
+        "rating": 3
+      },
+      {
+        "name": "Testing",
+        "rating": 3
+      },
+      {
+        "name": "Agile Development",
+        "rating": 3
+      }
+    ],
+    "projects": [
+      {
+        "title": "Multi Modal Listing (MML)",
+        "description": "Led development of an AI-enhanced product listing feature in Android using server-based and on-device AI models. Reduced listing time and improved seller acquisition."
+      },
+      {
+        "title": "Android App Modernization at VMware",
+        "description": "Refactored large Java codebases to Kotlin, introduced Room DB, improved test coverage and CI/CD pipelines, and enforced architectural best practices."
+      }
+    ],
+    "organizations": [
+      "Carousell",
+      "VMware"
+    ],
+    "certifications_or_extras": {
+      "patents": [
+        {
+          "title": "Reserving physical resources based upon a physical identifier",
+          "status": "Issued",
+          "patent_number": "US10547712"
+        }
+      ],
+      "education": "Bachelor of Engineering in Electronics and Communication, PESIT, VTU",
+      "journals_or_publications": [
+        "Navigation Drawer using Jetpack Compose",
+        "Bottom Navigation and Navigation Drawer Using Scaffold from Jetpack Compose"
+      ]
+    }
+  },
+  "timestamp": "2025-06-22T19:28:32.238731",
+  "room": "interview-8786d34a-c3f1-40c2-9464-e9e25829491f",
+  "interview_plan": {
+    "scheduled_duration_in_minutes": 45,
+    "questions": [
+      {
+        "question": "Describe your experience developing RESTful APIs using Django and DRF.",
+        "evaluation_category": "Backend Development",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Explain your approach to optimizing database queries in Django. Can you provide an example?",
+        "evaluation_category": "Database Optimization",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "How would you implement authentication and authorization for a Django REST API?",
+        "evaluation_category": "Security",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Describe your experience with writing unit and integration tests in Python.",
+        "evaluation_category": "Testing",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Have you used Celery or other message queues? If so, explain your experience and use cases.",
+        "evaluation_category": "Asynchronous Tasks",
+        "evaluation_depth": "medium"
+      },
+      {
+        "question": "Given a list of integers, write a function to find the largest product of any three numbers.",
+        "evaluation_category": "DSA",
+        "evaluation_depth": "deep"
+      },
+      {
+        "question": "Explain how you have collaborated with DevOps teams to set up deployment pipelines.",
+        "evaluation_category": "DevOps Collaboration",
+        "evaluation_depth": "light"
+      },
+      {
+        "question": "Considering your experience with Android and Kotlin, how would you approach designing a new API endpoint for mobile applications?",
+        "evaluation_category": "API Design",
+        "evaluation_depth": "medium"
+      }
+    ]
+  },
+  "interview_context": {
+    "candidate_first_name": "Anubhav",
+    "candidate_name": "Anubhav Singh",
+    "candidate_email": "anubhav.singh.08@gmail.com",
+    "company_name": "FinEdge Labs",
+    "jd_role": "Backend Developer"
+  }
+}
