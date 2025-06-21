@@ -4,32 +4,66 @@ import torch.nn as nn
 import torch.nn.functional as F
 from typing import Optional, Tuple, List, Dict, Any
 from dataclasses import dataclass
+from pdb import set_trace 
+from transformers import PretrainedConfig
 
-@dataclass
-class LLama3Config:
-    """Configuration for LLama3 model"""
-    vocab_size: int = 32000
-    hidden_size: int = 1024  # Reduced for 1B parameter target
-    intermediate_size: int = 2816  # Adjusted for 1B parameter target
-    num_hidden_layers: int = 12  # Reduced for 1B parameter target
-    num_attention_heads: int = 16  # Adjusted for 1B parameter target
-    num_key_value_heads: int = 16  # Adjusted for 1B parameter target
-    hidden_act: str = "silu"
-    max_position_embeddings: int = 2048
-    initializer_range: float = 0.02
-    rms_norm_eps: float = 1e-6
-    use_cache: bool = True
-    pad_token_id: int = 0
-    bos_token_id: int = 1
-    eos_token_id: int = 2
-    tie_word_embeddings: bool = False
-    rope_theta: float = 10000.0
-    rope_scaling: Optional[Dict[str, Any]] = None
-    # Llama3 specific parameters
-    use_parallel_attention: bool = True  # Llama3 uses parallel attention
-    use_swiglu: bool = True  # Llama3 uses SwiGLU activation
-    use_rotary_embeddings: bool = True
-    use_grouped_query_attention: bool = True
+class LLama3Config(PretrainedConfig):
+    model_type = "llama3"
+
+    def __init__(self,
+                 vocab_size=32000,
+                 hidden_size=1024,
+                 intermediate_size=2816,
+                 num_hidden_layers=12,
+                 num_attention_heads=16,
+                 num_key_value_heads=8,
+                 hidden_act="silu",
+                 max_position_embeddings=2048,
+                 initializer_range=0.02,
+                 rms_norm_eps=1e-6,
+                 use_cache=True,
+                 pad_token_id=0,
+                 bos_token_id=1,
+                 eos_token_id=2,
+                 tie_word_embeddings=False,
+                 rope_theta=10000.0,
+                 rope_scaling=None,
+                 use_parallel_attention=True,
+                 use_swiglu=True,
+                 use_rotary_embeddings=True,
+                 use_grouped_query_attention=True,
+                 output_attentions=False,
+                 output_hidden_states=False,
+                 use_return_dict=False,
+                 **kwargs):
+        super().__init__(
+            pad_token_id=pad_token_id,
+            bos_token_id=bos_token_id,
+            eos_token_id=eos_token_id,
+            tie_word_embeddings=tie_word_embeddings,
+            **kwargs
+        )
+        self.vocab_size = vocab_size
+        self.hidden_size = hidden_size
+        self.intermediate_size = intermediate_size
+        self.num_hidden_layers = num_hidden_layers
+        self.num_attention_heads = num_attention_heads
+        self.num_key_value_heads = num_key_value_heads
+        self.hidden_act = hidden_act
+        self.max_position_embeddings = max_position_embeddings
+        self.initializer_range = initializer_range
+        self.rms_norm_eps = rms_norm_eps
+        self.use_cache = use_cache
+        self.rope_theta = rope_theta
+        self.rope_scaling = rope_scaling
+        self.use_parallel_attention = use_parallel_attention
+        self.use_swiglu = use_swiglu
+        self.use_rotary_embeddings = use_rotary_embeddings
+        self.use_grouped_query_attention = use_grouped_query_attention
+        self.output_attentions = output_attentions
+        self.output_hidden_states = output_hidden_states
+        # self.use_return_dict = use_return_dict
+
 
 class RotaryEmbedding(nn.Module):
     """Rotary Position Embedding"""
@@ -119,17 +153,18 @@ class LLama3Attention(nn.Module):
         output_attentions: bool = False,
         use_cache: bool = False,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
-        bsz, q_len, _ = hidden_states.size()
+        # hidden_states (x)
+        bsz, seq_len, _ = hidden_states.size() # (B, T, D)
 
-        query_states = self.q_proj(hidden_states)
-        key_states = self.k_proj(hidden_states)
-        value_states = self.v_proj(hidden_states)
+        query_states = self.q_proj(hidden_states) # (B, T, D) -> (B, T, H * D/H)
+        key_states = self.k_proj(hidden_states) # (B, T, D) -> (B, T, H_kv * D/H)
+        value_states = self.v_proj(hidden_states) # (B, T, D) -> (B, T, H_kv * D/H)
 
-        query_states = query_states.view(bsz, q_len, self.num_heads, self.head_dim).transpose(1, 2)
-        key_states = key_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
-        value_states = value_states.view(bsz, q_len, self.num_key_value_heads, self.head_dim).transpose(1, 2)
+        query_states = query_states.view(bsz, seq_len, self.num_heads, self.head_dim).transpose(1, 2) # (B, T, H * D/H) -> (B, T, H , D/H) -> (B, H, T, D/H)
+        key_states = key_states.view(bsz, seq_len, self.num_key_value_heads, self.head_dim).transpose(1, 2) # (B, T, H_kv * D/H) -> (B, T, H_kv , D/H) -> (B, H_kv, T, D/H)
+        value_states = value_states.view(bsz, seq_len, self.num_key_value_heads, self.head_dim).transpose(1, 2) # (B, T, H_kv * D/H) -> (B, T, H_kv , D/H) -> (B, H_kv, T, D/H)
 
-        kv_seq_len = key_states.shape[-2]
+        kv_seq_len = key_states.shape[-2] # should be same as seq_len
         if past_key_value is not None:
             kv_seq_len += past_key_value[0].shape[-2]
         
@@ -143,19 +178,24 @@ class LLama3Attention(nn.Module):
         past_key_value = (key_states, value_states) if use_cache else None
 
         # Repeat k/v heads if n_kv_heads < n_heads
-        key_states = self._repeat_kv(key_states, self.num_key_value_groups)
-        value_states = self._repeat_kv(value_states, self.num_key_value_groups)
+        key_states = self._repeat_kv(key_states, self.num_key_value_groups) # (B, H_kv, T, D/H) -> (B, H, T, D/H)
+        value_states = self._repeat_kv(value_states, self.num_key_value_groups) # (B, H_kv, T, D/H) -> (B, H, T, D/H)
 
-        attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim)
+        attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim) # (B, H, T, D/H) * (B, H, D/H, T) -> (B, H, T, T)
 
         if attention_mask is not None:
+            if attention_mask.dim() == 2:
+                attention_mask = attention_mask[:, None, None, :]  # expand
+            attention_mask = attention_mask.to(dtype=attn_weights.dtype)  # float32
+            attention_mask = (1.0 - attention_mask) * -10000.0  # large negative values
             attn_weights = attn_weights + attention_mask
+            # attn_weights.masked_fill_(attention_mask==0, float('-inf'))
 
         attn_weights = F.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
         attn_output = torch.matmul(attn_weights, value_states)
 
         attn_output = attn_output.transpose(1, 2).contiguous()
-        attn_output = attn_output.reshape(bsz, q_len, self.hidden_size)
+        attn_output = attn_output.reshape(bsz, seq_len, self.hidden_size)
 
         attn_output = self.o_proj(attn_output)
 
@@ -402,13 +442,13 @@ class LLama3ForCausalLM(nn.Module):
 def create_llama3_1b() -> LLama3ForCausalLM:
     """Creates a 1B parameter version of Llama3"""
     config = LLama3Config(
-        vocab_size=32000,
-        hidden_size=1024,
-        intermediate_size=2816,
-        num_hidden_layers=12,
-        num_attention_heads=16,
-        num_key_value_heads=16,
-        max_position_embeddings=2048,
+        # vocab_size=32000,
+        # hidden_size=1024,
+        # intermediate_size=2816,
+        # # num_hidden_layers=12,
+        # # num_attention_heads=16,
+        # # num_key_value_heads=16,
+        # max_position_embeddings=2048,
     )
     return LLama3ForCausalLM(config)
 

@@ -110,7 +110,7 @@ use livekit cloud by Signig up here [Livekit Cloud](https://livekit.io)
 
 ##### On Mac
 ```
-brew install livekit-server
+brew install livekit
 ```
 
 ##### On other OS
