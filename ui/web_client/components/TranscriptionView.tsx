@@ -1,33 +1,51 @@
-import useCombinedTranscriptions from "@/hooks/useCombinedTranscriptions";
-import * as React from "react";
+// TranscriptionView.tsx
 
-export default function TranscriptionView() {
-  const combinedTranscriptions = useCombinedTranscriptions();
-  const containerRef = React.useRef<HTMLDivElement>(null);
+import React, { useRef, useEffect } from "react";
 
-  // scroll to bottom when new transcription is added
-  React.useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
-    }
-  }, [combinedTranscriptions]);
+// Define Segment type. Adjust fields to match your hook/provider.
+export interface Segment {
+  id: string;
+  role: string //"assistant" | "user";
+  text: string;
+}
+
+interface TranscriptionViewProps {
+  transcripts: Segment[];
+  fullWidth?: boolean; 
+}
+
+export default function TranscriptionView({ transcripts, fullWidth }: TranscriptionViewProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to bottom whenever transcripts change
+  useEffect(() => {
+    containerRef.current?.scrollTo(0, containerRef.current.scrollHeight);
+  }, [transcripts]);
 
   return (
-    <div className="relative h-[200px] w-[512px] max-w-[90vw] mx-auto">
-      {/* Fade-out gradient mask */}
+    <div className={
+      fullWidth
+        ? "relative h-[200px] w-full min-w-0"
+        : "relative h-[200px] w-[512px] max-w-[90vw] mx-auto"
+    }>
+      {/* Fade-out top gradient */}
       <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-[var(--lk-bg)] to-transparent z-10 pointer-events-none" />
+      {/* Fade-out bottom gradient */}
       <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-[var(--lk-bg)] to-transparent z-10 pointer-events-none" />
 
       {/* Scrollable content */}
-      <div ref={containerRef} className="h-full flex flex-col gap-2 overflow-y-auto px-4 py-8">
-        {combinedTranscriptions.map((segment) => (
+      <div
+        ref={containerRef}
+        className="h-full flex flex-col gap-2 overflow-y-auto px-4 py-8"
+      >
+        {transcripts.map((segment) => (
           <div
             id={segment.id}
             key={segment.id}
             className={
               segment.role === "assistant"
-                ? "p-2 self-start fit-content"
-                : "bg-gray-800 rounded-md p-2 self-end fit-content"
+                ? "p-2 self-start"
+                : "bg-gray-800 rounded-md p-2 self-end"
             }
           >
             {segment.text}
