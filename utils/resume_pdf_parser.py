@@ -1,5 +1,8 @@
+from io import BytesIO
 import os
+from typing import Tuple
 from fastapi import UploadFile
+from markitdown import MarkItDown
 import pymupdf4llm
 import logging
 import fitz
@@ -16,19 +19,51 @@ api_key = os.getenv("GOOGLE_API_KEY")
 client = genai.Client(api_key=api_key)
 
 
-async def parse_resume_pdf(file: UploadFile) -> str:
+async def parse_resume_pdf(file: UploadFile) -> Tuple[bool, str]:
     """
     Parse a PDF file and return the text content in markdown format.
     """
 
-    file_bytes = await file.read()  # Read the file contents
-    doc = fitz.open(stream=file_bytes, filetype="pdf")  # Create a PyMuPDF Document
-    md_text = pymupdf4llm.to_markdown(doc) 
+    try:
+        file_bytes = await file.read()  # Read the file contents
 
-    return await call_llm(md_text)
+        try:
+            doc = fitz.open(stream=file_bytes, filetype="pdf")  # Try to open PDF
+            md_text = pymupdf4llm.to_markdown(doc)
+        except Exception as e:
+            logger.error(f"❌ Failed to open PDF for pymupdf: {e}")
 
+        if not md_text or md_text.strip() == "":
+            logger.error("❌ pymupdf4llm failed to parse resume to markdown. Trying Markitdown.")
+            md_text = faback_to_markitdown(file_bytes=file_bytes, file=file)
+            
 
-async def call_llm(resume_parsed: str) -> str:
+        if not md_text or md_text.strip() == "":
+            logger.error("❌ Parsed markdown is empty.")
+            return False, "Error: Failed to extract content from PDF."
+
+        # logger.info(f"Resume Markdown: {md_text}")
+        logger.info(f"✅ Resume parsed to markdown successfully")
+
+        return await call_llm(md_text)
+
+    except Exception as e:
+        logger.error(f"❌ Unexpected error while parsing PDF: {e}")
+        return False, "❌ Error: An unexpected error occurred while parsing PDF."
+    
+
+def faback_to_markitdown(file_bytes: bytes, file: UploadFile) -> str:
+    converter = MarkItDown()
+    stream = BytesIO(file_bytes)
+    stream.name = file.filename  # Optional, for format detection
+    stream.seek(0)
+    md_text = converter.convert(stream).text_content
+    if not md_text or md_text.strip() == "":
+      logger.error("MarkItDown also failed to parse resume to markdown!")
+    return md_text
+    
+
+async def call_llm(resume_parsed: str) -> Tuple[bool, str]:
     try:
         prompt = f"""You are an expert resume analyzer. Your job is to analyze a resume in markdown format and extract the following information:
 
@@ -79,8 +114,8 @@ Here is the resume:
         response = await call_llm_with_timeout(client, prompt)
         raw = response.strip()
         logger.info(f"LLM output: {raw}")
-        return raw
+        return True, raw
 
     except Exception as e:
         logger.error(f"⚠️ llm failed to parse resume: {repr(e)}")
-        return "error"
+        return False, "error"
