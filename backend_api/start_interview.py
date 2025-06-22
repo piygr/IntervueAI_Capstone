@@ -27,6 +27,7 @@ print(LIVEKIT_API_KEY, LIVEKIT_SERVER_URL)
 
 @router.post("/start-interview")
 async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
+    print(LIVEKIT_API_KEY, LIVEKIT_SERVER_URL)
     logger.info(f"Starting interview for JD: {jobId}")
     room_name = f"interview-{interviewId}"
 

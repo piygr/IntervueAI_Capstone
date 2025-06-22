@@ -43,4 +43,11 @@ async def call_llm_with_timeout(client, prompt, timeout=10):
 def extract_json_string(raw_output: str) -> str:
     # Remove leading/trailing code block markers like ```json or ```
     cleaned = re.sub(r"^```(?:json)?\s*|```$", "", raw_output.strip(), flags=re.MULTILINE)
+    if cleaned.find("```json") > 0:
+        cleaned_arr = cleaned.split("```json")
+        if len(cleaned_arr) >= 2:
+            cleaned = cleaned_arr[1]
+            cleaned_arr = cleaned.split("```")
+            cleaned = cleaned_arr[0]
+
     return cleaned.strip()
