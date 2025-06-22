@@ -146,14 +146,14 @@ class Coordinator(Agent):
                 return ""
         except Exception as e:
             logger.error(f"Error in parsing json:{e}")
-            return full_output
+            return ""
         
 
     async def on_enter(self):
         self.session.on("user_input_transcribed", self.user_input_transcribed)
-        self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
         self.session.generate_reply(instructions="Greet the candidate and wish him/her luck for the interview")
-    
+        self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
+        
     #async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
         #self.user_last_coversation = time.time()
 
@@ -163,27 +163,30 @@ class Coordinator(Agent):
             self.user_last_coversation = time.time()
 
     async def _monitor_silence(self):
-        while True:
-            await asyncio.sleep(10)
+        #while True:
+        await asyncio.sleep(10)
 
-            # If agent or user is currently speaking, skip
-            # If both have been silent for over 10 seconds
-            async with self._lock:
-                now = time.time()
-                if self._cancel_interview_task is None and \
-                now - max(self.agent_last_conversation, self.user_last_coversation) > random.randint(15, 20):
-                    l = ["Are you there?", "Could you please tell me what you are thinking?", "Let me know if you need clarification."]
-                    msg = l[random.randint(0, len(l)-1)]
-                    await self.session.say(msg)
-                    self.agent_last_conversation = now
-                    if now - self.user_last_coversation > 60:
-                        self._cancel_interview_task = asyncio.create_task(self._cancel_interview)
+        # If agent or user is currently speaking, skip
+        # If both have been silent for over 10 seconds
+        #async with self._lock:
+        now = time.time()
+        if self._cancel_interview_task is None and \
+        now - max(self.agent_last_conversation, self.user_last_coversation) > random.randint(15, 20):
+            #l = ["Are you there?", "Could you please tell me what you are thinking?", "Let me know if you need clarification."]
+            #msg = l[random.randint(0, len(l)-1)]
+            silence_break_prompt = f"Candidate has not spoken for a while, ask him if he/she is thiking or he has lost the connection or needs clarification."
+            await self.session.generate_reply(instructions=silence_break_prompt)
+            self.agent_last_conversation = now
+            self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
+        
+                #if now - self.user_last_coversation > 60:
+                #    self._cancel_interview_task = asyncio.create_task(self._cancel_interview)
 
     async def _cancel_interview(self):
-        async with self._lock:
-            self.session.say("Looks like you are away, I am cancelling the interview for now. Please connect again later.", allow_interruptions=False)
-            self.silence_watchdog_task.cancel()
-            self.session.aclose()
+        #async with self._lock:
+        await self.session.say("Looks like you are away, I am cancelling the interview for now. Please connect again later.", allow_interruptions=False)
+        self.silence_watchdog_task.cancel()
+        self.session.aclose()
 
     '''async def tts_node(
         self, text: AsyncIterable[str], model_settings: ModelSettings
