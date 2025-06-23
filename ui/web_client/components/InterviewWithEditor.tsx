@@ -5,7 +5,8 @@ import SimpleCodeEditor from "./SimpleCodeEditor";
 
 export type InterviewWithEditorProps = {
   children: React.ReactNode;
-  initialCode?: string;
+  code: string;
+  onCodeChange: (code: string) => void;
   onSubmit: (code: string) => void;
   codeLanguage?: string;
   highlight?: boolean;
@@ -13,13 +14,13 @@ export type InterviewWithEditorProps = {
 
 const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
   children,
-  initialCode = "",
+  code,
+  onCodeChange,
   onSubmit,
   codeLanguage = "text",
   highlight = true,
 }) => {
   const [editorOpen, setEditorOpen] = useState(false);
-  const [code, setCode] = useState(initialCode);
 
   // Clone children to inject editorOpen prop
   const childrenWithProps = Children.map(children, (child) => {
@@ -73,7 +74,7 @@ const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
           <div className="flex-1 overflow-auto p-2">
             <SimpleCodeEditor
               value={code}
-              onChange={setCode}
+              onChange={onCodeChange}
               language={codeLanguage}
               highlight={highlight}
               minRows={16}

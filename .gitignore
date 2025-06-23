@@ -215,3 +215,4 @@ session_logs/
 test.*
 *.pdf
 .vscode
+logs/

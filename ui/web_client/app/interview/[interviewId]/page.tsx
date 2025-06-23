@@ -16,9 +16,13 @@ import {
   useVoiceAssistant,
 } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Room, RoomEvent, AudioCaptureOptions } from "livekit-client";
+import { Room, RoomEvent, AudioCaptureOptions, Participant, DataPacket_Kind, RemoteParticipant } from "livekit-client";
 import { useCallback, useEffect, useState } from "react";
 import InterviewWithEditor from "@/components/InterviewWithEditor";
+import { useRoomContext } from "@livekit/components-react";
+
+const encoder = new TextEncoder()
+const decoder = new TextDecoder()
 
 export default function InterviewPage({ params }: { params: { interviewId: string } }) {
   const searchParams = useSearchParams();
@@ -38,10 +42,38 @@ export default function InterviewPage({ params }: { params: { interviewId: strin
 function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUrl: string, roomToken: string }) {
   const strans = useCombinedTranscriptions();
   const [transcripts, setTranscripts] = useState<Segment[]>([]);
+  const [code, setCode] = useState("// Initial code from UI");
 
   useEffect(() => {
     setTranscripts(strans);
   }, [strans]);
+
+  // --- Listen for code from agent ---
+  useEffect(() => {
+    const handleData = (payload: Uint8Array, participant?: Participant, kind?: DataPacket_Kind, topic?: string) => {
+      if (topic === "code-editor") {
+        const text = decoder.decode(payload);
+        setCode(text);
+      }
+    };
+    room.on(RoomEvent.DataReceived, handleData);
+    return () => {
+      room.off(RoomEvent.DataReceived, handleData);
+    };
+  }, [room]);
+
+  // --- Send code to agent on submit ---
+  const handleSubmit = useCallback(
+    (codeText: string) => {
+      const data = encoder.encode(codeText)
+      room.localParticipant.publishData(
+        data,
+        { reliable: true, topic: "code-editor" }
+      );
+      // Optionally, do other things (e.g., show a toast)
+    },
+    [room]
+  );
 
   const onConnectButtonClicked = useCallback(async () => {
     const audioCaptureOptions: AudioCaptureOptions = {
@@ -65,8 +97,9 @@ function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUr
   return (
     <div className="flex w-screen h-screen">
       <InterviewWithEditor
-        initialCode={"// Write your code here"}
-        onSubmit={code => alert("Submitted code:\n" + code)}
+        code={code}
+        onCodeChange={setCode}
+        onSubmit={handleSubmit}
         codeLanguage="js"
         highlight={true}
       >

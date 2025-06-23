@@ -11,7 +11,7 @@ from livekit.agents import (
     WorkerOptions,
     cli,
     metrics,
-    RoomInputOptions,
+    RoomInputOptions
 )
 from livekit.agents.llm.chat_context import ChatContext, ChatMessage
 from livekit.plugins import (
@@ -92,7 +92,6 @@ def prewarm(proc: JobProcess):
 
 
 async def entrypoint(ctx: JobContext):
-
     await ctx.connect(
         auto_subscribe=AutoSubscribe.AUDIO_ONLY,
     )
@@ -100,60 +99,54 @@ async def entrypoint(ctx: JobContext):
     logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
 
     session_id = ctx.room.name.replace('interview-', '')
-
-    ### Fetching session details eg. JD, Resume ####
     session_details = fetch_session(session_id)
-    # logger.info(fetch_session(session_id))
-    ### 
+    jd_id = session_details.get("JD")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    jd_path = os.path.join(script_dir, "..", "job_description", f"{jd_id}.json")
+    with open(jd_path, "r", encoding="utf-8") as file:
+        jd_text = file.read()
+
+    agent = Assistant(job_description=jd_text, resume=session_details.get("resume"))
+
+    session = AgentSession(
+        vad=ctx.proc.userdata["vad"],
+        min_endpointing_delay=0.5,
+        max_endpointing_delay=5.0
+    )
+
+    def on_data_received(packet):
+        asyncio.create_task(handle_data_received(packet))
+
+    async def handle_data_received(packet):
+        # packet is a livekit.rtc.DataPacket
+        data = packet.data
+        topic = packet.topic
+        participant = packet.participant.identity  # if you need it
+        logger.info(f"Received {len(data)} bytes on topic {topic}")
+        if topic == "code-editor":
+            msg = data.decode("utf-8")
+            logger.info(f"Message: {msg}")
+            # You can process/store the code as needed
+
+    ctx.room.on("data_received", on_data_received)
+
+    # --- Example: Send code to UI after participant joins ---
+    async def send_code_to_ui():
+        await asyncio.sleep(5)  # Wait for UI to be ready (optional)
+        code_snippet = "// Here is a code snippet from the agent"
+        await ctx.room.local_participant.publish_data(
+            code_snippet.encode("utf-8"),
+            reliable=True,
+            topic="code-editor"
+        )
 
     # Wait for the first participant to connect
     participant = await ctx.wait_for_participant()
     logger.info(f"starting voice assistant for participant {participant.identity}")
 
-    usage_collector = metrics.UsageCollector()
-
-    #def on_transcription_received(segments):
-    #    print("received transcription")
-    #    print(segments)
-
-    # Log metrics and collect usage data
-    def on_metrics_collected(agent_metrics: metrics.AgentMetrics):
-        metrics.log_metrics(agent_metrics)
-        usage_collector.collect(agent_metrics)
-
-    jd_id = session_details.get("JD")
-
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    jd_path = os.path.join(script_dir, "..", "job_description", f"{jd_id}.json")
-
-    with open(jd_path, "r", encoding="utf-8") as file:
-        jd_text = file.read()
-
-    agent = Assistant(job_description=jd_text, resume=session_details.get("resume"))
-    
-    #print("AWS-->", os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_REGION"))
-
-    session = AgentSession(
-        vad=ctx.proc.userdata["vad"],
-        # minimum delay for endpointing, used when turn detector believes the user is done with their turn
-        min_endpointing_delay=0.5,
-        # maximum delay for endpointing, used when turn detector does not believe the user is done with their turn
-        max_endpointing_delay=5.0
-    )
-
-    # Trigger the on_metrics_collected function when metrics are collected
-    session.on("metrics_collected", on_metrics_collected)
-
-    try:
-        logger.info("Waiting for participant to join (max 30s)...")
-        #participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=300)
-        logger.info(f"Participant joined: {participant.identity}")
-    except asyncio.TimeoutError:
-        logger.warning("No participant joined within 30 seconds. Shutting down agent.")
-        await ctx.close()
-        return  # Exits the entrypoint, safely ends the subprocess
-
+    # Start the session and send code after join
     await session.start(room=ctx.room, agent=agent)
+    await send_code_to_ui()
 
 if __name__ == "__main__":
     cli.run_app(
