@@ -16,9 +16,16 @@ import {
   useVoiceAssistant,
 } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Room, RoomEvent, AudioCaptureOptions } from "livekit-client";
-import { useCallback, useEffect, useState } from "react";
+import { Room, RoomEvent, AudioCaptureOptions, Participant, DataPacket_Kind, RemoteParticipant } from "livekit-client";
+import { useMemo, useRef, useEffect, useCallback, useState  } from "react";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import InterviewWithEditor from "@/components/InterviewWithEditor";
+import { useRoomContext } from "@livekit/components-react";
+import debounce from 'lodash/debounce';
+
+const encoder = new TextEncoder()
+const decoder = new TextDecoder()
 
 export default function InterviewPage({ params }: { params: { interviewId: string } }) {
   const searchParams = useSearchParams();
@@ -38,10 +45,71 @@ export default function InterviewPage({ params }: { params: { interviewId: strin
 function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUrl: string, roomToken: string }) {
   const strans = useCombinedTranscriptions();
   const [transcripts, setTranscripts] = useState<Segment[]>([]);
+  const [code, setCode] = useState("// Initial code from UI");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setTranscripts(strans);
   }, [strans]);
+
+  useEffect(() => {
+    const handleData = (payload: Uint8Array, participant?: Participant, kind?: DataPacket_Kind, topic?: string) => {
+      console.log("Coding question received")
+      if (topic === "code-editor") {
+        var text = decoder.decode(payload);
+        text = text + "\n\n// Type your code below this:\n"
+        setCode(text);
+      }
+    };
+    room.on(RoomEvent.DataReceived, handleData);
+    return () => {
+      room.off(RoomEvent.DataReceived, handleData);
+    };
+  }, [room]);
+
+  const debouncedHandleStreamingCode = useMemo(() => {
+    const debounced = debounce((codeText: string) => {
+      const data = encoder.encode(codeText);
+      room.localParticipant.publishData(
+        data,
+        { reliable: true, topic: "code-editor" }
+      );
+    }, 1000);
+    return debounced;
+  }, [room]);
+
+  const handleSubmit = useCallback(
+    (codeText: string) => {
+      setIsSubmitting(true);
+      try {
+        debouncedHandleStreamingCode.flush();
+        codeText = codeText + "<--final code-->";
+        const data = encoder.encode(codeText);
+        room.localParticipant.publishData(
+          data,
+          { reliable: true, topic: "code-editor" }
+        );
+        toast.success("Code submitted successfully!");
+      } catch (error) {
+        console.error("Error during submission:", error);
+        toast.error("Failed to submit code.");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [room, debouncedHandleStreamingCode]
+  );
+
+  const handleCodeChange = useCallback((newCode: string) => {
+    setCode(newCode);
+    debouncedHandleStreamingCode(newCode);
+  }, [debouncedHandleStreamingCode]);
+
+  useEffect(() => {
+    return () => {
+      debouncedHandleStreamingCode.cancel();
+    };
+  }, [debouncedHandleStreamingCode]);
 
   const onConnectButtonClicked = useCallback(async () => {
     const audioCaptureOptions: AudioCaptureOptions = {
@@ -65,13 +133,16 @@ function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUr
   return (
     <div className="flex w-screen h-screen">
       <InterviewWithEditor
-        initialCode={"// Write your code here"}
-        onSubmit={code => alert("Submitted code:\n" + code)}
+        code={code}
+        onCodeChange={handleCodeChange}
+        onSubmit={handleSubmit}
         codeLanguage="js"
         highlight={true}
+        isSubmitting={isSubmitting}
       >
         <SimpleVoiceAssistant room={room} serverUrl={serverUrl} participantToken={roomToken} transcripts={transcripts} />
       </InterviewWithEditor>
+      <ToastContainer position="top-center" autoClose={2000} aria-label="Notification" />
     </div>
   );
 }

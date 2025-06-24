@@ -107,11 +107,12 @@ async def entrypoint(ctx: JobContext):
     )
     logger.info(f"connecting to room {ctx.room.name}")
     
+    
     session_id = ctx.room.name.replace('interview-', '')
 
     ### Fetching session details eg. JD, Resume ####
     session_details = fetch_session(session_id)
-    
+
     # Wait for the first participant to connect
     participant = await ctx.wait_for_participant()
     logger.info(f"starting voice assistant for participant {participant.identity}")
@@ -128,6 +129,11 @@ async def entrypoint(ctx: JobContext):
         interview_plan=session_details.get("interview_plan"),
         interview_context=session_details.get("interview_context")
     )
+
+    def on_data_received(packet):
+        asyncio.create_task(agent.handle_data_received(packet))
+
+    ctx.room.on("data_received", on_data_received)
     
     session = AgentSession(
         vad=ctx.proc.userdata["vad"],
@@ -275,73 +281,6 @@ async def entrypoint2(ctx: JobContext):
     ctx.add_shutdown_callback(cleanup)
 
 '''
-
-async def entrypoint(ctx: JobContext):
-
-    await ctx.connect(
-        auto_subscribe=AutoSubscribe.AUDIO_ONLY,
-    )
-    logger.info(f"connecting to room {ctx.room.name}")
-    #logger.info(f"Interview ID: {os.getenv('INTERVIEW_ID')}")
-
-    session_id = ctx.room.name.replace('interview-', '')
-
-    ### Fetching session details eg. JD, Resume ####
-    session_details = fetch_session(session_id)
-    # logger.info(fetch_session(session_id))
-    ### 
-
-    # Wait for the first participant to connect
-    participant = await ctx.wait_for_participant()
-    logger.info(f"starting voice assistant for participant {participant.identity}")
-
-    usage_collector = metrics.UsageCollector()
-
-    # Log metrics and collect usage data
-    def on_metrics_collected(agent_metrics: metrics.AgentMetrics):
-        metrics.log_metrics(agent_metrics)
-        usage_collector.collect(agent_metrics)
-
-    agent = Coordinator(
-        participant_identity=participant.identity,
-        interview_plan=session_details.get("interview_plan"),
-        interview_context=session_details.get("interview_context")
-    )
-    
-    session = AgentSession(
-        vad=ctx.proc.userdata["vad"],
-        # minimum delay for endpointing, used when turn detector believes the user is done with their turn
-        min_endpointing_delay=1,
-        # maximum delay for endpointing, used when turn detector does not believe the user is done with their turn
-        max_endpointing_delay=5.0,
-        allow_interruptions=True,
-        min_interruption_words=5
-    )
-
-    # Trigger the on_metrics_collected function when metrics are collected
-    session.on("metrics_collected", on_metrics_collected)
-
-    try:
-        logger.info("Waiting for participant to join (max 30s)...")
-        #participant = await asyncio.wait_for(ctx.wait_for_participant(), timeout=300)
-        logger.info(f"Participant joined: {participant.identity}")
-    except asyncio.TimeoutError:
-        logger.warning("No participant joined within 30 seconds. Shutting down agent.")
-        await ctx.close()
-        return  # Exits the entrypoint, safely ends the subprocess
-
-    await session.start(
-        room=ctx.room, 
-        agent=agent,
-        room_input_options=RoomInputOptions(
-            text_enabled=False,
-            #noise_cancellation=noise_cancellation.BVC()
-        ),
-        room_output_options=RoomOutputOptions(
-            transcription_enabled=True,
-            audio_enabled=True,
-        )
-    )
 
 
 if __name__ == "__main__":

@@ -32,10 +32,10 @@ Generate an Interview Plan tailored to the given job role and candidate, formatt
 ⚠️ INSTRUCTIONS TO FOLLOW
 
 - Make sure the question in the interview plan are concise. **DO NOT join multiple questions** in one, leave that for the voice-agent for the followup. 
-- Choose **the right number of questions** such that they can be reasonably covered within the scheduled duration, leaving room for follow-up probes.
 - Focus primarily on **JD-centric questions** that are critical to success in the role. However, you may **slightly tailor** questions to the candidate's background for relevance or engagement.
 - Ensure **fairness and consistency** across candidates. The core evaluation must not overly depend on the resume.
 - Include **programming, DSA, problem-solving,** or **aptitude puzzles** if they are relevant to the job role.
+- Generate exactly 2 questions for the interview. The second one being the programming, DSA, problem-solving.
 - Use a **mix of evaluation depths** (light, medium, deep) depending on the complexity and criticality of each competency.
 - Be clear, concise, and technically sound in your questions.
 - STRICTLY adhere to the output JSON format. Do not include any additional explanations or notes.

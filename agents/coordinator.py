@@ -22,7 +22,10 @@ from livekit.agents import (
     StopResponse,
     llm,
     utils,
-    ModelSettings
+    ModelSettings,
+    RunContext,
+    function_tool,
+    get_job_context
 )
 from livekit.agents.llm.chat_context import ChatContext, ChatMessage
 
@@ -67,7 +70,7 @@ class Coordinator(Agent):
     def __init__(self, *, participant_identity: str, interview_plan: dict, interview_context: dict):
         
         self.system_prompt = ""
-        prompt_file_path = "prompts/coordinator.txt"
+        prompt_file_path = "prompts/coordinator.3.txt"
         
         if os.path.exists(prompt_file_path):
             with open(prompt_file_path, 'r') as f:
@@ -105,7 +108,7 @@ class Coordinator(Agent):
     ):# -> Coroutine[Any, Any, llm.ChatChunk]:
         # Compose structured system prompt
         
-        #chat_ctx.add_message(
+       #chat_ctx.add_message(
         #    content=self.prompt,
         #    role="system"
         #)
@@ -119,7 +122,7 @@ class Coordinator(Agent):
         # Call the LLM and yield result
         stream = self.llm.chat(
             chat_ctx=chat_ctx,
-            tools=[]
+            tools=tools
         )
         
         async for chunk in stream:
@@ -133,6 +136,13 @@ class Coordinator(Agent):
             logger.info(full_output)
             if full_output:
                 json_object = json.loads(extract_json_string(full_output))
+                if json_object.get('use_code_editor_tool'):
+                    logger.info(f'🛠️ need to call tool here...')
+                    ques_index = json_object.get('current_question_index')
+                    ques = self.interview_plan.questions[ques_index].question
+                    await self.send_question_to_code_editor(ques)
+                    # await self.session.say("please open the code editor now.")
+                    return json_object.get('agent_action_message') + "please open the code editor now."
                 if json_object.get('agent_action') not in ['stay_silent'] \
                     or (time.time() - self.agent_last_conversation) > 10:
                     self.agent_last_conversation = time.time()
@@ -184,6 +194,50 @@ class Coordinator(Agent):
         await self.session.say("Looks like you are away, I am cancelling the interview for now. Please connect again later.", allow_interruptions=False)
         self.silence_watchdog_task.cancel()
         self.session.aclose()
+
+    # @function_tool()
+    async def send_question_to_code_editor(self, question: str):
+        """Use this tool to send coding question or text to the code editor.
+        Args:
+            question: The question text to send to code editor.
+        """
+        logger.info(f"💬 coding question: {question}")
+        room = get_job_context().room
+        await room.local_participant.publish_data(
+            question.encode("utf-8"),
+            reliable=True,
+            topic="code-editor"
+        )
+
+    async def handle_data_received(self, packet):
+        # packet is a livekit.rtc.DataPacket
+        data = packet.data
+        topic = packet.topic
+        participant = packet.participant.identity  # if you need it
+        logger.info(f"💬 Received {len(data)} bytes on topic {topic}")
+        if topic == "code-editor":
+            code = data.decode("utf-8")
+
+            marker = "// Type your code below this:"
+            parts = code.split(marker, 1)
+            if len(parts) > 1:
+                code = parts[1].strip()
+                if code:
+                    final_marker = "<--final code-->"
+                    if code.strip().endswith(final_marker):
+                        code = code.rstrip().removesuffix(final_marker).rstrip()
+                        if code:
+                            logger.info(f"💬 Code: {code}")
+                            # await self.session.say("Thank you for the submission.")
+                            code_submission_prompt = "User has submitted the code. Evaluate the code correctness and ask further question on it."
+                            handle = self.session.generate_reply(user_input=code, instructions=code_submission_prompt)
+                            await handle
+                        else:
+                            await self.session.say("Your submission is empty. Please submit full code")
+                    else:
+                        logger.info(f"💬 streaming code: {code}")
+            else:
+                await self.session.say("Please do not delete any existing code or text from the editor.")
 
     '''async def tts_node(
         self, text: AsyncIterable[str], model_settings: ModelSettings
