@@ -5,7 +5,12 @@ import torch.nn.functional as F
 from typing import Optional, Tuple, List, Dict, Any
 from dataclasses import dataclass
 from pdb import set_trace 
-from transformers import PretrainedConfig
+import logging
+from transformers import PretrainedConfig, PreTrainedModel, AutoConfig, AutoModelForCausalLM, GenerationMixin
+from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger('llama3')
 
 class LLama3Config(PretrainedConfig):
     model_type = "llama3"
@@ -84,7 +89,11 @@ class RotaryEmbedding(nn.Module):
         self.register_buffer("cos_cached", emb.cos()[None, None, :, :])
         self.register_buffer("sin_cached", emb.sin()[None, None, :, :])
 
-    def forward(self, x: torch.Tensor, seq_len: Optional[int] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: Optional[torch.Tensor] = None, seq_len: Optional[int] = None) -> Tuple[torch.Tensor, torch.Tensor]:
+        if seq_len is None:
+            if x is None:
+                raise ValueError("Either x or seq_len must be provided")
+            seq_len = x.shape[-2]
         if seq_len > self.max_seq_len_cached:
             self._set_cos_sin_cache(seq_len)
         return (
@@ -99,6 +108,8 @@ def rotate_half(x: torch.Tensor) -> torch.Tensor:
 
 def apply_rotary_pos_emb(q: torch.Tensor, k: torch.Tensor, cos: torch.Tensor, sin: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     """Apply rotary embeddings to query and key tensors."""
+    logger.debug(f"Debug - q shape: {q.shape}, k shape: {k.shape}")
+    logger.debug(f"Debug - cos shape: {cos.shape}, sin shape: {sin.shape}")
     q_embed = (q * cos) + (rotate_half(q) * sin)
     k_embed = (k * cos) + (rotate_half(k) * sin)
     return q_embed, k_embed
@@ -153,8 +164,11 @@ class LLama3Attention(nn.Module):
         output_attentions: bool = False,
         use_cache: bool = False,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor]]]:
-        # hidden_states (x)
+        # hidden_states (x) 
         bsz, seq_len, _ = hidden_states.size() # (B, T, D)
+        if (bsz < 2):
+            # set_trace()
+            logger.debug(f"DEBUG - hidden_states.size() {hidden_states.size()}")
 
         query_states = self.q_proj(hidden_states) # (B, T, D) -> (B, T, H * D/H)
         key_states = self.k_proj(hidden_states) # (B, T, D) -> (B, T, H_kv * D/H)
@@ -168,7 +182,13 @@ class LLama3Attention(nn.Module):
         if past_key_value is not None:
             kv_seq_len += past_key_value[0].shape[-2]
         
-        cos, sin = self.rotary_emb(value_states, seq_len=kv_seq_len)
+        # cos, sin = self.rotary_emb(value_states, seq_len=kv_seq_len)
+        cos, sin = self.rotary_emb(seq_len=kv_seq_len)
+        logger.debug(f"Debug - query_states shape: {query_states.shape}, key_states shape: {key_states.shape}")
+        logger.debug(f"Debug - cos shape: {cos.shape}, sin shape: {sin.shape}, kv_seq_len: {kv_seq_len}")
+        # seq_len = query_states.shape[2]
+        # cos = cos[:, :, :seq_len, :]
+        # sin = sin[:, :, :seq_len, :]
         query_states, key_states = apply_rotary_pos_emb(query_states, key_states, cos, sin)
 
         if past_key_value is not None:
@@ -323,15 +343,20 @@ class LLama3Model(nn.Module):
 
         batch_size, seq_length = input_ids.shape
 
+        # Create positional embedding ids of size (batch_size, seq_length)
         if position_ids is None:
             device = input_ids.device
-            position_ids = torch.arange(0, seq_length, dtype=torch.long, device=device)
-            position_ids = position_ids.unsqueeze(0).expand(batch_size, -1)
+            position_ids = torch.arange(0, seq_length, dtype=torch.long, device=device) # [0, 1, 2, ..., seq_length-1]
+            position_ids = position_ids.unsqueeze(0).expand(batch_size, -1) # (B, seqLen)
 
         if inputs_embeds is None:
-            inputs_embeds = self.embed_tokens(input_ids)
+            inputs_embeds = self.embed_tokens(input_ids) # (B, seqLen) -> (B, seqLen, Embed)
 
+        # (B, seqLen, Embed)
         hidden_states = inputs_embeds
+        # b_size, _, _ = hidden_states.size()
+        # if (b_size < 2):
+        #     set_trace()
 
         # decoder layers
         all_hidden_states = () if output_hidden_states else None
@@ -374,13 +399,18 @@ class LLama3Model(nn.Module):
             "attentions": all_self_attns if output_attentions else None,
         }
 
-class LLama3ForCausalLM(nn.Module):
+# class LLama3ForCausalLM(nn.Module):
+class LLama3ForCausalLM(PreTrainedModel, GenerationMixin):
     """Llama3 model for causal language modeling"""
+    main_input_name = "input_ids"
+    
     def __init__(self, config: LLama3Config):
-        super().__init__()
+        # super().__init__()
+        super().__init__(config)
         self.config = config
         self.model = LLama3Model(config)
         self.lm_head = nn.Linear(config.hidden_size, config.vocab_size, bias=False)
+        # set_trace()
 
         # Initialize weights
         self.apply(self._init_weights)
@@ -421,6 +451,8 @@ class LLama3ForCausalLM(nn.Module):
         )
 
         hidden_states = outputs["last_hidden_state"]
+        
+        # hidden_states = outputs.last_hidden_state
         logits = self.lm_head(hidden_states)
 
         loss = None
@@ -431,13 +463,60 @@ class LLama3ForCausalLM(nn.Module):
             loss_fct = nn.CrossEntropyLoss()
             loss = loss_fct(shift_logits.view(-1, self.config.vocab_size), shift_labels.view(-1))
 
-        return {
-            "loss": loss,
-            "logits": logits,
-            "past_key_values": outputs["past_key_values"],
-            "hidden_states": outputs["hidden_states"],
-            "attentions": outputs["attentions"],
-        }
+        # return {
+        #     "loss": loss,
+        #     "logits": logits,
+        #     "past_key_values": outputs["past_key_values"],
+        #     "hidden_states": outputs["hidden_states"],
+        #     "attentions": outputs["attentions"],
+        # }
+        return CausalLMOutputWithPast(
+            loss=loss,
+            logits=logits,
+            past_key_values=outputs["past_key_values"],
+            hidden_states=outputs["hidden_states"],
+            attentions=outputs["attentions"],
+        )
+    
+    def get_input_embeddings(self):
+        return self.model.embed_tokens
+
+    def set_input_embeddings(self, value):
+        self.model.embed_tokens = value
+
+    def resize_token_embeddings(self, new_num_tokens: int):
+        self.model.embed_tokens = nn.Embedding(new_num_tokens, self.config.hidden_size)
+
+    def get_output_embeddings(self):
+        return self.lm_head
+
+    def set_output_embeddings(self, new_embeddings):
+        self.lm_head = new_embeddings
+
+    def prepare_inputs_for_generation(self, input_ids, past_key_values=None, attention_mask=None, inputs_embeds=None, **kwargs):
+        position_ids = kwargs.get("position_ids", None)
+        if attention_mask is not None and position_ids is None:
+            # create position_ids on the fly for batch generation
+            position_ids = attention_mask.long().cumsum(-1) - 1
+            position_ids.masked_fill_(attention_mask == 0, 1)
+            if past_key_values:
+                position_ids = position_ids[:, -input_ids.shape[1] :]
+
+        # if `inputs_embeds` are passed, we only want to use them in the 1st generation step
+        if inputs_embeds is not None and past_key_values is None:
+            model_inputs = {"inputs_embeds": inputs_embeds}
+        else:
+            model_inputs = {"input_ids": input_ids}
+
+        model_inputs.update(
+            {
+                "position_ids": position_ids,
+                "past_key_values": past_key_values,
+                "use_cache": kwargs.get("use_cache"),
+                "attention_mask": attention_mask,
+            }
+        )
+        return model_inputs
 
 def create_llama3_1b() -> LLama3ForCausalLM:
     """Creates a 1B parameter version of Llama3"""
@@ -450,7 +529,10 @@ def create_llama3_1b() -> LLama3ForCausalLM:
         # # num_key_value_heads=16,
         # max_position_embeddings=2048,
     )
-    return LLama3ForCausalLM(config)
+    _model = LLama3ForCausalLM(config)
+    # AutoConfig.register("llama3", LLama3Config)
+    # AutoModelForCausalLM.register(LLama3Config, LLama3ForCausalLM)
+    return _model
 
 def create_llama3_3b() -> LLama3ForCausalLM:
     """Creates a 3B parameter version of Llama3"""
