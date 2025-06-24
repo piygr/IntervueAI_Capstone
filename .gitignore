@@ -216,3 +216,7 @@ session_logs/
 .vscode
 test.*
 *.pdf
+
+.env*
+*.env
+.env.local*
