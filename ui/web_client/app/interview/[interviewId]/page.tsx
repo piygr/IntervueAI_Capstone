@@ -17,9 +17,12 @@ import {
 } from "@livekit/components-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Room, RoomEvent, AudioCaptureOptions, Participant, DataPacket_Kind, RemoteParticipant } from "livekit-client";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo, useRef, useEffect, useCallback, useState  } from "react";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import InterviewWithEditor from "@/components/InterviewWithEditor";
 import { useRoomContext } from "@livekit/components-react";
+import debounce from 'lodash/debounce';
 
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
@@ -43,16 +46,18 @@ function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUr
   const strans = useCombinedTranscriptions();
   const [transcripts, setTranscripts] = useState<Segment[]>([]);
   const [code, setCode] = useState("// Initial code from UI");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     setTranscripts(strans);
   }, [strans]);
 
-  // --- Listen for code from agent ---
   useEffect(() => {
     const handleData = (payload: Uint8Array, participant?: Participant, kind?: DataPacket_Kind, topic?: string) => {
+      console.log("Coding question received")
       if (topic === "code-editor") {
-        const text = decoder.decode(payload);
+        var text = decoder.decode(payload);
+        text = text + "\n\n// Type your code below this:\n"
         setCode(text);
       }
     };
@@ -62,18 +67,49 @@ function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUr
     };
   }, [room]);
 
-  // --- Send code to agent on submit ---
-  const handleSubmit = useCallback(
-    (codeText: string) => {
-      const data = encoder.encode(codeText)
+  const debouncedHandleStreamingCode = useMemo(() => {
+    const debounced = debounce((codeText: string) => {
+      const data = encoder.encode(codeText);
       room.localParticipant.publishData(
         data,
         { reliable: true, topic: "code-editor" }
       );
-      // Optionally, do other things (e.g., show a toast)
+    }, 1000);
+    return debounced;
+  }, [room]);
+
+  const handleSubmit = useCallback(
+    (codeText: string) => {
+      setIsSubmitting(true);
+      try {
+        debouncedHandleStreamingCode.flush();
+        codeText = codeText + "<--final code-->";
+        const data = encoder.encode(codeText);
+        room.localParticipant.publishData(
+          data,
+          { reliable: true, topic: "code-editor" }
+        );
+        toast.success("Code submitted successfully!");
+      } catch (error) {
+        console.error("Error during submission:", error);
+        toast.error("Failed to submit code.");
+      } finally {
+        setIsSubmitting(false);
+      }
     },
-    [room]
+    [room, debouncedHandleStreamingCode]
   );
+
+  const handleCodeChange = useCallback((newCode: string) => {
+    setCode(newCode);
+    debouncedHandleStreamingCode(newCode);
+  }, [debouncedHandleStreamingCode]);
+
+  useEffect(() => {
+    return () => {
+      debouncedHandleStreamingCode.cancel();
+    };
+  }, [debouncedHandleStreamingCode]);
 
   const onConnectButtonClicked = useCallback(async () => {
     const audioCaptureOptions: AudioCaptureOptions = {
@@ -98,13 +134,15 @@ function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUr
     <div className="flex w-screen h-screen">
       <InterviewWithEditor
         code={code}
-        onCodeChange={setCode}
+        onCodeChange={handleCodeChange}
         onSubmit={handleSubmit}
         codeLanguage="js"
         highlight={true}
+        isSubmitting={isSubmitting}
       >
         <SimpleVoiceAssistant room={room} serverUrl={serverUrl} participantToken={roomToken} transcripts={transcripts} />
       </InterviewWithEditor>
+      <ToastContainer position="top-center" autoClose={2000} aria-label="Notification" />
     </div>
   );
 }

@@ -1,7 +1,12 @@
 {
   "dependencies": {
     "@uiw/react-textarea-code-editor": "^3.1.1",
+    "lodash": "^4.17.21",
     "react-resizable-panels": "^3.0.3",
-    "react-split": "^2.0.14"
+    "react-split": "^2.0.14",
+    "react-toastify": "^11.0.5"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.18"
   }
 }

@@ -1,5 +1,5 @@
 import React, { useState, Children, cloneElement, isValidElement } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import SimpleCodeEditor from "./SimpleCodeEditor";
 
@@ -10,6 +10,7 @@ export type InterviewWithEditorProps = {
   onSubmit: (code: string) => void;
   codeLanguage?: string;
   highlight?: boolean;
+  isSubmitting?: boolean;
 };
 
 const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
@@ -19,14 +20,16 @@ const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
   onSubmit,
   codeLanguage = "text",
   highlight = true,
+  isSubmitting = false
 }) => {
   const [editorOpen, setEditorOpen] = useState(false);
 
-  // Clone children to inject editorOpen prop
   const childrenWithProps = Children.map(children, (child) => {
     if (!isValidElement<{ editorOpen?: boolean }>(child)) return child;
     return cloneElement(child, { editorOpen });
   });
+
+  const buttonBase = "transition duration-150 focus:outline-none font-semibold rounded shadow";
 
   if (!editorOpen) {
     return (
@@ -34,7 +37,7 @@ const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
         <div className="flex-1 min-w-0">{childrenWithProps}</div>
         <div className="p-4 flex justify-center">
           <button
-            className="px-4 py-2 rounded bg-white text-black font-semibold shadow"
+            className={`${buttonBase} bg-white text-black px-4 py-2 hover:bg-gray-100 active:bg-gray-200 focus:ring-2 focus:ring-gray-400`}
             onClick={() => setEditorOpen(true)}
           >
             Open Code Editor
@@ -47,7 +50,7 @@ const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
   return (
     <PanelGroup direction="horizontal" className="flex-grow flex w-full h-full">
       <Panel defaultSize={30} minSize={20}>
-        <div className="bg-black flex flex-col h-full min-w-0" style={{ overflow: "auto" }}>
+        <div className="bg-black flex flex-col h-full min-w-0 overflow-auto">
           <div className="flex-1 min-w-0">{childrenWithProps}</div>
         </div>
       </Panel>
@@ -65,10 +68,10 @@ const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
           <div className="flex items-center justify-between p-4 border-b border-gray-700">
             <span className="font-semibold text-white">Code Editor</span>
             <button
-              className="px-3 py-1 rounded bg-gray-800 text-white hover:bg-gray-700"
+              className={`${buttonBase} bg-gray-800 text-white px-3 py-1 hover:bg-gray-700 active:bg-gray-900 focus:ring-2 focus:ring-gray-400`}
               onClick={() => setEditorOpen(false)}
             >
-              Back to Interview
+              Close Editor
             </button>
           </div>
           <div className="flex-1 overflow-auto p-2">
@@ -78,18 +81,20 @@ const InterviewWithEditor: React.FC<InterviewWithEditorProps> = ({
               language={codeLanguage}
               highlight={highlight}
               minRows={16}
-              style={{
-                background: "#23272a",
-                color: "#fff"
-              }}
+              style={{ background: "#23272a", color: "#fff" }}
             />
           </div>
           <div className="p-4 border-t border-gray-700 flex justify-end">
             <button
-              className="px-4 py-2 rounded bg-blue-600 text-white font-semibold shadow"
-              onClick={() => onSubmit(code)}
+              disabled={isSubmitting}
+              className={`${buttonBase} ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''} bg-indigo-600 text-white px-5 py-2 rounded-md text-sm font-semibold hover:bg-indigo-700 transition-colors`}
+              onClick={() => {
+                if (window.confirm("Are you sure you want to submit this code?")) {
+                  onSubmit(code);
+                }
+              }}
             >
-              Submit
+              {isSubmitting ? 'Submitting...' : 'Submit'}
             </button>
           </div>
         </motion.div>

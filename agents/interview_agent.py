@@ -11,7 +11,10 @@ from livekit.agents import (
     WorkerOptions,
     cli,
     metrics,
-    RoomInputOptions
+    RoomInputOptions,
+    RunContext,
+    function_tool,
+    get_job_context
 )
 from livekit.agents.llm.chat_context import ChatContext, ChatMessage
 from livekit.plugins import (
@@ -52,7 +55,8 @@ class Assistant(Agent):
         instructions = f"""
 You are an AI interview agent conducting a structured job interview.
 
-You will be given a **job description** and a **candidate's resume** in JSON format. Use this information to prepare and ask **10 interview questions**, starting with general or introductory topics and gradually progressing to more technical or role-specific areas.
+You will be given a **job description** and a **candidate's resume** in JSON format. Use this information to prepare and ask **2 interview questions only**, 
+starting with general or introductory topics and the next will be a very basic coding question on data structure and alogrithm.
 
 Conduct the interview in an **interactive manner**:
 - Ask one question at a time.
@@ -64,6 +68,13 @@ Conduct the interview in an **interactive manner**:
 - Tailor questions based on the candidate's past roles, projects, and skills.
 - Align the focus of the questions with the job's requirements, but keep the language conversational.
 - Ask a mix of behavioral, situational, and technical questions.
+- When asking the coding question, frame the question in a manner that candidate can understand and also send the question text to code editor by calling the tool: 
+"send_question_to_code_editor(question: str)
+ Use this tool to send coding question or text to the code editor
+Args:
+    question: The question text to send to code editor."
+- For coding question, keep some information ambiguous and let the cnadidate ask clarification question and then answer them just like a candidate would ask in a real interview. Do not send the clarification to code editor.
+- When candidate submits the code, ask followup question on time complexity and space complexity if it's not already answered in the submitted code text.
 - Keep the tone professional and engaging.
 - Do not answer the questions yourself.
 
@@ -85,6 +96,51 @@ Here is the candidate's resume:
     async def on_enter(self):
         # The agent should be polite and greet the user when it joins :)
         self.session.say("Hey, how are you doing today?")
+
+    @function_tool()
+    async def send_question_to_code_editor(self, context: RunContext, question: str):
+        """Use this tool to send coding question or text to the code editor.
+        Args:
+            question: The question text to send to code editor.
+        """
+        logger.info(f"💬 coding question: {question}")
+        room = get_job_context().room
+        await room.local_participant.publish_data(
+            question.encode("utf-8"),
+            reliable=True,
+            topic="code-editor"
+        )
+        await context.session.say("please open the code editor now.")
+
+
+    async def handle_data_received(self, packet):
+        # packet is a livekit.rtc.DataPacket
+        data = packet.data
+        topic = packet.topic
+        participant = packet.participant.identity  # if you need it
+        logger.info(f"💬 Received {len(data)} bytes on topic {topic}")
+        if topic == "code-editor":
+            code = data.decode("utf-8")
+
+            marker = "// Type your code below this:"
+            parts = code.split(marker, 1)
+            if len(parts) > 1:
+                code = parts[1].strip()
+                if code:
+                    final_marker = "<--final code-->"
+                    if code.strip().endswith(final_marker):
+                        code = code.rstrip().removesuffix(final_marker).rstrip()
+                        if code:
+                            logger.info(f"💬 Code: {code}")
+                            # await self.session.say("Thank you for the submission.")
+                            handle = self.session.generate_reply(user_input=code, instructions="User has submitted the code. Evaluate the code correctness and ask further question on it.")
+                            await handle
+                        else:
+                            await self.session.say("Your submission is empty. Please submit full code")
+                    else:
+                        logger.info(f"💬 streaming code: {code}")
+            else:
+                await self.session.say("Please do not delete any existing code or text from the editor.")
 
 
 def prewarm(proc: JobProcess):
@@ -115,38 +171,15 @@ async def entrypoint(ctx: JobContext):
     )
 
     def on_data_received(packet):
-        asyncio.create_task(handle_data_received(packet))
-
-    async def handle_data_received(packet):
-        # packet is a livekit.rtc.DataPacket
-        data = packet.data
-        topic = packet.topic
-        participant = packet.participant.identity  # if you need it
-        logger.info(f"Received {len(data)} bytes on topic {topic}")
-        if topic == "code-editor":
-            msg = data.decode("utf-8")
-            logger.info(f"Message: {msg}")
-            # You can process/store the code as needed
+        asyncio.create_task(agent.handle_data_received(packet))
 
     ctx.room.on("data_received", on_data_received)
-
-    # --- Example: Send code to UI after participant joins ---
-    async def send_code_to_ui():
-        await asyncio.sleep(5)  # Wait for UI to be ready (optional)
-        code_snippet = "// Here is a code snippet from the agent"
-        await ctx.room.local_participant.publish_data(
-            code_snippet.encode("utf-8"),
-            reliable=True,
-            topic="code-editor"
-        )
 
     # Wait for the first participant to connect
     participant = await ctx.wait_for_participant()
     logger.info(f"starting voice assistant for participant {participant.identity}")
 
-    # Start the session and send code after join
     await session.start(room=ctx.room, agent=agent)
-    await send_code_to_ui()
 
 if __name__ == "__main__":
     cli.run_app(
