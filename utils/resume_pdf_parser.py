@@ -130,4 +130,3 @@ Here is the resume:
     except Exception as e:
         logger.error(f"⚠️ llm failed to parse resume: {repr(e)}")
         return False, "error"
-
