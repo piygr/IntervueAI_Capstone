@@ -17,7 +17,10 @@
     "livekit-client": "^2.8.0",
     "livekit-server-sdk": "^2.9.7",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-dom": "^18.3.1",
+    "@uiw/react-textarea-code-editor": "^3.1.1",
+    "react-resizable-panels": "^3.0.3",
+    "react-split": "^2.0.14"
   },
   "devDependencies": {
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",

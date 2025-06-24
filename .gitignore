@@ -212,6 +212,7 @@ pre_training/wandb/*
 
 # session logs
 session_logs/
+logs/
 
 .vscode
 test.*
