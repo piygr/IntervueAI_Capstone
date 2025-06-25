@@ -67,4 +67,5 @@ COMPANY NAME: {company_name}
 - You **MUST** call the right tool with proper arguements.
 - If unsure, prefer to clarify or probe gently — do not guess or end prematurely.
 - You have to keep track of the current question index from the interview plan.
+- For all the tools which require any message as arguements for the user, make sure the message is not abrupt and it connects with the candidate's response.
 
