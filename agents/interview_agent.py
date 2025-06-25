@@ -32,7 +32,7 @@ from livekit.plugins import (
 #from livekit.plugins.turn_detector.english import EnglishModel
 
 from utils.session import fetch_session
-from agents.coordinator import Coordinator
+from agents.coordinator import Coordinator, Memory
 import os
 
 load_dotenv(dotenv_path=".env.local")
@@ -135,14 +135,15 @@ async def entrypoint(ctx: JobContext):
 
     ctx.room.on("data_received", on_data_received)
     
-    session = AgentSession(
+    session = AgentSession[Memory](
         vad=ctx.proc.userdata["vad"],
         # minimum delay for endpointing, used when turn detector believes the user is done with their turn
         min_endpointing_delay=1,
         # maximum delay for endpointing, used when turn detector does not believe the user is done with their turn
         max_endpointing_delay=5.0,
         allow_interruptions=True,
-        min_interruption_words=5
+        min_interruption_words=5,
+        userdata=Memory(),
     )
 
     # Trigger the on_metrics_collected function when metrics are collected

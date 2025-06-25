@@ -49,6 +49,8 @@ from agents.interviewer import Interviewer
 from livekit.agents import UserInputTranscribedEvent
 from livekit.agents import ConversationItemAddedEvent
 from utils.llm import extract_json_string
+from dataclasses import dataclass, field
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 load_dotenv(dotenv_path=".env.local")
@@ -66,11 +68,21 @@ tts = aws.TTS(
     region=os.getenv("AWS_REGION")
 )
 
+@dataclass
+class Memory:
+    interview_plan: InterviewPlan = None
+    response_summary: list[dict] = field(default_factory=list)
+    current_question_index: int = -1
+    agent_last_conversation: int = 0
+    user_last_conversation: int = 0
+
+
+
 class Coordinator(Agent):
     def __init__(self, *, participant_identity: str, interview_plan: dict, interview_context: dict):
         
         self.system_prompt = ""
-        prompt_file_path = "prompts/coordinator.3.txt"
+        prompt_file_path = "prompts/coordinator.txt"
         
         if os.path.exists(prompt_file_path):
             with open(prompt_file_path, 'r') as f:
@@ -100,7 +112,7 @@ class Coordinator(Agent):
         self._cancel_interview_task = None
         self._lock = asyncio.Lock()
     
-    async def llm_node(
+    '''async def llm_node(
         self,
         chat_ctx: ChatContext,
         tools: list = [],
@@ -153,13 +165,16 @@ class Coordinator(Agent):
                 return ""
         except Exception as e:
             logger.error(f"Error in parsing json:{e}")
-            return ""
+            return ""'''
         
 
     async def on_enter(self):
         self.session.on("user_input_transcribed", self.user_input_transcribed)
-        self.session.generate_reply(instructions="Greet the candidate and wish him/her luck for the interview")
         self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
+        self.session.userdata.interview_plan = self.interview_plan
+        #self.session.generate_reply(instructions="Greet the candidate and wish him/her luck for the interview")
+        self.session.generate_reply(allow_interruptions=False)
+        
         
     #async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
         #self.user_last_coversation = time.time()
@@ -169,33 +184,177 @@ class Coordinator(Agent):
             print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
             self.user_last_coversation = time.time()
 
-    async def _monitor_silence(self):
-        #while True:
-        await asyncio.sleep(10)
+            self.session.userdata.user_last_coversation = time.time()
 
-        # If agent or user is currently speaking, skip
-        # If both have been silent for over 10 seconds
-        #async with self._lock:
-        now = time.time()
-        if self._cancel_interview_task is None and \
-        now - max(self.agent_last_conversation, self.user_last_coversation) > random.randint(15, 20):
-            #l = ["Are you there?", "Could you please tell me what you are thinking?", "Let me know if you need clarification."]
-            #msg = l[random.randint(0, len(l)-1)]
-            silence_break_prompt = f"Candidate has not spoken for a while, ask him if he/she is thiking or he has lost the connection or needs clarification."
-            await self.session.generate_reply(instructions=silence_break_prompt)
-            self.agent_last_conversation = now
-            self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
+    async def _monitor_silence(self):
+        logger.info(f"Started monitor silence")
+        while True:
+            await asyncio.sleep(10)
+
+            # If agent or user is currently speaking, skip
+            # If both have been silent for over 10 seconds
+            #async with self._lock:
+            now = time.time()
+            logger.info(f"agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_coversation: {self.session.userdata.user_last_coversation}")
+            if self._cancel_interview_task is None and \
+            now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_coversation) > random.randint(15, 20):
+                #l = ["Are you there?", "Could you please tell me what you are thinking?", "Let me know if you need clarification."]
+                #msg = l[random.randint(0, len(l)-1)]
+                silence_break_prompt = f"Candidate has not spoken for a while, ask him if he/she is thiking or he has lost the connection or needs clarification."
+                await self.session.generate_reply(instructions=silence_break_prompt)
+                self.session.userdata.agent_last_conversation = now
+            #self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
         
-                #if now - self.user_last_coversation > 60:
-                #    self._cancel_interview_task = asyncio.create_task(self._cancel_interview)
+                if now - self.session.userdata.user_last_coversation > 60:
+                    self._cancel_interview_task = await self._cancel_interview()
+                    break
 
     async def _cancel_interview(self):
         #async with self._lock:
         await self.session.say("Looks like you are away, I am cancelling the interview for now. Please connect again later.", allow_interruptions=False)
-        self.silence_watchdog_task.cancel()
-        self.session.aclose()
+        await self.silence_watchdog_task.cancel()
+        await self.session.aclose()
 
-    # @function_tool()
+    @function_tool
+    async def stay_silent(self,
+        context: RunContext[Memory],
+        current_question_index: int
+    ):
+        """
+        Called when the candidate may still be speaking or thinking, as an interviewer you don't have any message for the candidate so better to stay silent.
+        
+        Args:
+            current_question_index: Index of the current active question from the interview plan
+        """
+
+        logger.info(f"{current_question_index}: Stay Silent")
+        context.userdata.current_question_index = current_question_index
+
+    @function_tool
+    async def probe(
+        self,
+        context: RunContext[Memory],
+        current_question_index: int,
+        probing_message: str
+    ):
+        """
+        Called to ask a follow-up question to explore the answer more deeply, depending on the interview plan's evaluation depth and the previous user response.
+
+        Args:
+            current_question_index: Index of the current active question from the interview plan
+            probing_question: Message that needs to be asked to the candidate to probe further. Make sure the message blends in flow of the conversation. 
+        """
+
+        logger.info(f"{current_question_index}: Probe Further: {probing_message}")
+        context.userdata.current_question_index = current_question_index
+        self.session.say(probing_message)
+        context.userdata.agent_last_conversation = time.time()
+
+
+    @function_tool
+    async def hint(
+        self,
+        context: RunContext[Memory],
+        current_question_index: int,
+        hint_message: str
+    ):
+        """
+        Called to offer a helpful clue or nudge if the candidate seems stuck or confused.
+        
+        Args:
+            current_question_index: Index of the current active question from the interview plan
+            hint_message: Hint message that needs to be told to the candidate. Make sure the message blends in flow of the conversation.
+        """
+
+        logger.info(f"{current_question_index}: Provide hint: {hint_message}")
+        context.userdata.current_question_index = current_question_index
+        self.session.say(hint_message)
+        context.userdata.agent_last_conversation = time.time()
+
+
+    @function_tool
+    async def clarify(
+        self,
+        context: RunContext[Memory],
+        current_question_index: int,
+        clarification_message: str
+    ):
+        """
+        Called to rephrase or repeat the question if the candidate misunderstood or asked for clarification
+
+        Args:
+            current_question_index: Index of the current active question from the interview plan
+            clarification_message: Clarification message that needs to be told to the candidate. Make sure the message blends in flow of the conversation.
+        """
+        logger.info(f"{current_question_index}: Clarification message: {clarification_message}")
+        context.userdata.current_question_index = current_question_index
+        self.session.say(clarification_message)
+        context.userdata.agent_last_conversation = time.time()
+
+
+    @function_tool
+    async def next_question(self,
+        context: RunContext[Memory],
+        current_question_index: int,
+        next_question_message: str,
+        previous_question_user_response_summary: str,
+        use_code_editor: bool
+    ):
+        """
+        Called to move to the next question once the current one has been sufficiently answered
+
+        Args:
+            current_question_index: Index of the question from the interview plan being asked in thhe next_question_message
+            next_question_message: Next question message that needs to be asked to the candidate. Make sure the message blends in flow of the conversation.
+            previous_question_user_response_summary: Detailed summary of the user response for the previous question
+            use_code_editor: If the question is a coding related question or DSA or algo related question which requires code editor use, make it true otherwise false.
+        """
+
+        logger.info(f"{current_question_index}: Next Question message: {next_question_message}")
+        context.userdata.current_question_index = current_question_index
+        if current_question_index > 0:
+            context.userdata.response_summary.append(dict(question_index=current_question_index, 
+                                                          user_response_summary=previous_question_user_response_summary))
+            
+        if not use_code_editor:
+            self.session.say(next_question_message)
+        else:
+            question = self.interview_plan.questions[current_question_index].question
+            logger.info(f"💬 coding question: {question}")
+            room = get_job_context().room
+            await room.local_participant.publish_data(
+                question.encode("utf-8"),
+                reliable=True,
+                topic="code-editor"
+            )
+            self.session.say(next_question_message + "\n Please open code editor to answer.")
+
+        context.userdata.agent_last_conversation = time.time()
+
+    @function_tool
+    async def end_interview(self,
+        context: RunContext[Memory],
+        last_question_index: int,
+        end_interview_message: str,
+        previous_question_user_response_summary: str,
+    ):
+        """
+        Called to end the interview due to time constraint or all questions have been asked.
+
+        Args:
+            last_question_index: Index of the last question from the interview plan after which the end of interview is reached
+            
+            end_interview_message: Message to convey to the candidate at the end of interview. Make sure the message blends in flow of the conversation.
+            previous_question_user_response_summary: Detailed summary of the user response for the previous question
+        """
+        logger.info(f"{last_question_index}: End of interview")
+        
+        context.userdata.response_summary.append(dict(question_index=last_question_index, 
+                                                          user_response_summary=previous_question_user_response_summary))
+        self.session.say(end_interview_message)
+        context.userdata.agent_last_conversation = time.time()
+
+    #@function_tool
     async def send_question_to_code_editor(self, question: str):
         """Use this tool to send coding question or text to the code editor.
         Args:
