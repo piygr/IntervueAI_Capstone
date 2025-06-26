@@ -77,14 +77,18 @@ class Memory:
     current_question_index: int = -1
     agent_last_conversation: int = 0
     user_last_conversation: int = 0
+    is_coding_question: bool = False
+    cancellation_warned:bool = False
 
+silence_break_time = random.randint(15, 20)
+silence_break_time_for_coding = 5*60 # 5 min
 
 
 class Coordinator(Agent):
     def __init__(self, *, participant_identity: str, interview_plan: dict, interview_context: dict):
         
         self.system_prompt = ""
-        prompt_file_path = "prompts/coordinator.txt"
+        prompt_file_path = "prompts/coordinator.4.txt"
         
         if os.path.exists(prompt_file_path):
             with open(prompt_file_path, 'r') as f:
@@ -176,6 +180,7 @@ class Coordinator(Agent):
         self.session.userdata.interview_plan = self.interview_plan
         #self.session.generate_reply(instructions="Greet the candidate and wish him/her luck for the interview")
         self.session.generate_reply(allow_interruptions=False)
+        self.session.userdata.user_last_conversation = time.time()
         
         
     #async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
@@ -183,13 +188,13 @@ class Coordinator(Agent):
 
     def user_input_transcribed(self, event: UserInputTranscribedEvent):
         if event.is_final:
-            print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
+            print(f"📖 User input transcribed: {event.transcript}, final: {event.is_final}")
             self.user_last_conversation = time.time()
 
             self.session.userdata.user_last_conversation = time.time()
 
     async def _monitor_silence(self):
-        logger.info(f"Started monitor silence")
+        logger.info(f"👂 Started monitor silence")
         try:
             while True:
                 await asyncio.sleep(10)
@@ -198,17 +203,31 @@ class Coordinator(Agent):
                 # If both have been silent for over 10 seconds
                 #async with self._lock:
                 now = time.time()
-                logger.info(f"agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
+                logger.info(f"⌛️ agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
+
+                _silence_break_time = silence_break_time_for_coding if self.session.userdata.is_coding_question else silence_break_time
+
+                logger.info(f'⏱️ silence break time: {_silence_break_time}')
+
                 if self._cancel_interview_task is None and \
-                now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > random.randint(15, 20):
+                now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > _silence_break_time:
                     #l = ["Are you there?", "Could you please tell me what you are thinking?", "Let me know if you need clarification."]
                     #msg = l[random.randint(0, len(l)-1)]
                     silence_break_prompt = f"Candidate has not spoken for a while, ask him if he/she is thiking or he has lost the connection or needs clarification."
                     await self.session.generate_reply(instructions=silence_break_prompt)
                     self.session.userdata.agent_last_conversation = now
                 #self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
-            
-                    if now - self.session.userdata.user_last_conversation > 60:
+                    # Warn user of interview cancellation.
+                    
+                    warn_wait_time = 2 * silence_break_time_for_coding if self.session.userdata.is_coding_question else 60
+                    logger.info(f'⏱️ warn_wait_time: {warn_wait_time}')
+                    if not self.session.userdata.cancellation_warned and now - self.session.userdata.user_last_conversation > warn_wait_time:
+                        self.session.userdata.cancellation_warned = True
+                        await self.session.say("You've been silent for a long time. Your interview will be cancelled soon. Please speak up to avoid cancellation.")
+
+                    cancel_wait_time = 3 * silence_break_time_for_coding if self.session.userdata.is_coding_question else 120
+                    logger.info(f'⏱️ cancel_wait_time: {cancel_wait_time}')
+                    if now - self.session.userdata.user_last_conversation > cancel_wait_time:
                         self._cancel_interview_task = await self._cancel_interview()
                         break
         except Exception as e:
@@ -350,6 +369,7 @@ class Coordinator(Agent):
             
         if not use_code_editor:
             self.session.say(question_message)
+            context.userdata.is_coding_question = False
         else:
             question = self.interview_plan.questions[question_index].question
             logger.info(f"💬 coding question: {question}")
@@ -360,6 +380,7 @@ class Coordinator(Agent):
                 topic="code-editor"
             )
             self.session.say(question_message + "\n Please open code editor to answer.")
+            context.userdata.is_coding_question = True
 
         context.userdata.agent_last_conversation = time.time()
 
@@ -419,9 +440,10 @@ class Coordinator(Agent):
                     if code.strip().endswith(final_marker):
                         code = code.rstrip().removesuffix(final_marker).rstrip()
                         if code:
+                            self.session.userdata.user_last_conversation = time.time()
                             logger.info(f"💬 Code: {code}")
-                            # await self.session.say("Thank you for the submission.")
-                            code_submission_prompt = "User has submitted the code. Evaluate the code correctness and ask further question on it."
+                            await self.session.say("Thank you for the submission.")
+                            code_submission_prompt = "User has submitted the code. Evaluate the code correctness and ask further probing question on it including time and space complexity if it has not been answered already in the code text"
                             handle = self.session.generate_reply(user_input=code, instructions=code_submission_prompt)
                             await handle
                         else:
@@ -430,6 +452,19 @@ class Coordinator(Agent):
                         logger.info(f"💬 streaming code: {code}")
             else:
                 await self.session.say("Please do not delete any existing code or text from the editor.")
+
+    async def tts_node(
+        self, text: AsyncIterable[str], model_settings: ModelSettings
+    ) -> AsyncIterable[rtc.AudioFrame]:
+        llm_resp = ""
+        async for chunk in text:
+            llm_resp += chunk
+        logger.info(f'💬 Agent text: {llm_resp}')
+        logger.info(f'💬 Agent text2: {text}')
+
+        async for frame in Agent.default.tts_node(self, text, model_settings):
+            # Insert custom audio processing here
+            yield frame
 
     '''async def tts_node(
         self, text: AsyncIterable[str], model_settings: ModelSettings
