@@ -10,7 +10,7 @@ import logging
 import sys
 from utils.resume_pdf_parser import parse_resume_pdf
 from utils.interview_planner import generate_interview_plan
-from utils.session import update_session, fetch_session
+from utils.session import update_session, fetch_session, load_config
 import json
 
 logger = logging.getLogger("start-interview")
@@ -23,10 +23,9 @@ LIVEKIT_API_KEY = os.getenv("LIVEKIT_API_KEY")
 LIVEKIT_API_SECRET = os.getenv("LIVEKIT_API_SECRET")
 LIVEKIT_SERVER_URL = os.getenv("LIVEKIT_URL")
 
-print(LIVEKIT_API_KEY, LIVEKIT_SERVER_URL)
-
 @router.post("/start-interview")
 async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
+    config = load_config()
     print(LIVEKIT_API_KEY, LIVEKIT_SERVER_URL)
     logger.info(f"Starting interview for JD: {jobId}")
     room_name = f"interview-{interviewId}"
@@ -56,7 +55,7 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
     resume_json = session_dict.get('resume')
     
     if resume_json:
-        interview_plan = await generate_interview_plan(jd_json, resume_json, 45)
+        interview_plan = await generate_interview_plan(jd_json, resume_json, config.get('interview', {}).get('duration_minutes'))
         if interview_plan:
             interview_context = dict(
                 candidate_first_name=resume_json.get('candidate_first_name', ''),

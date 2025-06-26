@@ -1,0 +1,10 @@
+model:
+  type: "gemini"
+  name: "gemini-2.0-flash"
+
+interview:
+  duration_minutes: 45
+
+tts:
+  voice: "Kajal"
+  language: "en-IN"

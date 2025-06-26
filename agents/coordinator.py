@@ -71,7 +71,7 @@ tts = aws.TTS(
 )
 
 @dataclass
-class Memory:
+class InterviewContext:
     interview_plan: InterviewPlan = None
     response_summary: list[dict] = field(default_factory=list)
     current_question_index: int = -1
@@ -197,19 +197,22 @@ class Coordinator(Agent):
         self.session.on("user_input_transcribed", self.user_input_transcribed)
         self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
         self.session.userdata.interview_plan = self.interview_plan
-        #self.session.generate_reply(instructions="Greet the candidate and wish him/her luck for the interview")
         self.session.generate_reply(allow_interruptions=False)
         
         
-    #async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
-        #self.user_last_conversation = time.time()
-
     def user_input_transcribed(self, event: UserInputTranscribedEvent):
         if event.is_final:
             print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
             self.user_last_conversation = time.time()
 
             self.session.userdata.user_last_conversation = time.time()
+
+            if self.session.userdata.current_question_index >= 0:
+                self.memory.update_candidate_response(
+                    question_index=self.current_qn_index, 
+                    response=event.transcript,
+                    timestamp=time.time()
+                )
 
     async def _monitor_silence(self):
         logger.info(f"Started monitor silence")
@@ -223,14 +226,12 @@ class Coordinator(Agent):
                 now = time.time()
                 logger.info(f"agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
                 if self._cancel_interview_task is None and \
-                ((now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > random.randint(15, 20) ) \
-                    or (self.session.userdata.current_question_requires_coding and now - self.session.userdata.user_last_typed > random.randint(15, 20) ) ):
-                        #silence_break_prompt = f"Candidate has not spoken for a while, ask him if he/she is thiking or he has lost the connection or needs clarification."
-                        #self.session._chat_ctx.add_message(role="system", content=silence_break_prompt)
+                ((now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > random.randint(40, 60) ) \
+                    or (self.session.userdata.current_question_requires_coding and now - self.session.userdata.user_last_typed > random.randint(200, 300) ) ):
                         msg = random.choice(SILENCE_BREAKER)
                         await self.session.say(msg)
                         self.session.userdata.agent_last_conversation = now
-                        if now - self.session.userdata.user_last_conversation > 60:
+                        if now - self.session.userdata.user_last_conversation > 300:
                             self._cancel_interview_task = await self._cancel_interview()
                             break
                         
@@ -256,7 +257,7 @@ class Coordinator(Agent):
 
     @function_tool
     async def greet(self,
-        context: RunContext[Memory],
+        context: RunContext[InterviewContext],
         greeting_message: str
     ):
         """
@@ -272,7 +273,7 @@ class Coordinator(Agent):
 
     @function_tool
     async def stay_silent(self,
-        context: RunContext[Memory],
+        context: RunContext[InterviewContext],
         current_question_index: int
     ):
         """
@@ -288,7 +289,7 @@ class Coordinator(Agent):
     @function_tool
     async def probe(
         self,
-        context: RunContext[Memory],
+        context: RunContext[InterviewContext],
         current_question_index: int,
         probing_message: str
     ):
@@ -305,11 +306,16 @@ class Coordinator(Agent):
         self.session.say(probing_message)
         context.userdata.agent_last_conversation = time.time()
 
+        self.memory.add_followup_item(question_index=current_question_index,
+                                            followup_type="probe_further",
+                                            followup=probing_message,
+                                            timestamp=time.time())
+
 
     @function_tool
     async def hint(
         self,
-        context: RunContext[Memory],
+        context: RunContext[InterviewContext],
         current_question_index: int,
         hint_message: str
     ):
@@ -326,11 +332,16 @@ class Coordinator(Agent):
         self.session.say(hint_message)
         context.userdata.agent_last_conversation = time.time()
 
+        self.memory.add_followup_item(question_index=current_question_index,
+                                            followup_type="provide_hint",
+                                            followup=hint_message,
+                                            timestamp=time.time())
+
 
     @function_tool
     async def clarify(
         self,
-        context: RunContext[Memory],
+        context: RunContext[InterviewContext],
         current_question_index: int,
         clarification_message: str
     ):
@@ -346,10 +357,15 @@ class Coordinator(Agent):
         self.session.say(clarification_message)
         context.userdata.agent_last_conversation = time.time()
 
+        self.memory.add_followup_item(question_index=current_question_index,
+                                            followup_type="clarify",
+                                            followup=clarification_message,
+                                            timestamp=time.time())
+        
 
     @function_tool
     async def next_question(self,
-        context: RunContext[Memory],
+        context: RunContext[InterviewContext],
         question_index: int,
         pre_message: str,
         question_message: str,
@@ -393,9 +409,14 @@ class Coordinator(Agent):
 
         context.userdata.agent_last_conversation = time.time()
 
+        self.memory.add_agent_question(question_index=question_index,
+                                            agent=question_message,
+                                            timestamp=time.time())
+
+
     @function_tool
     async def end_interview(self,
-        context: RunContext[Memory],
+        context: RunContext[InterviewContext],
         last_question_index: int,
         end_interview_message: str,
         previous_question_user_response_summary: str,
@@ -455,6 +476,12 @@ class Coordinator(Agent):
                             code_submission_prompt = "User has submitted the code. Evaluate the code correctness and ask further question on it."
                             handle = self.session.generate_reply(user_input=code, instructions=code_submission_prompt)
                             await handle
+
+                            self.memory.update_candidate_response(
+                                question_index=self.session.userdata.current_question_index, 
+                                response="[User submitted the following code]\n '''\n{code}'''\n]",
+                                timestamp=time.time()
+                            )
                         else:
                             await self.session.say("Your submission is empty. Please submit full code")
                     else:

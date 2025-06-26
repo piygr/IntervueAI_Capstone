@@ -1,5 +1,6 @@
 livekit-api
 fastapi
+pyyaml
 uvicorn
 python-multipart
 aiofiles

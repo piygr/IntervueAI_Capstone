@@ -13,6 +13,7 @@ Generate an Interview Plan tailored to the given job role and candidate, formatt
       "question": string,               // The actual question to be asked
       "evaluation_category": string,    // The skill or domain being evaluated (e.g., system design, DSA, communication)
       "evaluation_depth": string        // Expected depth of response (light | medium | deep)
+      "tentative_time_allocation_in_minutes": float //Tentative time to allocate to this question
     }}
     // Add more questions as needed
   ]
@@ -38,3 +39,4 @@ Generate an Interview Plan tailored to the given job role and candidate, formatt
 - Use a **mix of evaluation depths** (light, medium, deep) depending on the complexity and criticality of each competency.
 - Be clear, concise, and technically sound in your questions.
 - STRICTLY adhere to the output JSON format. Do not include any additional explanations or notes.
+- Make sure to allocate significantly more interview time to questions related to **programming, DSA, problem-solving,** or **aptitude puzzles**

@@ -1,6 +1,13 @@
 import os
 import json
 from datetime import datetime
+import yaml
+
+def load_config(path="configs/config.yaml"):
+    with open(path, "r") as f:
+        config = yaml.safe_load(f)
+    return config
+
 
 def update_session(session_id, new_data):
     folder_path = "logs/sessions"
@@ -49,3 +56,4 @@ def fetch_session(session_id):
         data = {}
 
     return data
+

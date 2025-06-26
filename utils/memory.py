@@ -108,7 +108,7 @@ class MemoryManager:
                 raw = json.load(f)
                 self.session_id = raw.get("session_id")
                 self.interview_plan = InterviewPlan(**raw.get("interview_plan"))
-                self.conversation = List(ConversationItem(**item) for item in raw.get("conversation"))
+                self.conversation = list(ConversationItem(**item) for item in raw.get("conversation"))
 
     def save(self):
         # Before opening the file for writing
@@ -261,74 +261,21 @@ class MemoryManager:
         
         self.save()
 
-    '''
-    def add_tool_call(
-        self, tool_name: str, tool_args: dict, tags: Optional[List[str]] = None
-    ):
-        item = ConversationItem(
-            timestamp=time.time(),
-            type="tool_call",
-            text=f"Called {tool_name} with {tool_args}",
-            tool_name=tool_name,
-            tool_args=tool_args,
-            tags=tags or [],
-        )
-        self.add(item)
+    def get_conversation(self):
+        text = ''
+        for index, cItem in enumerate(self.conversation):
+            if cItem.question_index >= 0:
+                item = cItem.model_dump_json()
+                
+                text += f'''Question {index + 1}\n\n'''
+                while item:
+                    if item.get('agent') is not None:
+                        text += f'''Interview Agent: {item.get('agent')} \n'''
+                        item = item.get('candidate')
+                    elif item.get('response') is not None:
+                        text += f''''Candidate: {item.get('response')} \n'''
+                        item = item.get('followup')
 
-    def add_tool_output(
-        self, tool_name: str, tool_args: dict, tool_result: dict, success: bool, tags: Optional[List[str]] = None
-    ):
-        item = ConversationItem(
-            timestamp=time.time(),
-            type="tool_output",
-            text=f"Output of {tool_name}: {tool_result}",
-            tool_name=tool_name,
-            tool_args=tool_args,
-            tool_result=tool_result,
-            success=success,  # 🆕 Track success!
-            tags=tags or [],
-        )
-        self.add(item)
-
-    def add_final_answer(self, text: str):
-        item = ConversationItem(
-            timestamp=time.time(),
-            type="final_answer",
-            text=text,
-            final_answer=text,
-        )
-        self.add(item)
-
-    def find_recent_successes(self, limit: int = 5) -> List[str]:
-        """Find tool names which succeeded recently."""
-        tool_successes = []
-
-        # Search from newest to oldest
-        for item in reversed(self.items):
-            if item.type == "tool_output" and item.success:
-                if item.tool_name and item.tool_name not in tool_successes:
-                    tool_successes.append(item.tool_name)
-            if len(tool_successes) >= limit:
-                break
-
-        return tool_successes
-
-    def add_tool_success(self, tool_name: str, success: bool):
-        """Patch last tool call or output for a given tool with success=True/False."""
-
-        # Search backwards for latest matching tool call/output
-        for item in reversed(self.items):
-            if item.tool_name == tool_name and item.type in {"tool_call", "tool_output"}:
-                item.success = success
-                log("memory", f"✅ Marked {tool_name} as success={success}")
-                self.save()
-                return
-
-        log("memory", f"⚠️ Tried to mark {tool_name} as success={success} but no matching memory found.")
-
-    def get_session_items(self) -> List[MemoryItem]:
-        """
-        Return all memory items for current session.
-        """
-        return self.items
-'''
+                text += f'''\n\n'''
+        
+        return text
