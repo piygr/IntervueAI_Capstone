@@ -265,7 +265,7 @@ class MemoryManager:
         text = ''
         for index, cItem in enumerate(self.conversation):
             if cItem.question_index >= 0:
-                item = cItem.model_dump_json()
+                item = json.loads(cItem.model_dump_json())
                 
                 text += f'''Question {index + 1}\n\n'''
                 while item:
@@ -273,7 +273,7 @@ class MemoryManager:
                         text += f'''Interview Agent: {item.get('agent')} \n'''
                         item = item.get('candidate')
                     elif item.get('response') is not None:
-                        text += f''''Candidate: {item.get('response')} \n'''
+                        text += f'''Candidate: {item.get('response')} \n'''
                         item = item.get('followup')
 
                 text += f'''\n\n'''

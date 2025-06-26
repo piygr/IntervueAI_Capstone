@@ -209,7 +209,7 @@ class Coordinator(Agent):
 
             if self.session.userdata.current_question_index >= 0:
                 self.memory.update_candidate_response(
-                    question_index=self.current_qn_index, 
+                    question_index=self.session.userdata.current_question_index, 
                     response=event.transcript,
                     timestamp=time.time()
                 )
@@ -413,6 +413,7 @@ class Coordinator(Agent):
                                             agent=question_message,
                                             timestamp=time.time())
 
+        #logger.info(self.memory.get_conversation())
 
     @function_tool
     async def end_interview(self,
