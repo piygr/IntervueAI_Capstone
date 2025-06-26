@@ -77,8 +77,31 @@ class Memory:
     current_question_index: int = -1
     agent_last_conversation: int = 0
     user_last_conversation: int = 0
+    user_last_typed: int = 0
+    current_question_requires_coding: bool = False
 
-
+SILENCE_BREAKER = [
+  "Are you still with me?",
+  "Take your time, but let me know if you’re stuck.",
+  "Just checking in — is everything okay on your side?",
+  "Feel free to think out loud if that helps.",
+  "No rush, but I’m here if you need a hint or clarification.",
+  "Do you want me to repeat the question?",
+  "Hey, let me know when you’re ready to continue.",
+  "Just making sure we’re still connected.",
+  "Would you like to hear the question again?",
+  "Don’t worry, I’m here to support you — let me know if you need anything.",
+  "It’s okay to pause, but I’m still listening if you’re ready.",
+  "If you’re thinking, take your time — I just wanted to check in.",
+  "Is there anything unclear that I can help with?",
+  "Sometimes thinking aloud can help — feel free to do that.",
+  "Would a small nudge help you move forward?",
+  "No pressure — just let me know if you’re ready to proceed.",
+  "Just a gentle ping — are you still working on the question?",
+  "I’m happy to wait, but let me know if you need support.",
+  "You’ve been quiet for a bit — should we move on or dig deeper?",
+  "If you're lost in thought, that's perfectly fine. Just checking if you're still there."
+]
 
 class Coordinator(Agent):
     def __init__(self, *, participant_identity: str, interview_plan: dict, interview_context: dict):
@@ -200,17 +223,17 @@ class Coordinator(Agent):
                 now = time.time()
                 logger.info(f"agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
                 if self._cancel_interview_task is None and \
-                now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > random.randint(15, 20):
-                    #l = ["Are you there?", "Could you please tell me what you are thinking?", "Let me know if you need clarification."]
-                    #msg = l[random.randint(0, len(l)-1)]
-                    silence_break_prompt = f"Candidate has not spoken for a while, ask him if he/she is thiking or he has lost the connection or needs clarification."
-                    await self.session.generate_reply(instructions=silence_break_prompt)
-                    self.session.userdata.agent_last_conversation = now
-                #self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
-            
-                    if now - self.session.userdata.user_last_conversation > 60:
-                        self._cancel_interview_task = await self._cancel_interview()
-                        break
+                ((now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > random.randint(15, 20) ) \
+                    or (self.session.userdata.current_question_requires_coding and now - self.session.userdata.user_last_typed > random.randint(15, 20) ) ):
+                        #silence_break_prompt = f"Candidate has not spoken for a while, ask him if he/she is thiking or he has lost the connection or needs clarification."
+                        #self.session._chat_ctx.add_message(role="system", content=silence_break_prompt)
+                        msg = random.choice(SILENCE_BREAKER)
+                        await self.session.say(msg)
+                        self.session.userdata.agent_last_conversation = now
+                        if now - self.session.userdata.user_last_conversation > 60:
+                            self._cancel_interview_task = await self._cancel_interview()
+                            break
+                        
         except Exception as e:
             logger.error(f"Error in _monitor_silence {e}")
 
@@ -328,6 +351,7 @@ class Coordinator(Agent):
     async def next_question(self,
         context: RunContext[Memory],
         question_index: int,
+        pre_message: str,
         question_message: str,
         previous_question_user_response_summary: str,
         use_code_editor: bool
@@ -337,6 +361,11 @@ class Coordinator(Agent):
 
         Args:
             question_index: Index of the question from the interview plan being asked in the question_message. index starts from 0 for first question and so on.
+            pre_message: Message that is conveyed to the candidate before asking the next question. Examples: 
+                        - Let's move on to the next question.
+                        - Moving on to the next question.
+                        - Alright. Let's discuss something else. 
+
             question_message: Next question message that needs to be asked to the candidate. Make sure the message blends in flow of the conversation.
             previous_question_user_response_summary: Detailed summary of the user response for the previous question
             use_code_editor: If the question is a coding related question or DSA or algo related question which requires code editor use, make it true otherwise false.
@@ -348,8 +377,9 @@ class Coordinator(Agent):
             context.userdata.response_summary.append(dict(question_index=question_index, 
                                                           user_response_summary=previous_question_user_response_summary))
             
+        context.userdata.current_question_requires_coding = use_code_editor
         if not use_code_editor:
-            self.session.say(question_message)
+            self.session.say(pre_message + "\n" + question_message)
         else:
             question = self.interview_plan.questions[question_index].question
             logger.info(f"💬 coding question: {question}")
@@ -359,7 +389,7 @@ class Coordinator(Agent):
                 reliable=True,
                 topic="code-editor"
             )
-            self.session.say(question_message + "\n Please open code editor to answer.")
+            self.session.say(pre_message + "\n" + question_message + "\n Please open code editor to answer.")
 
         context.userdata.agent_last_conversation = time.time()
 
@@ -413,6 +443,7 @@ class Coordinator(Agent):
             marker = "// Type your code below this:"
             parts = code.split(marker, 1)
             if len(parts) > 1:
+                self.session.userdata.user_last_typed = time.time()
                 code = parts[1].strip()
                 if code:
                     final_marker = "<--final code-->"
