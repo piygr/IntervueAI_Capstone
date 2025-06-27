@@ -2,39 +2,21 @@ import logging
 
 from dotenv import load_dotenv
 import asyncio
-from collections.abc import AsyncGenerator, AsyncIterable, Coroutine, Generator
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from livekit import rtc
 from livekit.agents import (
     Agent,
-    AgentSession,
-    AutoSubscribe,
-    JobContext,
-    JobProcess,
-    WorkerOptions,
-    cli,
-    metrics,
-    RoomInputOptions,
-    RoomOutputOptions,
-    RoomIO,
-    StopResponse,
-    llm,
-    utils,
-    ModelSettings,
     RunContext,
     function_tool,
     get_job_context
 )
-from livekit.agents.llm.chat_context import ChatContext, ChatMessage
 
 from livekit.plugins import (
     openai,
     silero,
     aws,
-    google,
-    noise_cancellation
+    google
 )
 #from livekit.plugins.turn_detector.english import EnglishModel
 
@@ -42,29 +24,31 @@ from agents.feedback_agent import FeedbackAgent
 from utils.session import fetch_session
 from utils.memory import MemoryManager, ConversationItem, InterviewPlan
 
-import os, json
+import os
 import random
 import time
-from agents.interviewer import Interviewer
 
 from livekit.agents import UserInputTranscribedEvent
-from livekit.agents import ConversationItemAddedEvent
-from utils.llm import extract_json_string
+from utils.session import load_config
+
 from dataclasses import dataclass, field
-from typing import Optional
 
 from livekit.api import LiveKitAPI, ListParticipantsRequest, RoomParticipantIdentity
 
 logger = logging.getLogger(__name__)
 load_dotenv(dotenv_path=".env.local")
+config = load_config()
 
-llm_model = google.LLM(
-        model="gemini-2.0-flash",
-    )
+llm_model = None
+if config.get('model', {}).get('type', '') == 'gemini':
+    llm_model = google.LLM(
+            model="gemini-2.0-flash",
+        )
+    
 stt = aws.STT()
 tts = aws.TTS(
-    voice="Kajal",
-    language="en-IN",
+    voice=config.get('tts', {}).get('voice', ''),
+    language=config.get('tts', {}).get('language', ''),
     speech_engine="generative",
     api_key=os.getenv("AWS_ACCESS_KEY_ID"),
     api_secret=os.getenv("AWS_SECRET_ACCESS_KEY"),
@@ -81,31 +65,57 @@ class InterviewContext:
     user_last_typed: int = 0
     current_question_requires_coding: bool = False
     cancellation_warned: bool = False
-
+    
 silence_break_time_for_coding = 5*60 # 5 min
 
-SILENCE_BREAKER = [
-  "Are you still with me?",
-  "Take your time, but let me know if you’re stuck.",
-  "Just checking in — is everything okay on your side?",
-  "Feel free to think out loud if that helps.",
-  "No rush, but I’m here if you need a hint or clarification.",
-  "Do you want me to repeat the question?",
-  "Hey, let me know when you’re ready to continue.",
-  "Just making sure we’re still connected.",
-  "Would you like to hear the question again?",
-  "Don’t worry, I’m here to support you — let me know if you need anything.",
-  "It’s okay to pause, but I’m still listening if you’re ready.",
-  "If you’re thinking, take your time — I just wanted to check in.",
-  "Is there anything unclear that I can help with?",
-  "Sometimes thinking aloud can help — feel free to do that.",
-  "Would a small nudge help you move forward?",
-  "No pressure — just let me know if you’re ready to proceed.",
-  "Just a gentle ping — are you still working on the question?",
-  "I’m happy to wait, but let me know if you need support.",
-  "You’ve been quiet for a bit — should we move on or dig deeper?",
-  "If you're lost in thought, that's perfectly fine. Just checking if you're still there."
-]
+
+SILENCE_BREAKER = {
+    "question": [
+        "Are you still with me?",
+        "Take your time, but let me know if you’re stuck.",
+        "Just checking in — is everything okay on your side?",
+        "Feel free to think out loud if that helps.",
+        "No rush, but I’m here if you need a hint or clarification.",
+        "Do you want me to repeat the question?",
+        "Hey, let me know when you’re ready to continue.",
+        "Just making sure we’re still connected.",
+        "Would you like to hear the question again?",
+        "Do you need help — let me know if you need anything.",
+        "It’s okay to pause, but I’m still listening if you’re ready.",
+        "If you’re thinking, take your time — I just wanted to check in.",
+        "Is there anything unclear that I can help with?",
+        "Sometimes thinking aloud can help — feel free to do that.",
+        "Would a small nudge help you move forward?",
+        "No pressure — just let me know if you’re ready to proceed.",
+        "Just a gentle ping — are you still working on the question?",
+        "I’m happy to wait, but let me know if you need help.",
+        "You’ve been quiet for a bit — should we move on or dig deeper?",
+        "If you're lost in thought, that's perfectly fine. Just checking if you're still there."
+    ],
+    "greet": [
+        "Just checking — can you hear me clearly?",
+        "Whenever you’re ready, feel free to say hello so we can begin.",
+        "No rush — take your time and let me know when you’re ready to start.",
+        "I'm here and ready when you are!",
+        "Shall we get started with the interview?",
+        "Hi again! Just waiting for you to say something so we can begin.",
+        "If you're facing any tech issues, feel free to reload or unmute.",
+        "Is everything working okay on your end?",
+        "Feel free to say 'ready' when you're good to go!",
+        "Just a friendly nudge — we can begin whenever you're set.",
+        "Let me know if you need a moment or if you'd like to start now.",
+        "I haven’t heard from you yet — is your mic working?",
+        "Ready to dive in? You can speak when you're set.",
+        "I'm all ears — shall we begin?",
+        "Still here with you. Say something when you're ready!",
+        "Looks like we haven’t started yet — everything alright?",
+        "Give me a quick hello so I know we can proceed.",
+        "No pressure — just let me know when you're ready to kick things off.",
+        "We haven’t started yet — is there anything you need help with before we begin?",
+        "Say something when you're ready, and we’ll get started right away!"
+    ]
+
+}
 
 class Coordinator(Agent):
     def __init__(self, *, participant_identity: str, interview_plan: dict, interview_context: dict):
@@ -134,70 +144,12 @@ class Coordinator(Agent):
                                     memory_dir="logs/memory",
                                     interview_plan=self.interview_plan)
         
-        self.current_qn_index = -1
-        self.agent_last_conversation = 0
-        self.user_last_conversation = 0
         self.silence_watchdog_task = None
         self._cancel_interview_task = None
-        self._lock = asyncio.Lock()
-    
-    '''async def llm_node(
-        self,
-        chat_ctx: ChatContext,
-        tools: list = [],
-        model_settings: ModelSettings = None
-    ):# -> Coroutine[Any, Any, llm.ChatChunk]:
-        # Compose structured system prompt
-        
-       #chat_ctx.add_message(
-        #    content=self.prompt,
-        #    role="system"
-        #)
-
-        #chat_ctx.
-
-        # Add LLM-callable tools if needed
-        #all_tools = tools + [summarize_tool, end_interview]
-
-        full_output = ""
-        # Call the LLM and yield result
-        stream = self.llm.chat(
-            chat_ctx=chat_ctx,
-            tools=tools
-        )
-        
-        async for chunk in stream:
-            if isinstance(chunk, llm.ChatChunk):
-                if chunk.delta and chunk.delta.content:
-                    full_output += chunk.delta.content
-            else:
-                full_output += str(chunk)
-
-        try:
-            logger.info(full_output)
-            if full_output:
-                json_object = json.loads(extract_json_string(full_output))
-                if json_object.get('use_code_editor_tool'):
-                    logger.info(f'🛠️ need to call tool here...')
-                    ques_index = json_object.get('current_question_index')
-                    ques = self.interview_plan.questions[ques_index].question
-                    await self.send_question_to_code_editor(ques)
-                    # await self.session.say("please open the code editor now.")
-                    return json_object.get('agent_action_message') + "please open the code editor now."
-                if json_object.get('agent_action') not in ['stay_silent'] \
-                    or (time.time() - self.agent_last_conversation) > 10:
-                    self.agent_last_conversation = time.time()
-                    return json_object.get('agent_action_message')
-                else:
-                    return ""
-            else:
-                return ""
-        except Exception as e:
-            logger.error(f"Error in parsing json:{e}")
-            return ""'''
         
 
     async def on_enter(self):
+        self.session.userdata.user_last_conversation = time.time()
         self.session.on("user_input_transcribed", self.user_input_transcribed)
         self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
         self.session.userdata.interview_plan = self.interview_plan
@@ -208,7 +160,6 @@ class Coordinator(Agent):
     def user_input_transcribed(self, event: UserInputTranscribedEvent):
         if event.is_final:
             logger.info(f"📝 User input transcribed: {event.transcript}, final: {event.is_final}")
-            self.user_last_conversation = time.time()
 
             self.session.userdata.user_last_conversation = time.time()
 
@@ -225,18 +176,18 @@ class Coordinator(Agent):
             while True:
                 await asyncio.sleep(10)
 
-                # If agent or user is currently speaking, skip
-                # If both have been silent for over 10 seconds
-                #async with self._lock:
                 now = time.time()
                 logger.info(f"⌛️ agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
-                _silence_break_time = silence_break_time_for_coding if self.session.userdata.current_question_requires_coding else random.randint(15, 20)
+                _silence_break_time = random.randint(200, 300) if self.session.userdata.current_question_requires_coding else random.randint(15, 20)
 
                 logger.info(f'⏱️ silence break time: {_silence_break_time}')
 
                 if self._cancel_interview_task is None and \
                 now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > _silence_break_time:
-                        msg = random.choice(SILENCE_BREAKER)
+                        if self.session.userdata.current_question_index >= 0:
+                            msg = random.choice(SILENCE_BREAKER['question'])
+                        else:
+                            msg = random.choice(SILENCE_BREAKER['greet'])
                         await self.session.say(msg)
                         self.session.userdata.agent_last_conversation = now
 
@@ -257,7 +208,6 @@ class Coordinator(Agent):
             logger.error(f"Error in _monitor_silence {e}")
 
     async def _cancel_interview(self, message: str):
-        #async with self._lock:
         async with LiveKitAPI() as lkapi:
             if message:
                 await self.session.say(message, allow_interruptions=False)
@@ -281,6 +231,7 @@ class Coordinator(Agent):
             await self.silence_watchdog_task.cancel()
             await self.session.drain()
             await self.session.aclose()
+
 
     @function_tool
     async def greet(self,
@@ -440,7 +391,6 @@ class Coordinator(Agent):
                                             agent=question_message,
                                             timestamp=time.time())
 
-        #logger.info(self.memory.get_conversation())
 
     @function_tool
     async def end_interview(self,
@@ -462,10 +412,11 @@ class Coordinator(Agent):
         
         context.userdata.response_summary.append(dict(question_index=last_question_index, 
                                                           user_response_summary=previous_question_user_response_summary))
-        await self.session.say(end_interview_message)
+        #self.session.say(end_interview_message)
         context.userdata.agent_last_conversation = time.time()
-        await self._cancel_interview(message=None)
+        await self._cancel_interview(message=end_interview_message)
 
+  
     async def handle_data_received(self, packet):
         # packet is a livekit.rtc.DataPacket
         data = packet.data
@@ -487,15 +438,16 @@ class Coordinator(Agent):
                         if code:
                             self.session.userdata.user_last_conversation = time.time()
                             logger.debug(f"📝 Code: {code}")
-                            self.memory.update_candidate_response(
-                                question_index=self.session.userdata.current_question_index, 
-                                response=f"[Candidate submitted the following code]\n '''\n{code}'''\n]",
-                                timestamp=time.time()
-                            )
                             # await self.session.say("Thank you for the submission.")
                             code_submission_prompt = "Candidate has submitted the code. Evaluate the code correctness, check if the code handles the edge cases correctly and ask further probing question on it including time and space complexity if it has not been answered already in the code text."
                             handle = self.session.generate_reply(user_input=code, instructions=code_submission_prompt)
                             await handle
+
+                            self.memory.update_candidate_response(
+                                question_index=self.session.userdata.current_question_index, 
+                                response="[Candidate submitted the following code]\n '''\n{code}'''\n]",
+                                timestamp=time.time()
+                            )   
 
                         else:
                             await self.session.say("Your submission is empty. Please submit full code")
@@ -503,66 +455,3 @@ class Coordinator(Agent):
                         logger.debug(f"📝 streaming code: {code}")
             else:
                 await self.session.say("Please do not delete any existing code or text from the editor.")
-
-    '''async def tts_node(
-        self, text: AsyncIterable[str], model_settings: ModelSettings
-    ) -> (
-        AsyncGenerator[rtc.AudioFrame, None]
-        | Coroutine[Any, Any, AsyncIterable[rtc.AudioFrame]]
-        | Coroutine[Any, Any, None]
-    ):
-        llm_resp = ""
-        async for chunk in text:
-            llm_resp += chunk
-        
-        message = ""
-        try:
-            if llm_resp:
-                llm_resp_json = json.loads(extract_json_string(llm_resp))
-                message = llm_resp_json.get("agent_action_message")
-        except Exception as e:
-            logger.error(f"Error in json parsing in tts_node: {e}")
-
-        logger.info(f"tts_node: {message}")
-        yield message'''
-
-"""
-    async def on_user_turn_completed(self, chat_ctx: llm.ChatContext, new_message: llm.ChatMessage):
-        #async with self._lock:
-        user_transcript = new_message.text_content
-        logger.info(f"User {self.participant_identity} said -> {user_transcript}")
-        '''self.memory.update_candidate_response(
-                question_index=self.current_qn_index, 
-                response=user_transcript,
-                timestamp=time.time()
-            )'''
-        self.user_last_conversation = time.time()
-        #time.sleep(2)
-        '''self.update_instructions(instructions=self.system_prompt.format(interview_plan=self.interview_plan,
-                                                                        conversation=self.memory.to_json().get("conversation"),
-                                                                        current_question=self.current_qn_index))
-        
-        
-
-        logger.info(f"user: {self.session.user_state}, agent: {self.session.agent_state}")
-        #if self.session.agent_state not in ['speaking'] and self.session.user_state not in ['speaking']:
-        agent_response = await self.interviewer.decide_next_action(self.memory)
-        #probe_further, provide_hint, clarify, move_to_next_question, end_interview
-        if agent_response.get('agent_action') == 'stay_silent':
-            pass
-        else:
-            if agent_response.get('agent_action') == "move_to_next_question":
-                self.current_qn_index += 1
-                self.memory.add_agent_question(question_index=self.current_qn_index,
-                                            agent=agent_response.get('agent_action_message'),
-                                            timestamp=time.time())
-            else:
-                self.memory.add_followup_item(question_index=self.current_qn_index,
-                                            followup_type=agent_response.get('agent_action'),
-                                            followup=agent_response.get('agent_action_message'),
-                                            timestamp=time.time())
-            
-            self.session.say(agent_response.get('agent_action_message'))
-        raise StopResponse()
-        '''
-        """
