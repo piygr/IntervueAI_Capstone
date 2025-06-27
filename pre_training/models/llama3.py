@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pdb import set_trace 
 import logging
 from transformers import PretrainedConfig, PreTrainedModel, AutoConfig, AutoModelForCausalLM, GenerationMixin
+from transformers import AutoConfig, LlamaForCausalLM
 from transformers.modeling_outputs import CausalLMOutputWithPast, BaseModelOutputWithPast
 
 logging.basicConfig(level=logging.INFO)
@@ -30,7 +31,7 @@ class LLama3Config(PretrainedConfig):
                  pad_token_id=0,
                  bos_token_id=1,
                  eos_token_id=2,
-                 tie_word_embeddings=False,
+                 tie_word_embeddings=True,
                  rope_theta=10000.0,
                  rope_scaling=None,
                  use_parallel_attention=True,
@@ -68,7 +69,6 @@ class LLama3Config(PretrainedConfig):
         self.output_attentions = output_attentions
         self.output_hidden_states = output_hidden_states
         # self.use_return_dict = use_return_dict
-
 
 class RotaryEmbedding(nn.Module):
     """Rotary Position Embedding"""
@@ -460,7 +460,10 @@ class LLama3ForCausalLM(PreTrainedModel, GenerationMixin):
             # Shift so that tokens < n predict n
             shift_logits = logits[..., :-1, :].contiguous()
             shift_labels = labels[..., 1:].contiguous()
-            loss_fct = nn.CrossEntropyLoss()
+            if self.config.pad_token_id is not None:
+                loss_fct = nn.CrossEntropyLoss(ignore_index=self.config.pad_token_id)
+            else:
+                loss_fct = nn.CrossEntropyLoss()
             loss = loss_fct(shift_logits.view(-1, self.config.vocab_size), shift_labels.view(-1))
 
         # return {
@@ -517,21 +520,65 @@ class LLama3ForCausalLM(PreTrainedModel, GenerationMixin):
             }
         )
         return model_inputs
+# Approx .5B params
+llama3_config_1 = {
+        "hidden_size":1024,
+        "intermediate_size":2816,
+        "num_hidden_layers":12,
+        "num_attention_heads":16,
+        "num_key_value_heads":8,
+        # "max_position_embeddings":2048,
+}
 
-def create_llama3_1b() -> LLama3ForCausalLM:
+# approx 1B param - mostly official values
+llama3_config_2 = {
+        "hidden_size":1536,
+        "intermediate_size":4096,
+        "num_hidden_layers":22,
+        "num_attention_heads":16,
+        "num_key_value_heads":8,
+        # "max_position_embeddings":2048,
+}
+
+# approx 1.6B param - mostly official values
+llama3_config_3 = {
+        "hidden_size":2048,
+        "intermediate_size":5504,
+        "num_hidden_layers":24,
+        "num_attention_heads":16,
+        "num_key_value_heads":8,
+        # "max_position_embeddings":2048,
+}
+
+config_dict = {
+    "0.5B": llama3_config_1,
+    "1B": llama3_config_2,
+    "1.5B": llama3_config_3
+}
+
+def create_llama3_1b(config_type, input_config:Optional[Dict] = {}) -> LLama3ForCausalLM:
     """Creates a 1B parameter version of Llama3"""
+    # pad_token_id=0,
+    # bos_token_id=1,
+    # eos_token_id=2,
     config = LLama3Config(
-        # vocab_size=32000,
+        vocab_size=32000,
         # hidden_size=1024,
         # intermediate_size=2816,
-        # # num_hidden_layers=12,
-        # # num_attention_heads=16,
-        # # num_key_value_heads=16,
+        # num_hidden_layers=12,
+        # hidden_size=2048,
+        # intermediate_size=5504,
+        # num_hidden_layers=24,
+        # num_attention_heads=16,
+        # num_key_value_heads=8,
         # max_position_embeddings=2048,
     )
+    config.update(config_dict.get(config_type))
+    config.update(input_config)
     _model = LLama3ForCausalLM(config)
     # AutoConfig.register("llama3", LLama3Config)
     # AutoModelForCausalLM.register(LLama3Config, LLama3ForCausalLM)
+    set_trace()
     return _model
 
 def create_llama3_3b() -> LLama3ForCausalLM:
@@ -545,4 +592,12 @@ def create_llama3_3b() -> LLama3ForCausalLM:
         num_key_value_heads=16,  # Kept same as 1B
         max_position_embeddings=2048,
     )
+    set_trace()
     return LLama3ForCausalLM(config) 
+
+def loadLlamaModelWithoutWeights(model_type, config_type, input_config:Optional[Dict] = {}):
+    config = AutoConfig.from_pretrained(model_type)
+    config.update(config_dict.get(config_type))
+    config.update(input_config)
+    set_trace()
+    return LlamaForCausalLM(config)  # No weights are loaded; this is from scratch

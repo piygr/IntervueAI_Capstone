@@ -9,3 +9,4 @@ accelerate>=0.20.0
 requests>=2.31.0
 evaluate
 rouge_score
+torchinfo
