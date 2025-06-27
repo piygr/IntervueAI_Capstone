@@ -14,6 +14,7 @@ class InterviewQuestionItem(BaseModel):
     question: str
     evaluation_category: str
     evaluation_depth: str
+    tentative_time_allocation_in_minutes: float
 
 class InterviewPlan(BaseModel):
     scheduled_duration_in_minutes: int
