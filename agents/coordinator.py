@@ -368,7 +368,6 @@ class Coordinator(Agent):
                                             agent=question_message,
                                             timestamp=time.time())
 
-        #logger.info(self.memory.get_conversation())
 
     @function_tool
     async def end_interview(self,
@@ -394,6 +393,7 @@ class Coordinator(Agent):
         context.userdata.agent_last_conversation = time.time()
         await self._cancel_interview(msg=end_interview_message)
 
+    
     #@function_tool
     async def send_question_to_code_editor(self, question: str):
         """Use this tool to send coding question or text to the code editor.
@@ -408,6 +408,7 @@ class Coordinator(Agent):
             topic="code-editor"
         )
 
+    
     async def handle_data_received(self, packet):
         # packet is a livekit.rtc.DataPacket
         data = packet.data
@@ -429,13 +430,13 @@ class Coordinator(Agent):
                         if code:
                             logger.info(f"💬 Code: {code}")
                             # await self.session.say("Thank you for the submission.")
-                            code_submission_prompt = "User has submitted the code. Evaluate the code correctness and ask further question on it."
+                            code_submission_prompt = "Candidate has submitted the code. Evaluate the code correctness and ask further question on it."
                             handle = self.session.generate_reply(user_input=code, instructions=code_submission_prompt)
                             await handle
 
                             self.memory.update_candidate_response(
                                 question_index=self.session.userdata.current_question_index, 
-                                response="[User submitted the following code]\n '''\n{code}'''\n]",
+                                response="[Candidate submitted the following code]\n '''\n{code}'''\n]",
                                 timestamp=time.time()
                             )
                         else:
