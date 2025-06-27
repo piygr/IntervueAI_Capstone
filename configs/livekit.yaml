@@ -1,0 +1,14 @@
+port: 7880
+
+bind_addresses:
+  - 0.0.0.0
+
+rtc:
+  tcp_port: 7881
+  udp_port: 7882
+  # Optional: enable ICE lite mode if behind NAT without TURN
+  use_external_ip: true
+
+keys:
+  #devkey: secret
+  devkey: <32-character long secret for production>
