@@ -11,6 +11,7 @@ const ResumeUploadPopup = ({ jdId, onClose }: { jdId: string; onClose: () => voi
   const [isUploading, setIsUploading] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<{ message: string; score?: number } | null>(null);
+  const [interviewId, setInterviewId] = useState<string | null>(null);
 
   const handleResumeUpload = async () => {
     if (!file) return;
@@ -41,6 +42,7 @@ const ResumeUploadPopup = ({ jdId, onClose }: { jdId: string; onClose: () => voi
 
       // If resume matches, proceed with interview setup
       const interviewFormData = new FormData();
+      setInterviewId(matchData.interviewId)
       interviewFormData.append('interviewId', matchData.interviewId);
       interviewFormData.append('jobId', jdId);
       const interviewRes = await fetch(process.env.API_HOST + '/start-interview', {
@@ -65,7 +67,7 @@ const ResumeUploadPopup = ({ jdId, onClose }: { jdId: string; onClose: () => voi
   useEffect(() => {
     if (roomToken && serverUrl) {
       setIsRedirecting(true);
-      const url = `/interview/${jdId}?r=${roomToken}&s=${serverUrl}`;
+      const url = `/interview/${jdId}?r=${roomToken}&s=${serverUrl}&i=${interviewId}`;
       router.push(url);
     }
   }, [roomToken, serverUrl, jdId, router]);
