@@ -30,7 +30,7 @@ class FollowupItem(BaseModel):
 class CandidateResponseItem(BaseModel):
     response: str
     timestamp: float
-    followup: Optional[FollowupItem] = None
+    followup: Optional[FollowupItem] = {}
 
 
 class ConversationItem(BaseModel):
@@ -221,8 +221,8 @@ class MemoryManager:
                     item.candidate.followup = new_followup
             else:
                 new_candidate_response = CandidateResponseItem(
-                        response=None,
-                        timestamp=None,
+                        response='',
+                        timestamp=-1,
                         followup=FollowupItem(
                             agent=followup,
                             type=followup_type,
@@ -250,8 +250,8 @@ class MemoryManager:
                 else:
                     
                     new_candidate_response = CandidateResponseItem(
-                        response=None,
-                        timestamp=None,
+                        response='',
+                        timestamp=-1,
                         followup=FollowupItem(
                             agent=followup,
                             type=followup_type,
@@ -270,10 +270,10 @@ class MemoryManager:
                 
                 text += f'''Question {index + 1}\n\n'''
                 while item:
-                    if item.get('agent') is not None:
+                    if item.get('agent') is not None and item.get('timestamp') > 0:
                         text += f'''Interview Agent: {item.get('agent')} \n'''
                         item = item.get('candidate')
-                    elif item.get('response') is not None:
+                    elif item.get('response') is not None and item.get('timestamp') > 0:
                         text += f'''Candidate: {item.get('response')} \n'''
                         item = item.get('followup')
 
