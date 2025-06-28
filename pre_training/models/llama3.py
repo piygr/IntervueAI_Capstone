@@ -203,13 +203,21 @@ class LLama3Attention(nn.Module):
 
         attn_weights = torch.matmul(query_states, key_states.transpose(2, 3)) / math.sqrt(self.head_dim) # (B, H, T, D/H) * (B, H, D/H, T) -> (B, H, T, T)
 
+        # Create causal mask if attention_mask is None
+        # Create causal mask: lower triangular matrix
+        causal_mask = torch.triu(torch.ones(seq_len, kv_seq_len, device=attn_weights.device), diagonal=1)
+        causal_mask = causal_mask.bool()  # Convert to boolean mask
+        # Expand to match attention weights shape (B, H, T, T)
+        causal_mask = causal_mask[None, None, :, :].expand(bsz, self.num_heads, -1, -1)
+        # Apply causal mask by setting masked positions to large negative values
+        attn_weights = attn_weights.masked_fill(causal_mask, float('-inf'))
         if attention_mask is not None:
+            # Handle provided attention_mask
             if attention_mask.dim() == 2:
-                attention_mask = attention_mask[:, None, None, :]  # expand
+                attention_mask = attention_mask[:, None, None, :]  # expand to (B, 1, 1, T)
             attention_mask = attention_mask.to(dtype=attn_weights.dtype)  # float32
             attention_mask = (1.0 - attention_mask) * -10000.0  # large negative values
             attn_weights = attn_weights + attention_mask
-            # attn_weights.masked_fill_(attention_mask==0, float('-inf'))
 
         attn_weights = F.softmax(attn_weights, dim=-1, dtype=torch.float32).to(query_states.dtype)
         attn_output = torch.matmul(attn_weights, value_states)
@@ -254,8 +262,8 @@ class LLama3DecoderLayer(nn.Module):
         self.hidden_size = config.hidden_size
         self.self_attn = LLama3Attention(config=config)
         self.mlp = LLama3MLP(config)
-        self.input_layernorm = nn.LayerNorm(config.hidden_size, eps=config.rms_norm_eps)
-        self.post_attention_layernorm = nn.LayerNorm(config.hidden_size, eps=config.rms_norm_eps)
+        self.input_layernorm = nn.RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
+        self.post_attention_layernorm = nn.RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 
     def forward(
         self,
@@ -307,7 +315,7 @@ class LLama3Model(nn.Module):
 
         self.embed_tokens = nn.Embedding(config.vocab_size, config.hidden_size, self.padding_idx)
         self.layers = nn.ModuleList([LLama3DecoderLayer(config) for _ in range(config.num_hidden_layers)])
-        self.norm = nn.LayerNorm(config.hidden_size, eps=config.rms_norm_eps)
+        self.norm = nn.RMSNorm(config.hidden_size, eps=config.rms_norm_eps)
 
         # Initialize weights
         self.apply(self._init_weights)
@@ -321,6 +329,13 @@ class LLama3Model(nn.Module):
             module.weight.data.normal_(mean=0.0, std=self.config.initializer_range)
             if module.padding_idx is not None:
                 module.weight.data[module.padding_idx].zero_()
+
+    def _create_causal_mask(self, seq_length: int, device: torch.device) -> torch.Tensor:
+        """Create a causal mask for autoregressive attention"""
+        # Create lower triangular mask (including diagonal)
+        mask = torch.triu(torch.ones(seq_length, seq_length, device=device), diagonal=1)
+        mask = mask.bool()  # Convert to boolean mask
+        return mask
 
     def forward(
         self,
@@ -348,6 +363,18 @@ class LLama3Model(nn.Module):
             device = input_ids.device
             position_ids = torch.arange(0, seq_length, dtype=torch.long, device=device) # [0, 1, 2, ..., seq_length-1]
             position_ids = position_ids.unsqueeze(0).expand(batch_size, -1) # (B, seqLen)
+
+        # set_trace()
+        # Handle attention mask for causal language modeling
+        if attention_mask is None:
+            # For causal LM, we don't need to pass attention_mask to attention layers
+            # The attention layers will create their own causal mask
+            attention_mask = None
+        else:
+            # If attention_mask is provided, ensure it's properly formatted
+            # attention_mask should be 1 for tokens to attend to, 0 for tokens to ignore
+            if attention_mask.dim() == 1:
+                attention_mask = attention_mask.unsqueeze(0).expand(batch_size, -1)
 
         if inputs_embeds is None:
             inputs_embeds = self.embed_tokens(input_ids) # (B, seqLen) -> (B, seqLen, Embed)
@@ -425,6 +452,39 @@ class LLama3ForCausalLM(PreTrainedModel, GenerationMixin):
             if module.padding_idx is not None:
                 module.weight.data[module.padding_idx].zero_()
 
+    @staticmethod
+    def create_attention_mask(input_ids: torch.LongTensor, pad_token_id: int = 0) -> torch.Tensor:
+        """
+        Create attention mask for causal language modeling with padding.
+        
+        Args:
+            input_ids: Input token IDs of shape (batch_size, seq_length)
+            pad_token_id: ID of the padding token
+            
+        Returns:
+            attention_mask: Mask of shape (batch_size, seq_length) where 1 indicates valid tokens, 0 indicates padding
+        """
+        # Create mask where 1 = valid token, 0 = padding token
+        attention_mask = (input_ids != pad_token_id).long()
+        return attention_mask
+
+    @staticmethod
+    def create_causal_attention_mask(seq_length: int, device: torch.device) -> torch.Tensor:
+        """
+        Create a causal attention mask for autoregressive attention.
+        
+        Args:
+            seq_length: Length of the sequence
+            device: Device to create the mask on
+            
+        Returns:
+            causal_mask: Lower triangular mask of shape (seq_length, seq_length)
+        """
+        # Create lower triangular mask (including diagonal)
+        mask = torch.triu(torch.ones(seq_length, seq_length, device=device), diagonal=1)
+        mask = mask.bool()  # Convert to boolean mask
+        return mask
+
     def forward(
         self,
         input_ids: torch.LongTensor,
@@ -438,6 +498,10 @@ class LLama3ForCausalLM(PreTrainedModel, GenerationMixin):
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
     ) -> Dict[str, Any]:
+        # For causal language modeling, we need to ensure proper attention masking
+        # If attention_mask is None, the model will use causal masking
+        # If attention_mask is provided, it should be 1 for valid tokens, 0 for padding tokens
+        
         outputs = self.model(
             input_ids=input_ids,
             attention_mask=attention_mask,
@@ -458,13 +522,39 @@ class LLama3ForCausalLM(PreTrainedModel, GenerationMixin):
         loss = None
         if labels is not None:
             # Shift so that tokens < n predict n
-            shift_logits = logits[..., :-1, :].contiguous()
-            shift_labels = labels[..., 1:].contiguous()
+            shift_logits = logits[:, :-1, :].contiguous()
+            shift_labels = labels[:, 1:].contiguous()
+            
+            # Create loss mask to ignore padding tokens in loss calculation
+            # if attention_mask is not None:
+            #     # Shift attention mask to align with shifted labels
+            #     shift_mask = attention_mask[:, 1:].contiguous()
+            #     # Flatten for loss calculation
+            #     shift_logits_flat = shift_logits.view(-1, self.config.vocab_size)
+            #     shift_labels_flat = shift_labels.view(-1)
+            #     shift_mask_flat = shift_mask.view(-1)
+                
+            #     # Only compute loss on non-padded tokens
+            #     loss_fct = nn.CrossEntropyLoss(reduction='none')
+            #     loss_per_token = loss_fct(shift_logits_flat, shift_labels_flat)
+            #     # Apply mask and take mean
+            #     loss = (loss_per_token * shift_mask_flat).sum() / shift_mask_flat.sum()
+            # else:
+            #     # No padding mask provided, use standard loss
+            #     if self.config.pad_token_id is not None:
+            #         loss_fct = nn.CrossEntropyLoss(ignore_index=self.config.pad_token_id)
+            #     else:
+            #         loss_fct = nn.CrossEntropyLoss()
+            #     loss = loss_fct(shift_logits.view(-1, self.config.vocab_size), shift_labels.view(-1))
+
             if self.config.pad_token_id is not None:
                 loss_fct = nn.CrossEntropyLoss(ignore_index=self.config.pad_token_id)
             else:
                 loss_fct = nn.CrossEntropyLoss()
             loss = loss_fct(shift_logits.view(-1, self.config.vocab_size), shift_labels.view(-1))
+            
+            if (loss < 1):
+                set_trace()
 
         # return {
         #     "loss": loss,
@@ -578,7 +668,6 @@ def create_llama3_1b(config_type, input_config:Optional[Dict] = {}) -> LLama3For
     _model = LLama3ForCausalLM(config)
     # AutoConfig.register("llama3", LLama3Config)
     # AutoModelForCausalLM.register(LLama3Config, LLama3ForCausalLM)
-    set_trace()
     return _model
 
 def create_llama3_3b() -> LLama3ForCausalLM:
@@ -592,12 +681,10 @@ def create_llama3_3b() -> LLama3ForCausalLM:
         num_key_value_heads=16,  # Kept same as 1B
         max_position_embeddings=2048,
     )
-    set_trace()
     return LLama3ForCausalLM(config) 
 
 def loadLlamaModelWithoutWeights(model_type, config_type, input_config:Optional[Dict] = {}):
     config = AutoConfig.from_pretrained(model_type)
     config.update(config_dict.get(config_type))
     config.update(input_config)
-    set_trace()
     return LlamaForCausalLM(config)  # No weights are loaded; this is from scratch

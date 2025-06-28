@@ -152,7 +152,7 @@ def prepare_dataset(tokenizer, block_size=512):
     # split the tokenized and grouped train split into 90% train and 10% validation.
     # Note - It turns out to be a common practice for large datasets 
     lm_datasets = tokenized.map(group_texts, batched=True)
-    train_test = lm_datasets["train"].train_test_split(test_size=0.03, seed=42)
+    train_test = lm_datasets["train"].train_test_split(test_size=0.001, seed=42)
 
     return train_test["train"], train_test["test"]
 
@@ -180,10 +180,11 @@ def train_model(model_type="custom-llama3-1b", config_type="0.5B", use_llama2_to
         model = loadLlamaModelWithoutWeights(model_type, config_type, input_config)
 
     logger.info(f"loaded model {model_type}")
-    print(f"Model: {model}")
+    logger.info(f"Model: {model}")
     summary(model, 
             input_size=(4, 512),
              dtypes=[torch.long])
+    logger.info(f"Config: {model.config}")
 
     # === Step 6: Define tokenizer ===
     # tokenizer = AutoTokenizer.from_pretrained("gpt2")
@@ -203,7 +204,7 @@ def train_model(model_type="custom-llama3-1b", config_type="0.5B", use_llama2_to
         tokenizer.pad_token = "<|finetune_right_pad_id|>"
         # model.resize_token_embeddings(len(tokenizer))
 
-    set_trace()
+    # set_trace()
     # === Step 7: Prepare dataset (call the function defined in step 2 & 3) ===
     train_dataset, val_dataset = prepare_dataset(tokenizer)
 
@@ -237,7 +238,7 @@ def train_model(model_type="custom-llama3-1b", config_type="0.5B", use_llama2_to
         fp16=device.type == "cuda",  # Mixed precision training
         logging_dir="./logs",
         logging_steps=100,
-        save_steps=500, # Save model every 500 steps
+        save_steps=1000, # Save model every 500 steps
         save_total_limit=2, # Save only the best model
         # evaluation_strategy="steps",
         eval_strategy="steps",
