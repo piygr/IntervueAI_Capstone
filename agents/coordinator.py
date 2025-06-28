@@ -60,6 +60,7 @@ class InterviewContext:
     interview_plan: InterviewPlan = None
     response_summary: list[dict] = field(default_factory=list)
     current_question_index: int = -1
+    timetracker: dict = field(default_factory=dict)
     agent_last_conversation: int = 0
     user_last_conversation: int = 0
     user_last_typed: int = 0
@@ -146,6 +147,7 @@ class Coordinator(Agent):
         
         self.silence_watchdog_task = None
         self._cancel_interview_task = None
+        self._lock = asyncio.Lock()
         
 
     async def on_enter(self):
@@ -174,9 +176,16 @@ class Coordinator(Agent):
         logger.info(f"👂 Started monitor silence")
         try:
             while True:
-                await asyncio.sleep(10)
+                await asyncio.sleep(20)
 
                 now = time.time()
+                
+                async with self._lock:
+                    question_index = self.session.userdata.current_question_index
+                    if question_index > 0:
+                        time_spent_so_far = "{:.2f}".format( (now - self.session.userdata.timetracker[question_index]) / 60.0)
+                        self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Ongoing Question (Question Index: {question_index} ) so far = ** {time_spent_so_far} minutes **")
+                   
                 logger.info(f"⌛️ agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
                 _silence_break_time = random.randint(200, 300) if self.session.userdata.current_question_requires_coding else random.randint(15, 20)
 
@@ -365,6 +374,7 @@ class Coordinator(Agent):
             use_code_editor: If the question is a coding related question or DSA or algo related question which requires code editor use, make it true otherwise false.
         """
 
+        now = time.time()
         logger.info(f"💬 {question_index}: Next Question message: {question_message}")
         context.userdata.current_question_index = question_index
         if question_index > 0:
@@ -385,11 +395,17 @@ class Coordinator(Agent):
             )
             await self.session.say(pre_message + "\n" + question_message + "\n Please open the code editor to answer.")
 
-        context.userdata.agent_last_conversation = time.time()
+        context.userdata.agent_last_conversation = now
 
         self.memory.add_agent_question(question_index=question_index,
                                             agent=question_message,
-                                            timestamp=time.time())
+                                            timestamp=now)
+
+        async with self._lock:
+            self.session.userdata.timetracker[question_index] = now
+            if question_index > 0:
+                time_spent_last_question =  "{:.2f}".format( (now - self.session.userdata.timetracker[question_index - 1]) / 60.0)
+                self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Last Question (Question Index: {question_index - 1} ) = ** {time_spent_last_question} minutes **")
 
 
     @function_tool
