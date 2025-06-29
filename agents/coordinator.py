@@ -178,7 +178,7 @@ class Coordinator(Agent):
                     question_index = self.session.userdata.current_question_index
                     if question_index > 0:
                         time_spent_so_far = "{:.2f}".format( (now - self.session.userdata.timetracker[question_index]) / 60.0)
-                        self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Ongoing Question (Question Index: {question_index} so far = ** {time_spent_so_far} minutes **")
+                        self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Ongoing Question (Question Index: {question_index} ) so far = ** {time_spent_so_far} minutes **")
                 
                 logger.info(f"agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
                 if self._cancel_interview_task is None and \
@@ -382,7 +382,7 @@ class Coordinator(Agent):
             self.session.userdata.timetracker[question_index] = now
             if question_index > 0:
                 time_spent_last_question =  "{:.2f}".format( (now - self.session.userdata.timetracker[question_index - 1]) / 60.0)
-                self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Last Question (Question Index: {question_index - 1} = ** {time_spent_last_question} minutes **")
+                self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Last Question (Question Index: {question_index - 1} ) = ** {time_spent_last_question} minutes **")
 
 
     @function_tool
