@@ -24,7 +24,7 @@ from utils import get_device
 from pdb import set_trace
 from torchinfo import summary 
 # === Step 1: Import your custom model ===
-from models.llama3 import LLama3Config, LLama3ForCausalLM, create_llama3_1b, create_llama3_3b, loadLlamaModelWithoutWeights
+from models.llama3 import LLama3Config, LLama3ForCausalLM, create_llama3_1b, loadLlamaModelWithoutWeights
 
 # === Step 1: Evaluation class using trainerCallback ===
 class PromptEvalCallback(TrainerCallback):
@@ -171,10 +171,8 @@ def train_model(model_type="custom-llama3-1b", config_type="0.5B", use_llama2_to
         "eos_token_id": 32001 if use_llama2_tokenizer else 128001,
         "pad_token_id": 32002 if use_llama2_tokenizer else 128004
         }
-    if model_type == "custom-llama3-1b":
+    if model_type == "custom-llama3":
         model = create_llama3_1b(config_type, input_config)
-    elif model_type == "custom-llama3-3b":
-        model = create_llama3_3b()
     else:
         #  model = AutoModelForCausalLM.from_pretrained(f"meta-llama/{model_type}") #loading given base model
         model = loadLlamaModelWithoutWeights(model_type, config_type, input_config)
@@ -303,12 +301,12 @@ def train_model(model_type="custom-llama3-1b", config_type="0.5B", use_llama2_to
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Train Llama3 model")
-    parser.add_argument("--model_type", type=str, default="custom-llama3-1b", choices=["custom-llama3-1b", "custom-llama3-3b", "meta-llama/Llama-3.2-1B"],
-                      help="model type to train (custom 1b, 3b or llama-2-7b-hf)")
+    parser.add_argument("--model_type", type=str, default="custom-llama3", choices=["custom-llama3", "meta-llama/Llama-3.2-1B"],
+                      help="model type to train (custom llama3 or meta-llama/Llama-3.2-1B)")
     parser.add_argument("--config_type", type=str, default="0.5B", choices=["0.5B", "1B", "1.5B"],
                       help="config type with approx number of trainable parameters")
     parser.add_argument("--use_llama2_tokenizer", type=bool, default=False,
-                      help="Whether to use llana2 type tokenizer with 32k vocab size compare to default llama2 tokenizer of vocab_size 128256")
+                      help="Whether to use llana2 type tokenizer with 32k vocab size compare to default llama3 tokenizer of vocab_size 128256")
     args = parser.parse_args()
     
     train_model(args.model_type, args.config_type, args.use_llama2_tokenizer) 

@@ -670,19 +670,6 @@ def create_llama3_1b(config_type, input_config:Optional[Dict] = {}) -> LLama3For
     # AutoModelForCausalLM.register(LLama3Config, LLama3ForCausalLM)
     return _model
 
-def create_llama3_3b() -> LLama3ForCausalLM:
-    """Creates a 3B parameter version of Llama3"""
-    config = LLama3Config(
-        vocab_size=32000,
-        hidden_size=2048,  # Increased from 1024
-        intermediate_size=5504,  # Increased from 2816
-        num_hidden_layers=22,  # Increased from 12
-        num_attention_heads=16,  # Kept same as 1B
-        num_key_value_heads=16,  # Kept same as 1B
-        max_position_embeddings=2048,
-    )
-    return LLama3ForCausalLM(config) 
-
 def loadLlamaModelWithoutWeights(model_type, config_type, input_config:Optional[Dict] = {}):
     config = AutoConfig.from_pretrained(model_type)
     config.update(config_dict.get(config_type))
