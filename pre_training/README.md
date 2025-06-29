@@ -134,4 +134,4 @@ The script includes several safeguards against overfitting:
 
 ### Logs
 We ran multiple rounds of trainings. When we tried to run it with 1B config or more, we have exhausing local system's memory. So, we eneded up training with only 0.5B config for quite a few hours to check that the loss is decreasing as expected. We tried to run it for both custom and meta's llm model to check they have been performing similar around the similar steps.
-These logs can be found in the `log` sub-directory.
+These logs can be found in the `training_logs` sub-directory.

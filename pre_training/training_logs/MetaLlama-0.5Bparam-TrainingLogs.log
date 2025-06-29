@@ -1,0 +1,505 @@
+(.venv) gitesh.grover@Giteshs-MacBook-Pro pre_training % python train_llama3.py --model_type "meta-llama/Llama-3.2-1B" --config_type "0.5B"
+INFO:__main__:Creating meta-llama/Llama-3.2-1B model...
+> /Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/pre_training/models/llama3.py(602)loadLlamaModelWithoutWeights()
+-> set_trace()
+(Pdb) config
+LlamaConfig {
+  "architectures": [
+    "LlamaForCausalLM"
+  ],
+  "attention_bias": false,
+  "attention_dropout": 0.0,
+  "bos_token_id": 128000,
+  "eos_token_id": 128001,
+  "head_dim": 64,
+  "hidden_act": "silu",
+  "hidden_size": 1024,
+  "initializer_range": 0.02,
+  "intermediate_size": 2816,
+  "max_position_embeddings": 2048,
+  "mlp_bias": false,
+  "model_type": "llama",
+  "num_attention_heads": 16,
+  "num_hidden_layers": 12,
+  "num_key_value_heads": 8,
+  "pad_token_id": 128004,
+  "pretraining_tp": 1,
+  "rms_norm_eps": 1e-05,
+  "rope_scaling": {
+    "factor": 32.0,
+    "high_freq_factor": 4.0,
+    "low_freq_factor": 1.0,
+    "original_max_position_embeddings": 8192,
+    "rope_type": "llama3"
+  },
+  "rope_theta": 500000.0,
+  "tie_word_embeddings": true,
+  "torch_dtype": "bfloat16",
+  "transformers_version": "4.52.4",
+  "use_cache": true,
+  "vocab_size": 128256
+}
+
+(Pdb) config-type
+*** TypeError: unsupported operand type(s) for -: 'LlamaConfig' and 'type'
+(Pdb) config_type
+'0.5B'
+(Pdb) c
+INFO:__main__:loaded model meta-llama/Llama-3.2-1B
+Model: LlamaForCausalLM(
+  (model): LlamaModel(
+    (embed_tokens): Embedding(128256, 1024, padding_idx=128004)
+    (layers): ModuleList(
+      (0-11): 12 x LlamaDecoderLayer(
+        (self_attn): LlamaAttention(
+          (q_proj): Linear(in_features=1024, out_features=1024, bias=False)
+          (k_proj): Linear(in_features=1024, out_features=512, bias=False)
+          (v_proj): Linear(in_features=1024, out_features=512, bias=False)
+          (o_proj): Linear(in_features=1024, out_features=1024, bias=False)
+        )
+        (mlp): LlamaMLP(
+          (gate_proj): Linear(in_features=1024, out_features=2816, bias=False)
+          (up_proj): Linear(in_features=1024, out_features=2816, bias=False)
+          (down_proj): Linear(in_features=2816, out_features=1024, bias=False)
+          (act_fn): SiLU()
+        )
+        (input_layernorm): LlamaRMSNorm((1024,), eps=1e-05)
+        (post_attention_layernorm): LlamaRMSNorm((1024,), eps=1e-05)
+      )
+    )
+    (norm): LlamaRMSNorm((1024,), eps=1e-05)
+    (rotary_emb): LlamaRotaryEmbedding()
+  )
+  (lm_head): Linear(in_features=1024, out_features=128256, bias=False)
+)
+===============================================================================================
+Layer (type:depth-idx)                        Output Shape              Param #
+===============================================================================================
+LlamaForCausalLM                              --                        --
+├─LlamaModel: 1-1                             --                        --
+│    └─Embedding: 2-1                         [4, 512, 1024]            131,334,144
+│    └─LlamaRotaryEmbedding: 2-2              [1, 512, 64]              --
+│    └─ModuleList: 2-3                        --                        --
+│    │    └─LlamaDecoderLayer: 3-1            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-2            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-3            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-4            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-5            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-6            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-7            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-8            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-9            [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-10           [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-11           [4, 512, 1024]            11,798,528
+│    │    └─LlamaDecoderLayer: 3-12           [4, 512, 1024]            11,798,528
+│    └─LlamaRMSNorm: 2-4                      [4, 512, 1024]            1,024
+├─Linear: 1-2                                 [4, 512, 128256]          131,334,144
+===============================================================================================
+Total params: 404,251,648
+Trainable params: 404,251,648
+Non-trainable params: 0
+Total mult-adds (Units.GIGABYTES): 1.62
+===============================================================================================
+Input size (MB): 0.02
+Forward/backward pass size (MB): 4450.16
+Params size (MB): 1617.01
+Estimated Total Size (MB): 6067.18
+===============================================================================================
+> /Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/pre_training/train_llama3.py(206)train_model()
+-> set_trace()
+(Pdb) c
+wandb: Currently logged in as: ggrover-farzi (ggrover-farzi-na) to https://api.wandb.ai. Use `wandb login --relogin` to force relogin
+wandb: Tracking run with wandb version 0.20.1
+wandb: Run data is saved locally in /Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/pre_training/wandb/run-20250627_010812-rta7agtg
+wandb: Run `wandb offline` to turn off syncing.
+wandb: Syncing run meta-llama/Llama-3.2-1B-pretraining
+wandb: ⭐️ View project at https://wandb.ai/ggrover-farzi-na/llama3-training
+wandb: 🚀 View run at https://wandb.ai/ggrover-farzi-na/llama3-training/runs/rta7agtg
+/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/pre_training/train_llama3.py:257: FutureWarning: `tokenizer` is deprecated and will be removed in version 5.0.0 for `Trainer.__init__`. Use `processing_class` instead.
+  trainer = Trainer(
+INFO:__main__:Starting training...
+wandb: WARNING The `run_name` is currently set to the same value as `TrainingArguments.output_dir`. If this was not intended, please specify a different run name by setting the `TrainingArguments.run_name` parameter.
+  0%|                                                 | 0/42495 [00:00<?, ?it/s]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'loss': 11.4834, 'grad_norm': 3.700112819671631, 'learning_rate': 3.96e-06, 'epoch': 0.01}
+{'loss': 9.7267, 'grad_norm': 2.1536293029785156, 'learning_rate': 7.960000000000002e-06, 'epoch': 0.01}
+{'loss': 8.6046, 'grad_norm': 1.524652361869812, 'learning_rate': 1.196e-05, 'epoch': 0.02}
+{'loss': 7.4222, 'grad_norm': 1.5482126474380493, 'learning_rate': 1.5960000000000003e-05, 'epoch': 0.03}
+{'loss': 6.8732, 'grad_norm': 1.3972337245941162, 'learning_rate': 1.9960000000000002e-05, 'epoch': 0.04}
+{'eval_loss': 6.735888957977295, 'eval_runtime': 555.3573, 'eval_samples_per_second': 12.623, 'eval_steps_per_second': 3.157, 'epoch': 0.04}                    
+  1%|▍                                   | 500/42495 [41:36<45:34:14,  3.91s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:15<00:00,  2.86it/s]
+🔍 Prompt Evaluation @ step 500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time the 2, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 2010, 201
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is, and the 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @,@ 1 @
+INFO:__main__:--------------------------------------------------
+{'loss': 6.6071, 'grad_norm': 1.1762800216674805, 'learning_rate': 1.9952851529944042e-05, 'epoch': 0.04}                                                       
+{'loss': 6.4478, 'grad_norm': 1.2886886596679688, 'learning_rate': 1.9905226812715802e-05, 'epoch': 0.05}
+{'loss': 6.3273, 'grad_norm': 1.3849259614944458, 'learning_rate': 1.985760209548756e-05, 'epoch': 0.06}
+{'loss': 6.1898, 'grad_norm': 1.5535489320755005, 'learning_rate': 1.980997737825932e-05, 'epoch': 0.06}
+{'loss': 6.121, 'grad_norm': 1.652300477027893, 'learning_rate': 1.9762352661031076e-05, 'epoch': 0.07}
+  2%|▊                                | 1000/42495 [1:14:11<44:50:22,  3.89s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 6.080770969390869, 'eval_runtime': 554.8554, 'eval_samples_per_second': 12.634, 'eval_steps_per_second': 3.159, 'epoch': 0.07}                    
+  2%|▊                                | 1000/42495 [1:23:26<44:50:22,  3.89s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:14<00:00,  3.16it/s]
+🔍 Prompt Evaluation @ step 1000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time, and the 2010s, the 2010s, and the 2010s, and the 2010s, and the 2010s, and the 2010s, and the 2010s, and
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is, and the " ". 
+ = = = = = 
+ = = = = = = 
+ The first time of the 2010s, the 2010s, the 2010s, the 2010s, and the
+INFO:__main__:--------------------------------------------------
+{'loss': 6.031, 'grad_norm': 1.2775781154632568, 'learning_rate': 1.9714727943802836e-05, 'epoch': 0.08}                                                        
+{'loss': 5.9556, 'grad_norm': 1.7863184213638306, 'learning_rate': 1.9667103226574593e-05, 'epoch': 0.08}
+{'loss': 5.9054, 'grad_norm': 1.6831647157669067, 'learning_rate': 1.9619478509346353e-05, 'epoch': 0.09}
+{'loss': 5.8408, 'grad_norm': 1.8831902742385864, 'learning_rate': 1.957185379211811e-05, 'epoch': 0.1}
+{'loss': 5.7951, 'grad_norm': 1.8510370254516602, 'learning_rate': 1.952422907488987e-05, 'epoch': 0.11}
+  4%|█▏                               | 1500/42495 [1:55:59<44:24:47,  3.90s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 5.772325038909912, 'eval_runtime': 553.6469, 'eval_samples_per_second': 12.661, 'eval_steps_per_second': 3.166, 'epoch': 0.11}                    
+  4%|█▏                               | 1500/42495 [2:05:13<44:24:47,  3.90s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:13<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 1500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time, and the film is a " ". The episode is a " The ", and " The " is a " ", and " The " is a " ", " The ", " The ", " The ", " The "
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the ". 
+ = = = = = 
+ = = = = = = 
+ = = = = = = 
+ = = = = = = 
+ = = = = = = 
+ = = = = = = 
+ = = = = =
+INFO:__main__:--------------------------------------------------
+{'loss': 5.7455, 'grad_norm': 1.694082260131836, 'learning_rate': 1.9476604357661627e-05, 'epoch': 0.11}                                                        
+{'loss': 5.705, 'grad_norm': 1.8111642599105835, 'learning_rate': 1.9428979640433387e-05, 'epoch': 0.12}
+{'loss': 5.6434, 'grad_norm': 1.8436201810836792, 'learning_rate': 1.9381354923205144e-05, 'epoch': 0.13}
+{'loss': 5.6183, 'grad_norm': 1.9617125988006592, 'learning_rate': 1.9333730205976905e-05, 'epoch': 0.13}
+{'loss': 5.5705, 'grad_norm': 1.86600661277771, 'learning_rate': 1.9286105488748665e-05, 'epoch': 0.14}
+  5%|█▌                               | 2000/42495 [2:37:43<43:51:34,  3.90s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 5.561733245849609, 'eval_runtime': 555.2266, 'eval_samples_per_second': 12.625, 'eval_steps_per_second': 3.157, 'epoch': 0.14}                    
+  5%|█▌                               | 2000/42495 [2:46:59<43:51:34,  3.90s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:15<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 2000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 2000s, the 2000s and 2000s, and the 2000s, the 2000s, 2000, 2000, 2000, 2009, 2009
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the first @-@ 1 @-@ 1 @-@ 1 @-@ 1 @-@ 1 @-@ 1 @-@ 1 @-@ 1 @-@ 1 @-@
+INFO:__main__:--------------------------------------------------
+{'loss': 5.532, 'grad_norm': 1.8925329446792603, 'learning_rate': 1.923848077152042e-05, 'epoch': 0.15}                                                         
+{'loss': 5.5064, 'grad_norm': 1.6341025829315186, 'learning_rate': 1.919085605429218e-05, 'epoch': 0.16}
+{'loss': 5.4779, 'grad_norm': 1.6490076780319214, 'learning_rate': 1.9143231337063935e-05, 'epoch': 0.16}
+{'loss': 5.4732, 'grad_norm': 1.650186538696289, 'learning_rate': 1.9095606619835696e-05, 'epoch': 0.17}
+{'loss': 5.409, 'grad_norm': 1.6484133005142212, 'learning_rate': 1.9047981902607456e-05, 'epoch': 0.18}
+  6%|█▉                               | 2500/42495 [3:19:30<43:23:10,  3.91s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 5.403139591217041, 'eval_runtime': 555.4137, 'eval_samples_per_second': 12.621, 'eval_steps_per_second': 3.156, 'epoch': 0.18}                    
+  6%|█▉                               | 2500/42495 [3:28:45<43:23:10,  3.91s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:15<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 2500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 2000s. 
+ = = = = 2005 – 2006 = = = = 
+ The 2005 – 2007 season, 2008, 2009, 2009, 2009,
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is a number of the 1th century. The 2th century is the most important of the 2th century, and is the most important of the 2th century. The 2th century is the 2th century, the
+INFO:__main__:--------------------------------------------------
+{'loss': 5.3833, 'grad_norm': 1.615560531616211, 'learning_rate': 1.9000357185379213e-05, 'epoch': 0.18}                                                        
+{'loss': 5.3653, 'grad_norm': 2.1958305835723877, 'learning_rate': 1.8952732468150973e-05, 'epoch': 0.19}
+{'loss': 5.3267, 'grad_norm': 1.8562507629394531, 'learning_rate': 1.890510775092273e-05, 'epoch': 0.2}
+{'loss': 5.3039, 'grad_norm': 1.7678825855255127, 'learning_rate': 1.8857483033694487e-05, 'epoch': 0.2}
+{'loss': 5.2719, 'grad_norm': 1.6431598663330078, 'learning_rate': 1.8809858316466247e-05, 'epoch': 0.21}
+  7%|██▎                              | 3000/42495 [4:01:14<42:39:44,  3.89s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 5.275484561920166, 'eval_runtime': 552.0321, 'eval_samples_per_second': 12.699, 'eval_steps_per_second': 3.176, 'epoch': 0.21}                    
+  7%|██▎                              | 3000/42495 [4:10:26<42:39:44,  3.89s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:12<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 3000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 2000s. 
+ = = = = 2000s = = = = 
+ The 2008 season, the 2008 season, was the first to be the first to be the first to be the first to be
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is a large @-@ 1. 
+ = = = = = = 
+ The first @-@ year @-@ old @-@ old @-@ class @-@ old @-@ old @-@ old @-@ old
+INFO:__main__:--------------------------------------------------
+{'loss': 5.2724, 'grad_norm': 1.7901092767715454, 'learning_rate': 1.8762233599238007e-05, 'epoch': 0.22}                                                       
+{'loss': 5.249, 'grad_norm': 1.7323904037475586, 'learning_rate': 1.8714608882009764e-05, 'epoch': 0.23}
+{'loss': 5.2461, 'grad_norm': 1.8578675985336304, 'learning_rate': 1.8666984164781524e-05, 'epoch': 0.23}
+{'loss': 5.1772, 'grad_norm': 1.7613847255706787, 'learning_rate': 1.861935944755328e-05, 'epoch': 0.24}
+{'loss': 5.1819, 'grad_norm': 1.8457731008529663, 'learning_rate': 1.8571734730325038e-05, 'epoch': 0.25}
+  8%|██▋                              | 3500/42495 [4:42:51<42:15:01,  3.90s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 5.1705756187438965, 'eval_runtime': 553.1475, 'eval_samples_per_second': 12.673, 'eval_steps_per_second': 3.169, 'epoch': 0.25}                   
+  8%|██▋                              | 3500/42495 [4:52:05<42:15:01,  3.90s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:13<00:00,  3.16it/s]
+🔍 Prompt Evaluation @ step 3500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 2000s. 
+ = = = = 2009 = = = = 
+ The 2005 season, the 2008 season, was the first to be the first to be the first to be the first to be the
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the first of the 1990s. 
+ = = = = 1990s = = = = 
+ The 1990s was the first of the 1990s to the 1990s. The first two were the first
+INFO:__main__:--------------------------------------------------
+{'loss': 5.1553, 'grad_norm': 1.7597870826721191, 'learning_rate': 1.8524110013096798e-05, 'epoch': 0.25}                                                       
+{'loss': 5.1384, 'grad_norm': 1.9821600914001465, 'learning_rate': 1.847648529586856e-05, 'epoch': 0.26}
+{'loss': 5.1166, 'grad_norm': 1.8459644317626953, 'learning_rate': 1.8428860578640315e-05, 'epoch': 0.27}
+{'loss': 5.0794, 'grad_norm': 1.6706817150115967, 'learning_rate': 1.8381235861412075e-05, 'epoch': 0.28}
+{'loss': 5.0778, 'grad_norm': 1.7497122287750244, 'learning_rate': 1.8333611144183832e-05, 'epoch': 0.28}
+  9%|███                              | 4000/42495 [5:24:28<41:25:51,  3.87s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 5.077626705169678, 'eval_runtime': 553.8427, 'eval_samples_per_second': 12.657, 'eval_steps_per_second': 3.165, 'epoch': 0.28}                    
+  9%|███                              | 4000/42495 [5:33:42<41:25:51,  3.87s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:13<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 4000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 2000s. 
+ = = = = 2000s = = = = 
+ In 2005, the 2008 – 2008, the 2008 – 2008, the 2008 – 
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the first @-@ class game in the 2000s. 
+ = = = = 2000s = = = = 
+ The 2006 – 2000s were the first time in the 2000s, and the
+INFO:__main__:--------------------------------------------------
+{'loss': 5.0612, 'grad_norm': 1.8503012657165527, 'learning_rate': 1.8285986426955593e-05, 'epoch': 0.29}                                                       
+{'loss': 5.0528, 'grad_norm': 1.8151975870132446, 'learning_rate': 1.823836170972735e-05, 'epoch': 0.3}
+{'loss': 5.038, 'grad_norm': 1.9600309133529663, 'learning_rate': 1.819073699249911e-05, 'epoch': 0.3}
+{'loss': 5.0082, 'grad_norm': 2.002336025238037, 'learning_rate': 1.8143112275270866e-05, 'epoch': 0.31}
+{'loss': 5.0027, 'grad_norm': 2.117661714553833, 'learning_rate': 1.8095487558042627e-05, 'epoch': 0.32}
+ 11%|███▍                             | 4500/42495 [6:06:08<40:59:10,  3.88s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.994421482086182, 'eval_runtime': 553.3303, 'eval_samples_per_second': 12.669, 'eval_steps_per_second': 3.168, 'epoch': 0.32}                    
+ 11%|███▍                             | 4500/42495 [6:15:22<40:59:10,  3.88s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:13<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 4500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 2006 – 2006, and the 2006 – 2008 season, the 2008 – 2008 season, and the 2008 – 2008 season, the 2008 – 2008
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the first of the 2000s. 
+ = = = = 2009 – 2006 = = = = 
+ The 2006 – 2006 season was the first time in the 2006 – 2006 season.
+INFO:__main__:--------------------------------------------------
+{'loss': 4.9558, 'grad_norm': 2.082205295562744, 'learning_rate': 1.8047862840814384e-05, 'epoch': 0.32}                                                        
+{'loss': 5.003, 'grad_norm': 1.9465000629425049, 'learning_rate': 1.8000238123586144e-05, 'epoch': 0.33}
+{'loss': 4.9433, 'grad_norm': 1.8787702322006226, 'learning_rate': 1.79526134063579e-05, 'epoch': 0.34}
+{'loss': 4.9347, 'grad_norm': 1.7819783687591553, 'learning_rate': 1.7904988689129657e-05, 'epoch': 0.35}
+{'loss': 4.9351, 'grad_norm': 1.860534906387329, 'learning_rate': 1.7857363971901418e-05, 'epoch': 0.35}
+ 12%|███▉                             | 5000/42495 [6:47:45<40:19:50,  3.87s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.92014741897583, 'eval_runtime': 554.6408, 'eval_samples_per_second': 12.639, 'eval_steps_per_second': 3.161, 'epoch': 0.35}                     
+ 12%|███▉                             | 5000/42495 [6:57:00<40:19:50,  3.87s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:14<00:00,  3.16it/s]
+🔍 Prompt Evaluation @ step 5000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time. 
+ = = = = 2005 – 2006 = = = = 
+ In 2005, the 2006 – 2008, the 2008 – 2008, the 2009 – 2008,
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important and most of the most important species of the world. The most important of the most important species of the 20th century, the 20th century, the 20th century, the 19th century, the 19
+INFO:__main__:--------------------------------------------------
+{'loss': 4.9226, 'grad_norm': 1.813940405845642, 'learning_rate': 1.7809739254673178e-05, 'epoch': 0.36}                                                        
+{'loss': 4.8948, 'grad_norm': 1.6973931789398193, 'learning_rate': 1.7762114537444935e-05, 'epoch': 0.37}
+{'loss': 4.8746, 'grad_norm': 1.898977518081665, 'learning_rate': 1.7714489820216695e-05, 'epoch': 0.37}
+{'loss': 4.8823, 'grad_norm': 1.891469120979309, 'learning_rate': 1.7666865102988452e-05, 'epoch': 0.38}
+{'loss': 4.8625, 'grad_norm': 1.8700076341629028, 'learning_rate': 1.761924038576021e-05, 'epoch': 0.39}
+ 13%|████▎                            | 5500/42495 [7:29:28<39:49:57,  3.88s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.854606628417969, 'eval_runtime': 551.5047, 'eval_samples_per_second': 12.711, 'eval_steps_per_second': 3.179, 'epoch': 0.39}                    
+ 13%|████▎                            | 5500/42495 [7:38:40<39:49:57,  3.88s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:11<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 5500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time. 
+ = = = = 2009 – 2006 = = = = 
+ = = = = 2009 – 2006 = = = = 
+ = = = = 2009 – 2006 = = = = 
+
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important part of the world. The first part of the original name is the first to be the first to be used as a " new ". The first version of the first series is the first series of the first series, which is the
+INFO:__main__:--------------------------------------------------
+{'loss': 4.8686, 'grad_norm': 1.6998025178909302, 'learning_rate': 1.757161566853197e-05, 'epoch': 0.4}                                                         
+{'loss': 4.8359, 'grad_norm': 1.8941234350204468, 'learning_rate': 1.752399095130373e-05, 'epoch': 0.4}
+{'loss': 4.823, 'grad_norm': 1.9546706676483154, 'learning_rate': 1.7476366234075486e-05, 'epoch': 0.41}
+{'loss': 4.8264, 'grad_norm': 1.8401015996932983, 'learning_rate': 1.7428741516847246e-05, 'epoch': 0.42}
+{'loss': 4.8209, 'grad_norm': 1.9987341165542603, 'learning_rate': 1.7381116799619003e-05, 'epoch': 0.42}
+ 14%|████▋                            | 6000/42495 [8:11:17<39:25:33,  3.89s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.793108940124512, 'eval_runtime': 556.0531, 'eval_samples_per_second': 12.607, 'eval_steps_per_second': 3.153, 'epoch': 0.42}                    
+ 14%|████▋                            | 6000/42495 [8:20:33<39:25:33,  3.89s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:16<00:00,  3.16it/s]
+🔍 Prompt Evaluation @ step 6000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 2000s. 
+ = = = = = = = 
+ The first of the 2000s were the 2006 – 2000 season. The 2006 – 2006 season was the 2007 –
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is a major @-@ scale and a major part of the 2000s. 
+ = = = = = = = 
+ The 2006 – 2006 season was the 2006 – 2006 season, and the 200
+INFO:__main__:--------------------------------------------------
+{'loss': 4.793, 'grad_norm': 1.8144395351409912, 'learning_rate': 1.733349208239076e-05, 'epoch': 0.43}                                                         
+{'loss': 4.7609, 'grad_norm': 1.8939781188964844, 'learning_rate': 1.728586736516252e-05, 'epoch': 0.44}
+{'loss': 4.7617, 'grad_norm': 1.8269339799880981, 'learning_rate': 1.723824264793428e-05, 'epoch': 0.44}
+{'loss': 4.7338, 'grad_norm': 1.7064216136932373, 'learning_rate': 1.7190617930706037e-05, 'epoch': 0.45}
+{'loss': 4.7494, 'grad_norm': 1.8783549070358276, 'learning_rate': 1.7142993213477798e-05, 'epoch': 0.46}
+ 15%|█████                            | 6500/42495 [8:52:58<38:38:41,  3.87s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.737128734588623, 'eval_runtime': 551.6648, 'eval_samples_per_second': 12.707, 'eval_steps_per_second': 3.178, 'epoch': 0.46}                    
+ 15%|█████                            | 6500/42495 [9:02:10<38:38:41,  3.87s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:11<00:00,  3.17it/s]
+🔍 Prompt Evaluation @ step 6500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 1st @-@ 2. 
+ = = = = 2000 = = = = 
+ The 2001 – 2000 season was the first time in the 2000 season. The 2004 season was
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is a " great ". 
+ = = = = = = 
+ The first episode of the series was written by the series's first episode, " The Simpsons ", which was written by the series'first episode, " The Simpsons ", and
+INFO:__main__:--------------------------------------------------
+{'loss': 4.7082, 'grad_norm': 1.6759532690048218, 'learning_rate': 1.7095368496249554e-05, 'epoch': 0.47}                                                       
+{'loss': 4.7007, 'grad_norm': 1.7771204710006714, 'learning_rate': 1.704774377902131e-05, 'epoch': 0.47}
+{'loss': 4.7204, 'grad_norm': 1.7673969268798828, 'learning_rate': 1.700011906179307e-05, 'epoch': 0.48}
+{'loss': 4.693, 'grad_norm': 1.897801399230957, 'learning_rate': 1.6952494344564832e-05, 'epoch': 0.49}
+{'loss': 4.7034, 'grad_norm': 1.9328101873397827, 'learning_rate': 1.690486962733659e-05, 'epoch': 0.49}
+ 16%|█████▍                           | 7000/42495 [9:34:36<38:18:12,  3.88s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.685469627380371, 'eval_runtime': 556.3394, 'eval_samples_per_second': 12.6, 'eval_steps_per_second': 3.151, 'epoch': 0.49}                      
+ 16%|█████▍                           | 7000/42495 [9:43:52<38:18:12,  3.88s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:16<00:00,  3.16it/s]
+🔍 Prompt Evaluation @ step 7000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time, and the film was not a " very good ". 
+ = = = = = 2000 = = = = = 
+ In 2008, the film was released on DVD in the United States on 9 August 2008.
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important and most important of the world. The most important of the world's most important works are the most important of the world's most important works, the most important of the world's most important and most important, the most
+INFO:__main__:--------------------------------------------------
+{'loss': 4.6574, 'grad_norm': 1.9189836978912354, 'learning_rate': 1.685724491010835e-05, 'epoch': 0.5}                                                         
+{'loss': 4.6761, 'grad_norm': 1.8837392330169678, 'learning_rate': 1.6809620192880106e-05, 'epoch': 0.51}
+{'loss': 4.6667, 'grad_norm': 1.7942728996276855, 'learning_rate': 1.6761995475651866e-05, 'epoch': 0.52}
+{'loss': 4.6606, 'grad_norm': 1.8920258283615112, 'learning_rate': 1.6714370758423623e-05, 'epoch': 0.52}
+{'loss': 4.6456, 'grad_norm': 2.4267821311950684, 'learning_rate': 1.666674604119538e-05, 'epoch': 0.53}
+ 18%|█████▋                          | 7500/42495 [10:16:31<38:06:03,  3.92s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.638264179229736, 'eval_runtime': 557.703, 'eval_samples_per_second': 12.569, 'eval_steps_per_second': 3.143, 'epoch': 0.53}                     
+ 18%|█████▋                          | 7500/42495 [10:25:48<38:06:03,  3.92s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:17<00:00,  3.14it/s]
+🔍 Prompt Evaluation @ step 7500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the film's release. 
+ = = = = 2007 – 2007 = = = = 
+ In 2009, the film was released in the United States on 9 September 2009. It was the first film
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important and most important and popular and popular and popular and popular in the United States. 
+ = = = = 2007 – 2006 = = = = 
+ In 2007, the United States Army was the first to be
+INFO:__main__:--------------------------------------------------
+{'loss': 4.627, 'grad_norm': 1.7306092977523804, 'learning_rate': 1.661912132396714e-05, 'epoch': 0.54}                                                         
+{'loss': 4.5921, 'grad_norm': 1.7518390417099, 'learning_rate': 1.65714966067389e-05, 'epoch': 0.54}
+{'loss': 4.6021, 'grad_norm': 1.802747130393982, 'learning_rate': 1.6523871889510657e-05, 'epoch': 0.55}
+{'loss': 4.5813, 'grad_norm': 1.797747015953064, 'learning_rate': 1.6476247172282417e-05, 'epoch': 0.56}
+{'loss': 4.6006, 'grad_norm': 1.8452489376068115, 'learning_rate': 1.6428622455054174e-05, 'epoch': 0.56}
+ 19%|██████                          | 8000/42495 [10:58:33<37:37:23,  3.93s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.59254264831543, 'eval_runtime': 556.0812, 'eval_samples_per_second': 12.606, 'eval_steps_per_second': 3.152, 'epoch': 0.56}                     
+ 19%|██████                          | 8000/42495 [11:07:49<37:37:23,  3.93s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:16<00:00,  3.13it/s]
+🔍 Prompt Evaluation @ step 8000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the film, which was a commercial success of the film. 
+ = = = = 2009 – 2009 = = = = 
+ In 2009, the film was released on DVD and Blu @-@ ray on DVD and
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is a major state of the state. 
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+INFO:__main__:--------------------------------------------------
+{'loss': 4.592, 'grad_norm': 1.889021635055542, 'learning_rate': 1.638099773782593e-05, 'epoch': 0.57}                                                          
+{'loss': 4.5679, 'grad_norm': 1.9768623113632202, 'learning_rate': 1.633337302059769e-05, 'epoch': 0.58}
+{'loss': 4.579, 'grad_norm': 1.827074408531189, 'learning_rate': 1.628574830336945e-05, 'epoch': 0.59}
+{'loss': 4.5606, 'grad_norm': 1.9923609495162964, 'learning_rate': 1.6238123586141208e-05, 'epoch': 0.59}
+{'loss': 4.5576, 'grad_norm': 1.8762121200561523, 'learning_rate': 1.619049886891297e-05, 'epoch': 0.6}
+ 20%|██████▍                         | 8500/42495 [11:40:34<36:46:47,  3.89s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.547366619110107, 'eval_runtime': 557.4985, 'eval_samples_per_second': 12.574, 'eval_steps_per_second': 3.144, 'epoch': 0.6}                     
+ 20%|██████▍                         | 8500/42495 [11:49:51<36:46:47,  3.89s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:17<00:00,  3.14it/s]
+🔍 Prompt Evaluation @ step 8500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 1 @-@ 0. 
+ = = = = 1 = = = = 
+ In the 1st century, the 2nd and 2nd centuries of the 2nd and 2nd centuries were the
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important and most important of the 20th century. 
+ = = = = 20th century = = = = 
+ In the 19th century, the 16th @-@ century English @-@ language style of the
+INFO:__main__:--------------------------------------------------
+{'loss': 4.5501, 'grad_norm': 1.9501502513885498, 'learning_rate': 1.6142874151684725e-05, 'epoch': 0.61}                                                       
+{'loss': 4.535, 'grad_norm': 2.0057058334350586, 'learning_rate': 1.6095249434456482e-05, 'epoch': 0.61}
+{'loss': 4.5332, 'grad_norm': 1.8587970733642578, 'learning_rate': 1.6047624717228242e-05, 'epoch': 0.62}
+{'loss': 4.5002, 'grad_norm': 1.9509942531585693, 'learning_rate': 1.6000000000000003e-05, 'epoch': 0.63}
+{'loss': 4.5284, 'grad_norm': 1.923849105834961, 'learning_rate': 1.595237528277176e-05, 'epoch': 0.64}
+ 21%|██████▊                         | 9000/42495 [12:22:27<36:02:32,  3.87s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.507755279541016, 'eval_runtime': 551.6732, 'eval_samples_per_second': 12.707, 'eval_steps_per_second': 3.178, 'epoch': 0.64}                    
+ 21%|██████▊                         | 9000/42495 [12:31:39<36:02:32,  3.87s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:11<00:00,  3.18it/s]
+🔍 Prompt Evaluation @ step 9000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 20th century, and the 13th century, the 13th century, the 13th century, the 13th century, the 13th century, the 13th century, the 13th century,
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important and most important and popular culture in the world. 
+ = = = = 2000 – 2000 = = = = 
+ In 2005, the United States was the first of the 2000s to be the
+INFO:__main__:--------------------------------------------------
+{'loss': 4.4937, 'grad_norm': 1.8304232358932495, 'learning_rate': 1.590475056554352e-05, 'epoch': 0.64}                                                        
+{'loss': 4.501, 'grad_norm': 1.8170983791351318, 'learning_rate': 1.5857125848315277e-05, 'epoch': 0.65}
+{'loss': 4.4817, 'grad_norm': 1.977964997291565, 'learning_rate': 1.5809501131087033e-05, 'epoch': 0.66}
+{'loss': 4.4898, 'grad_norm': 2.1780858039855957, 'learning_rate': 1.5761876413858794e-05, 'epoch': 0.66}
+{'loss': 4.5005, 'grad_norm': 1.8188778162002563, 'learning_rate': 1.5714251696630554e-05, 'epoch': 0.67}
+ 22%|███████▏                        | 9500/42495 [13:03:54<35:21:44,  3.86s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.468681335449219, 'eval_runtime': 548.6878, 'eval_samples_per_second': 12.776, 'eval_steps_per_second': 3.195, 'epoch': 0.67}                    
+ 22%|███████▏                        | 9500/42495 [13:13:02<35:21:44,  3.86s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:08<00:00,  3.19it/s]
+🔍 Prompt Evaluation @ step 9500
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the 100 @-@ foot ( 2 @.@ 2 m ) wide, and a 2 @.@ 5 @-@ foot ( 1 @.@ 4 m ) wide @-@ foot ( 1 @.@
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important and most important of the 20th century. 
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+INFO:__main__:--------------------------------------------------
+{'loss': 4.4761, 'grad_norm': 1.9142833948135376, 'learning_rate': 1.566662697940231e-05, 'epoch': 0.68}                                                        
+{'loss': 4.4615, 'grad_norm': 1.922302007675171, 'learning_rate': 1.561900226217407e-05, 'epoch': 0.68}
+{'loss': 4.4496, 'grad_norm': 2.01977276802063, 'learning_rate': 1.5571377544945828e-05, 'epoch': 0.69}
+{'loss': 4.4678, 'grad_norm': 1.870115876197815, 'learning_rate': 1.5523752827717585e-05, 'epoch': 0.7}
+{'loss': 4.4599, 'grad_norm': 1.9310779571533203, 'learning_rate': 1.5476128110489345e-05, 'epoch': 0.71}
+ 24%|███████▎                       | 10000/42495 [13:45:14<34:45:55,  3.85s/it]/Users/gitesh.grover/Study/AI-ERA/IntervueAI_Capstone/.venv/lib/python3.13/site-packages/torch/utils/data/dataloader.py:683: UserWarning: 'pin_memory' argument is set as true but not supported on MPS now, then device pinned memory won't be used.
+  warnings.warn(warn_msg)
+{'eval_loss': 4.430327892303467, 'eval_runtime': 549.6046, 'eval_samples_per_second': 12.755, 'eval_steps_per_second': 3.19, 'epoch': 0.71}                     
+ 24%|███████▎                       | 10000/42495 [13:54:24<34:45:55,  3.85s/itINFO:__main__:███████████████████████████████| 1753/1753 [09:09<00:00,  3.19it/s]
+🔍 Prompt Evaluation @ step 10000
+INFO:__main__:📝 Prompt: Once upon a time
+INFO:__main__:🧠 Model Output: Once upon a time of the film, and the film's " a little bit of a lot of the film ". 
+ = = = = 2000 – 2001 = = = = 
+ In 2001, the film was released on DVD and
+INFO:__main__:--------------------------------------------------
+INFO:__main__:📝 Prompt: The capital of France is
+INFO:__main__:🧠 Model Output: The capital of France is the most important and popular culture of the world. 
+ = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+INFO:__main__:--------------------------------------------------
+{'loss': 4.4045, 'grad_norm': 1.8270361423492432, 'learning_rate': 1.5428503393261102e-05, 'epoch': 0.71}                                                       
+{'loss': 4.4327, 'grad_norm': 1.848037600517273, 'learning_rate': 1.5380878676032862e-05, 'epoch': 0.72}
+{'loss': 4.4367, 'grad_norm': 1.8245179653167725, 'learning_rate': 1.5333253958804622e-05, 'epoch': 0.73}
+{'loss': 4.396, 'grad_norm': 1.9088610410690308, 'learning_rate': 1.528562924157638e-05, 'epoch': 0.73}
+ 25%|███████▌    
