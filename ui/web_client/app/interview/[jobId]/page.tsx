@@ -1,7 +1,7 @@
 // page.tsx
 "use client";
 
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { CloseIcon } from "@/components/CloseIcon";
 import { NoAgentNotification } from "@/components/NoAgentNotification";
 import TranscriptionView, { Segment } from "@/components/TranscriptionView";
@@ -27,26 +27,28 @@ import debounce from 'lodash/debounce';
 const encoder = new TextEncoder()
 const decoder = new TextDecoder()
 
-export default function InterviewPage({ params }: { params: { interviewId: string } }) {
+export default function InterviewPage({ params }: { params: { jobId: string } }) {
   const searchParams = useSearchParams();
   const serverUrl = searchParams.get('s') || '';
   const roomToken = searchParams.get('r') || '';
+  const interviewId = searchParams.get('i') || '';
   const [room] = useState(new Room());
 
   return (
     <main data-lk-theme="default" className="h-full grid content-center bg-[var(--lk-bg)]">
       <RoomContext.Provider value={room}>
-        <InterviewContent room={room} serverUrl={serverUrl} roomToken={roomToken} />
+        <InterviewContent room={room} serverUrl={serverUrl} roomToken={roomToken} jobId={params.jobId} interviewId={interviewId} />
       </RoomContext.Provider>
     </main>
   );
 }
 
-function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUrl: string, roomToken: string }) {
+function InterviewContent({ room, serverUrl, roomToken, jobId, interviewId }: { room: Room, serverUrl: string, roomToken: string, jobId: string, interviewId: string }) {
   const strans = useCombinedTranscriptions();
   const [transcripts, setTranscripts] = useState<Segment[]>([]);
   const [code, setCode] = useState("// Initial code from UI");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     setTranscripts(strans);
@@ -54,18 +56,25 @@ function InterviewContent({ room, serverUrl, roomToken }: { room: Room, serverUr
 
   useEffect(() => {
     const handleData = (payload: Uint8Array, participant?: Participant, kind?: DataPacket_Kind, topic?: string) => {
-      console.log("Coding question received")
-      if (topic === "code-editor") {
-        var text = decoder.decode(payload);
-        text = text + "\n\n// Type your code below this:\n"
-        setCode(text);
+      const text = decoder.decode(payload);
+      if (topic === "interview-status") {
+        if (text === "interview-ended") {
+          console.log('feedback jobId: ' + jobId)
+          console.log('feedback participant: ' + participant?.identity)
+          console.log('feedback interviewId: ' + interviewId)
+          router.push(`/interview/${jobId}/feedback?i=${interviewId}`);
+        }
+      } else if (topic === "code-editor") {
+        const updatedCode = text + "\n\n// Type your code below this:\n";
+        setCode(updatedCode);
       }
     };
+  
     room.on(RoomEvent.DataReceived, handleData);
     return () => {
       room.off(RoomEvent.DataReceived, handleData);
     };
-  }, [room]);
+  }, [room, router, jobId, interviewId]);
 
   const debouncedHandleStreamingCode = useMemo(() => {
     const debounced = debounce((codeText: string) => {

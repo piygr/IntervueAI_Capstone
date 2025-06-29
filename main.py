@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend_api.start_interview import router as st_router
 from backend_api.jd import router as jd_router
 from backend_api.resume_handler import router as resume_handler_router
+from backend_api.feedback import router as feedback_router
 from dotenv import load_dotenv
 from google import genai
 import os
@@ -27,6 +28,7 @@ app.add_middleware(
 app.include_router(st_router)
 app.include_router(jd_router)
 app.include_router(resume_handler_router)
+app.include_router(feedback_router)
 
 @app.get("/")
 def root():
