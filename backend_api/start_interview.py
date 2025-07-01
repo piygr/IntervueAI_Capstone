@@ -7,9 +7,7 @@ import uuid
 import os
 from dotenv import load_dotenv
 import logging
-import sys
-from utils.resume_pdf_parser import parse_resume_pdf
-from utils.interview_planner import generate_interview_plan
+from agents.interview_planner import generate_interview_plan
 from utils.session import update_session, fetch_session, load_config
 import json
 

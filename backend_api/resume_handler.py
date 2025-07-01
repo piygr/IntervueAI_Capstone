@@ -8,8 +8,8 @@ import os
 import json
 from dotenv import load_dotenv
 
-from utils.jd_resume_matcher import compare_jd_resume
-from utils.resume_pdf_parser import parse_resume_pdf
+from agents.jd_resume_matcher import compare_jd_resume
+from agents.resume_pdf_parser import parse_resume_pdf
 from utils.session import update_session, load_config
 load_dotenv()
 
