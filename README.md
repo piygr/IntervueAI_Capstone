@@ -44,7 +44,8 @@ At the end of each interview, the system generates a structured, rubric-based fe
 **Prompt Engineering for Custom Models:** Initial tests with local LLMs via Ollama (Phi, Mistral, etc.) didn’t yield great results. Need improved prompt chaining or agent design.
 
 **Dependency on AWS STT/TTS:** Chosen due to available credits and faster development, but may explore alternatives (e.g., Whisper, Coqui TTS) for cost scalability or latency.
-Latency and Agent Responsiveness: Still tuning for natural response pacing and reducing perceived lag in turn-taking.
+
+**Latency and Agent Responsiveness:** Still tuning for natural response pacing and reducing perceived lag in turn-taking.
 
 ---
 
