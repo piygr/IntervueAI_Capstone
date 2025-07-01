@@ -156,7 +156,7 @@ class Coordinator(Agent):
             
             if google_api_keys and isinstance(google_api_keys, list):
                 proc = load_process_yaml()
-                if proc and proc.get('google_api_key_index'):
+                if proc and proc.get('google_api_key_index', None) is not None:
                     google_api_key = google_api_keys[proc.get('google_api_key_index')]
                     google_api_key_index = (proc.get('google_api_key_index') + 1) % len(google_api_keys)
                 else:
