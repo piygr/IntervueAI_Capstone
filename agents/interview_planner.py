@@ -19,7 +19,7 @@ async def generate_interview_plan(jd_json, resume_json, scheduled_interview_dura
     """
     Geerate interview plan as per jd & resume.
     """
-    prompt_file_path = "prompts/interview_plan.txt"
+    prompt_file_path = "prompts/interview_planner.txt"
     if os.path.exists(prompt_file_path):
             with open(prompt_file_path, 'r') as f:
                 system_prompt = f.read()
