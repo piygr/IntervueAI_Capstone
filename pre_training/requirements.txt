@@ -10,3 +10,8 @@ requests>=2.31.0
 evaluate
 rouge_score
 torchinfo
+peft>=0.4.0
+trl>=0.7.0
+bitsandbytes>=0.41.0
+# sentencepiece
+# protobuf
