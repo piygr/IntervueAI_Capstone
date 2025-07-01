@@ -20,6 +20,7 @@ from livekit.plugins import (
 )
 #from livekit.plugins.turn_detector.english import EnglishModel
 
+from agents.feedback_agent import FeedbackAgent
 from utils.session import fetch_session
 from utils.memory import MemoryManager, ConversationItem, InterviewPlan
 
@@ -69,6 +70,9 @@ class InterviewContext:
     user_last_conversation: int = 0
     user_last_typed: int = 0
     current_question_requires_coding: bool = False
+    cancellation_warned: bool = False
+    
+silence_break_time_for_coding = 5*60 # 5 min
 
 
 SILENCE_BREAKER = {
@@ -156,12 +160,14 @@ class Coordinator(Agent):
         self.session.on("user_input_transcribed", self.user_input_transcribed)
         self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
         self.session.userdata.interview_plan = self.interview_plan
+        self.session.userdata.user_last_conversation = time.time()
         self.session.generate_reply(allow_interruptions=False)
         
         
     def user_input_transcribed(self, event: UserInputTranscribedEvent):
         if event.is_final:
-            print(f"User input transcribed: {event.transcript}, final: {event.is_final}")
+            logger.info(f"📝 User input transcribed: {event.transcript}, final: {event.is_final}")
+
             self.session.userdata.user_last_conversation = time.time()
 
             if self.session.userdata.current_question_index >= 0:
@@ -172,45 +178,62 @@ class Coordinator(Agent):
                 )
 
     async def _monitor_silence(self):
-        logger.info(f"Started monitor silence")
+        logger.info(f"👂 Started monitor silence")
         try:
             while True:
                 await asyncio.sleep(20)
 
                 now = time.time()
-
+                
                 async with self._lock:
                     question_index = self.session.userdata.current_question_index
                     if question_index > 0:
                         time_spent_so_far = "{:.2f}".format( (now - self.session.userdata.timetracker[question_index]) / 60.0)
                         self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Ongoing Question (Question Index: {question_index} ) so far = ** {time_spent_so_far} minutes **")
-                
-                logger.info(f"agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
+                   
+                logger.info(f"⌛️ agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
+                _silence_break_time = random.randint(200, 300) if self.session.userdata.current_question_requires_coding else random.randint(15, 20)
+
+                logger.info(f'⏱️ silence break time: {_silence_break_time}')
+
                 if self._cancel_interview_task is None and \
-                ((now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > random.randint(40, 60) ) \
-                    or (self.session.userdata.current_question_requires_coding and now - self.session.userdata.user_last_typed > random.randint(200, 300) ) ):
+                now - max(self.session.userdata.agent_last_conversation, self.session.userdata.user_last_conversation) > _silence_break_time:
                         if self.session.userdata.current_question_index >= 0:
                             msg = random.choice(SILENCE_BREAKER['question'])
                         else:
                             msg = random.choice(SILENCE_BREAKER['greet'])
-
                         await self.session.say(msg)
                         self.session.userdata.agent_last_conversation = now
-                        if now - self.session.userdata.user_last_conversation > 300:
-                            msg = "Looks like you are away, I am cancelling the interview for now. Please connect again later."
-                            self._cancel_interview_task = await self._cancel_interview(msg)
+
+                        warn_wait_time = 2 * silence_break_time_for_coding if self.session.userdata.current_question_requires_coding else 60
+                        logger.info(f'⏱️ warn_wait_time: {warn_wait_time}')
+                        if not self.session.userdata.cancellation_warned and now - self.session.userdata.user_last_conversation > warn_wait_time:
+                            self.session.userdata.cancellation_warned = True
+                            await self.session.say("You've been silent for a long time. Your interview will be cancelled soon. Please speak up to avoid cancellation.")
+
+                        cancel_wait_time = 3 * silence_break_time_for_coding if self.session.userdata.current_question_requires_coding else 120
+                        logger.info(f'⏱️ cancel_wait_time: {cancel_wait_time}')
+                        if now - self.session.userdata.user_last_conversation > cancel_wait_time:
+                            cancel_message = "Looks like you are away, I am cancelling the interview for now. Please connect again later."
+                            self._cancel_interview_task = await self._cancel_interview(cancel_message)
                             break
                         
         except Exception as e:
             logger.error(f"Error in _monitor_silence {e}")
 
-
-    async def _cancel_interview(self, msg=""):
+    async def _cancel_interview(self, message: str):
         async with LiveKitAPI() as lkapi:
-            if msg:
-                await self.session.say(msg, allow_interruptions=False)
-            
+            if message:
+                await self.session.say(message, allow_interruptions=False)
+
+            await FeedbackAgent.generate_feedback(self.memory)
             interview_room = get_job_context().room
+            await interview_room.local_participant.publish_data(
+                b"interview-ended",
+                reliable=True,
+                topic="interview-status"
+            )
+
             res = await lkapi.room.list_participants(ListParticipantsRequest(
                 room=interview_room.name
             ))
@@ -235,8 +258,8 @@ class Coordinator(Agent):
         Args:
             greeting_message: This is the greetig message which will be conveyed by the voice agent. 
         """
-        logger.info(f"{greeting_message}")
-        self.session.say(greeting_message)
+        logger.info(f"💬 {greeting_message}")
+        await self.session.say(greeting_message)
         context.userdata.agent_last_conversation = time.time()
 
 
@@ -253,7 +276,7 @@ class Coordinator(Agent):
             current_question_index: Index of the current active question from the interview plan
         """
 
-        logger.info(f"{current_question_index}: Stay Silent")
+        logger.info(f"💬 {current_question_index}: Stay Silent")
         context.userdata.current_question_index = current_question_index
 
     @function_tool
@@ -271,9 +294,9 @@ class Coordinator(Agent):
             probing_question: Message that needs to be asked to the candidate to probe further. Make sure the message blends in flow of the conversation. 
         """
 
-        logger.info(f"{current_question_index}: Probe Further: {probing_message}")
+        logger.info(f"💬 {current_question_index}: Probe Further: {probing_message}")
         context.userdata.current_question_index = current_question_index
-        self.session.say(probing_message)
+        await self.session.say(probing_message)
         context.userdata.agent_last_conversation = time.time()
 
         self.memory.add_followup_item(question_index=current_question_index,
@@ -297,9 +320,9 @@ class Coordinator(Agent):
             hint_message: Hint message that needs to be told to the candidate. Make sure the message blends in flow of the conversation.
         """
 
-        logger.info(f"{current_question_index}: Provide hint: {hint_message}")
+        logger.info(f"💬 {current_question_index}: Provide hint: {hint_message}")
         context.userdata.current_question_index = current_question_index
-        self.session.say(hint_message)
+        await self.session.say(hint_message)
         context.userdata.agent_last_conversation = time.time()
 
         self.memory.add_followup_item(question_index=current_question_index,
@@ -322,9 +345,9 @@ class Coordinator(Agent):
             current_question_index: Index of the current active question from the interview plan
             clarification_message: Clarification message that needs to be told to the candidate. Make sure the message blends in flow of the conversation.
         """
-        logger.info(f"{current_question_index}: Clarification message: {clarification_message}")
+        logger.info(f"💬 {current_question_index}: Clarification message: {clarification_message}")
         context.userdata.current_question_index = current_question_index
-        self.session.say(clarification_message)
+        await self.session.say(clarification_message)
         context.userdata.agent_last_conversation = time.time()
 
         self.memory.add_followup_item(question_index=current_question_index,
@@ -358,7 +381,7 @@ class Coordinator(Agent):
         """
 
         now = time.time()
-        logger.info(f"{question_index}: Next Question message: {question_message}")
+        logger.info(f"💬 {question_index}: Next Question message: {question_message}")
         context.userdata.current_question_index = question_index
         if question_index > 0:
             context.userdata.response_summary.append(dict(question_index=question_index, 
@@ -366,7 +389,7 @@ class Coordinator(Agent):
             
         context.userdata.current_question_requires_coding = use_code_editor
         if not use_code_editor:
-            self.session.say(pre_message + "\n" + question_message)
+            await self.session.say(pre_message + "\n" + question_message)
         else:
             question = self.interview_plan.questions[question_index].question
             logger.info(f"💬 coding question: {question}")
@@ -376,7 +399,7 @@ class Coordinator(Agent):
                 reliable=True,
                 topic="code-editor"
             )
-            self.session.say(pre_message + "\n" + question_message + "\n Please open code editor to answer.")
+            await self.session.say(pre_message + "\n" + question_message + "\n Please open the code editor to answer.")
 
         context.userdata.agent_last_conversation = now
 
@@ -407,36 +430,21 @@ class Coordinator(Agent):
             end_interview_message: Message to convey to the candidate at the end of interview. Make sure the message blends in flow of the conversation.
             previous_question_user_response_summary: Detailed summary of the user response for the previous question
         """
-        logger.info(f"{last_question_index}: End of interview")
+        logger.info(f"💬 {last_question_index}: End of interview, message: {end_interview_message}")
         
         context.userdata.response_summary.append(dict(question_index=last_question_index, 
                                                           user_response_summary=previous_question_user_response_summary))
         #self.session.say(end_interview_message)
         context.userdata.agent_last_conversation = time.time()
-        await self._cancel_interview(msg=end_interview_message)
+        await self._cancel_interview(message=end_interview_message)
 
-    
-    #@function_tool
-    async def send_question_to_code_editor(self, question: str):
-        """Use this tool to send coding question or text to the code editor.
-        Args:
-            question: The question text to send to code editor.
-        """
-        logger.info(f"💬 coding question: {question}")
-        room = get_job_context().room
-        await room.local_participant.publish_data(
-            question.encode("utf-8"),
-            reliable=True,
-            topic="code-editor"
-        )
-
-    
+  
     async def handle_data_received(self, packet):
         # packet is a livekit.rtc.DataPacket
         data = packet.data
         topic = packet.topic
         participant = packet.participant.identity  # if you need it
-        logger.info(f"💬 Received {len(data)} bytes on topic {topic}")
+        # logger.debug(f"📦 Received {len(data)} bytes on topic {topic}")
         if topic == "code-editor":
             code = data.decode("utf-8")
 
@@ -450,9 +458,10 @@ class Coordinator(Agent):
                     if code.strip().endswith(final_marker):
                         code = code.rstrip().removesuffix(final_marker).rstrip()
                         if code:
-                            logger.info(f"💬 Code: {code}")
+                            self.session.userdata.user_last_conversation = time.time()
+                            logger.debug(f"📝 Code: {code}")
                             # await self.session.say("Thank you for the submission.")
-                            code_submission_prompt = "Candidate has submitted the code. Evaluate the code correctness and ask further question on it."
+                            code_submission_prompt = "Candidate has submitted the code. Evaluate the code correctness, check if the code handles the edge cases correctly and ask further probing question on it including time and space complexity if it has not been answered already in the code text."
                             handle = self.session.generate_reply(user_input=code, instructions=code_submission_prompt)
                             await handle
 
@@ -460,10 +469,11 @@ class Coordinator(Agent):
                                 question_index=self.session.userdata.current_question_index, 
                                 response="[Candidate submitted the following code]\n '''\n{code}'''\n]",
                                 timestamp=time.time()
-                            )
+                            )   
+
                         else:
                             await self.session.say("Your submission is empty. Please submit full code")
                     else:
-                        logger.info(f"💬 streaming code: {code}")
+                        logger.debug(f"📝 streaming code: {code}")
             else:
                 await self.session.say("Please do not delete any existing code or text from the editor.")

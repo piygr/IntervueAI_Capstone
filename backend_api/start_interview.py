@@ -77,7 +77,8 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
             return JSONResponse(content={
                 "participantToken": token,
                 "serverUrl": LIVEKIT_SERVER_URL,
-                "roomName": room_name
+                "roomName": room_name,
+                "interviewId": interviewId
             })
         else:
             return JSONResponse(
