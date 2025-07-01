@@ -41,8 +41,13 @@ config = load_config()
 llm_model = None
 if config.get('model', {}).get('type', '') == 'gemini':
     llm_model = google.LLM(
-            model="gemini-2.0-flash",
+            model=config.get('model', {}).get('name', ''),
         )
+elif config.get('model', {}).get('type', '') == 'ollama':
+    llm_model = openai.LLM.with_ollama(
+        model=config.get('model', {}).get('name', ''),
+        base_url=config.get('model', {}).get('url', ''),
+    )
     
 stt = aws.STT()
 tts = aws.TTS(
@@ -242,6 +247,7 @@ class Coordinator(Agent):
     ):
         """
         Called when the candidate may still be speaking or thinking, as an interviewer you don't have any message for the candidate so better to stay silent.
+        But make sure staying silent is not creating a deadlock.
         
         Args:
             current_question_index: Index of the current active question from the interview plan
