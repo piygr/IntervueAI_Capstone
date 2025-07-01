@@ -13,10 +13,10 @@ def load_process_yaml(path="configs/process.yaml"):
     process = {}
     try:
         with open(path, "r") as f:
-            process = yaml.safe_load(f, Loader=yaml.FullLoader)
+            process = yaml.safe_load(f)
     except Exception as e:
         print(e)
-        
+
     return process
 
 
