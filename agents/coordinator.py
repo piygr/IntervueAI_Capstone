@@ -151,28 +151,28 @@ class Coordinator(Agent):
         
         llm_model = None
         if config.get('model', {}).get('type', '') == 'gemini':
-            google_api_keys = json.loads(os.getenv("GOOGLE_API_KEYS", "[]"))
             google_api_key = ''
-            
-            if google_api_keys and isinstance(google_api_keys, list):
-                proc = load_process_yaml()
-                if proc and proc.get('google_api_key_index', None) is not None:
-                    google_api_key = google_api_keys[proc.get('google_api_key_index')]
-                    google_api_key_index = (proc.get('google_api_key_index') + 1) % len(google_api_keys)
-                else:
-                    google_api_key = google_api_keys[0]
-                    google_api_key_index = 1 % len(google_api_keys)
+            try:
+                google_api_keys = json.loads(os.getenv("GOOGLE_API_KEYS", "[]"))
+                if len(google_api_keys) > 0:
+                    proc = load_process_yaml()
+                    if proc and proc.get('google_api_key_index', None) is not None:
+                        google_api_key = google_api_keys[proc.get('google_api_key_index')]
+                        google_api_key_index = (proc.get('google_api_key_index') + 1) % len(google_api_keys)
+                    else:
+                        google_api_key = google_api_keys[0]
+                        google_api_key_index = 1 % len(google_api_keys)
 
-                logger.info(f"Updated GOOGLE_API_KEY_INDEX: {google_api_key_index}")
-                proc['google_api_key_index'] = google_api_key_index
-                save_process_yaml(proc)
+                    logger.info(f"Updated GOOGLE_API_KEY_INDEX: {google_api_key_index}")
+                    proc['google_api_key_index'] = google_api_key_index
+                    save_process_yaml(proc)
 
-            else:
-                if google_api_keys and isinstance(google_api_keys, str):
-                    google_api_key = google_api_keys
                 else:
                     google_api_key = os.getenv('GOOGLE_API_KEY')
-                
+
+            except Exception as e:
+                logger.error(f"Error parsing GOOGLE_API_KEYS {e}")
+                google_api_key = os.getenv('GOOGLE_API_KEY')
             
             llm_model = google.LLM(
                     model=config.get('model', {}).get('name', ''),
