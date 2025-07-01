@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 from utils.jd_resume_matcher import compare_jd_resume
 from utils.resume_pdf_parser import parse_resume_pdf
-from utils.session import update_session
+from utils.session import update_session, load_config
 load_dotenv()
 
 # Environment variables or secure config
@@ -20,7 +20,7 @@ LIVEKIT_API_SECRET = os.getenv("LIVEKIT_API_SECRET")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("resume-handler")
 
-
+config = load_config()
 router = APIRouter(prefix="/api")
 
 @router.post("/handle-resume")
@@ -55,7 +55,7 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
         overall_score = match_data.get('overall_score', 0)
         logger.info(f"Overall score: {overall_score}")
         
-        if overall_score >= 2:
+        if overall_score >= config.get('interview', {}).get('min_resume_matching_score', 6):
             logger.info(f"Overall score is good: {overall_score}")
             # If score is good, return success with score and proceed to interview
             session_dict = dict(JD=f"{jobId}", resume=resume_text)
