@@ -34,6 +34,7 @@ IntervueAI is an AI-powered mock interview platform that allows candidates to up
 At the end of each interview, the system generates a structured, rubric-based feedback report for the candidate — useful for self-evaluation and interview preparation.
 
 ### 📊 Pretraining Strategy
+[Refer to the detailed README here](pre_training/README.md)
 
 **Pretrained Foundation Model:** Llama3 1B.
 
