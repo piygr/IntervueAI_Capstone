@@ -4,6 +4,7 @@ model:
   #url: "http://13.203.148.228:11434/v1"
 
 interview:
+  min_resume_matching_score: 6
   duration_minutes: 45
 
 tts:

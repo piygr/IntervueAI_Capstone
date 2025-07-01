@@ -26,6 +26,7 @@ from utils.memory import MemoryManager, ConversationItem, InterviewPlan
 import os
 import random
 import time
+import json
 
 from livekit.agents import UserInputTranscribedEvent
 from utils.session import load_config, load_process_yaml, save_process_yaml
@@ -150,7 +151,7 @@ class Coordinator(Agent):
         
         llm_model = None
         if config.get('model', {}).get('type', '') == 'gemini':
-            google_api_keys = os.getenv("GOOGLE_API_KEYS")
+            google_api_keys = json.loads(os.getenv("GOOGLE_API_KEYS", "[]"))
             google_api_key = ''
             
             if google_api_keys and isinstance(google_api_keys, list):
@@ -164,7 +165,7 @@ class Coordinator(Agent):
 
                 proc['google_api_key_index'] = google_api_key_index
                 save_process_yaml(proc)
-                
+
             else:
                 if google_api_keys and isinstance(google_api_keys, str):
                     google_api_key = google_api_keys
