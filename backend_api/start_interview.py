@@ -7,9 +7,7 @@ import uuid
 import os
 from dotenv import load_dotenv
 import logging
-import sys
-from utils.resume_pdf_parser import parse_resume_pdf
-from utils.interview_planner import generate_interview_plan
+from agents.interview_planner import InterviewPlanner
 from utils.session import update_session, fetch_session, load_config
 import json
 
@@ -55,7 +53,8 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
     resume_json = session_dict.get('resume')
     
     if resume_json:
-        interview_plan = await generate_interview_plan(jd_json, resume_json, config.get('interview', {}).get('duration_minutes'))
+        interview_planner = InterviewPlanner()
+        interview_plan = await interview_planner.generate_interview_plan(jd_json, resume_json, config.get('interview', {}).get('duration_minutes'))
         if interview_plan:
             interview_context = dict(
                 candidate_first_name=resume_json.get('candidate_first_name', ''),
@@ -77,7 +76,8 @@ async def start_interview(interviewId: str = Form(...), jobId: str = Form(...)):
             return JSONResponse(content={
                 "participantToken": token,
                 "serverUrl": LIVEKIT_SERVER_URL,
-                "roomName": room_name
+                "roomName": room_name,
+                "interviewId": interviewId
             })
         else:
             return JSONResponse(

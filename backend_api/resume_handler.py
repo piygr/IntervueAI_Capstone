@@ -2,15 +2,13 @@ import logging
 from fastapi import APIRouter, UploadFile, Form
 from fastapi.responses import JSONResponse
 import uuid
-import subprocess
-from livekit import api
 import os
 import json
 from dotenv import load_dotenv
 
-from utils.jd_resume_matcher import compare_jd_resume
-from utils.resume_pdf_parser import parse_resume_pdf
-from utils.session import update_session
+from agents.jd_resume_matcher import JDResumeMatcher
+from agents.resume_pdf_parser import ResumePDFParser
+from utils.session import update_session, load_config
 load_dotenv()
 
 # Environment variables or secure config
@@ -20,14 +18,15 @@ LIVEKIT_API_SECRET = os.getenv("LIVEKIT_API_SECRET")
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("resume-handler")
 
-
+config = load_config()
 router = APIRouter(prefix="/api")
 
 @router.post("/handle-resume")
 async def start_interview(resume: UploadFile, jobId: str = Form(...)):
     logger.info(f"Received resume for JD: {jobId}")
     interview_id = str(uuid.uuid4())
-    success, resume_text = await parse_resume_pdf(resume)
+    resume_pdf_parser = ResumePDFParser()
+    success, resume_text = await resume_pdf_parser.parse_resume_pdf(resume)
 
     if not success:
         return JSONResponse(content={
@@ -41,7 +40,8 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
     with open(jd_path, "r", encoding="utf-8") as file:
         jd_text = file.read()
 
-    jd_resume_match = await compare_jd_resume(jd_text, resume_text)
+    jd_resume_matcher = JDResumeMatcher()
+    jd_resume_match = await jd_resume_matcher.compare_jd_resume(jd_text, resume_text)
 
     if jd_resume_match == "error":
         return JSONResponse(content={
@@ -55,7 +55,7 @@ async def start_interview(resume: UploadFile, jobId: str = Form(...)):
         overall_score = match_data.get('overall_score', 0)
         logger.info(f"Overall score: {overall_score}")
         
-        if overall_score >= 2:
+        if overall_score >= config.get('interview', {}).get('min_resume_matching_score', 6):
             logger.info(f"Overall score is good: {overall_score}")
             # If score is good, return success with score and proceed to interview
             session_dict = dict(JD=f"{jobId}", resume=resume_text)

@@ -2,6 +2,52 @@
 
 IntervueAI is an AI-powered mock interview platform that allows candidates to upload their resume and start an automated voice interview based on a given job description (JD). The system combines a FastAPI backend, a LiveKit-powered voice assistant agent, and a frontend UI built using Next.js and `pnpm`.
 
+## ✅ Features Implemented
+
+### 🎤 Voice-based Interview Agent
+**WebRTC framework (LiveKit SDK):** Built a real-time voice-based interview system using LiveKit SDK with Python backend and React frontend.
+
+#### Tech Stack:
+- **Frontend:** React.js + LiveKit SDK
+- **Backend:** FastAPI + Livekit API (Python)
+- **LLM:** Gemini 2.0 Flash (Google)
+- **Voice:** AWS Text-to-Speech (TTS) and Speech-to-Text (STT)
+
+
+### 🧠 Candidate Screening Logic
+**Resume Parser & JD Matching Agent:** Automatically accepts or rejects candidates before starting the interview by evaluating JD-candidate fit using vector similarity and heuristics.
+
+### 💻 Coding Interview Support
+**Integrated Coding Editor:** For coding, DSA, or algorithm questions, the agent asks the candidate to open an embedded code editor to write and explain their solution.
+
+### 🔇 Silence Handling
+**Passive Listening:** Agent intelligently stays quiet if the candidate is thinking or pausing, ensuring a natural human-like experience.
+
+**Deadlock Resolution:** If both agent and candidate are silent beyond a threshold, the agent breaks the silence with conversational nudges (e.g., “Take your time,” or “Do you need a hint?”).
+
+### 🔍 Probing & Evaluation Logic
+**Contextual Probing:** Follow-up questions are dynamically decided based on the response depth, evaluation weight of the question, and available time.
+
+**Stuck Detection & Hints:** Agent can detect if a candidate is stuck and optionally provide contextual hints to assist progress (configurable).
+
+### 📝 Feedback Report Generation
+At the end of each interview, the system generates a structured, rubric-based feedback report for the candidate — useful for self-evaluation and interview preparation.
+
+### 📊 Pretraining Strategy
+[Refer to the detailed README here](pre_training/README.md)
+
+**Pretrained Foundation Model:** Llama3 1B.
+
+**Fine-tuning:** Applied light fine-tuning on a domain-specific dataset of interview questions and candidate responses to align the model better with real-world interview patterns.
+
+### ⚠️ Current Challenges & Areas for Improvement
+
+**Prompt Engineering for Custom Models:** Initial tests with local LLMs via Ollama (Phi, Mistral, etc.) didn’t yield great results. Need improved prompt chaining or agent design.
+
+**Dependency on AWS STT/TTS:** Chosen due to available credits and faster development, but may explore alternatives (e.g., Whisper, Coqui TTS) for cost scalability or latency.
+
+**Latency and Agent Responsiveness:** Still tuning for natural response pacing and reducing perceived lag in turn-taking.
+
 ---
 
 ## 🧱 Project Structure
@@ -13,34 +59,27 @@ IntervueAI_Capstone/
 ├── .env.local
 ├── main.py                     # Main entrypoint
 ├── configs/
+│   ├── livekit.yaml           # Needed for production setup
 │   └── config.yaml            # Model, path, port configs
+│
 ├── agents/
 │   ├── __init__.py
-    ├── interview_agent.py
-│   ├── macro_planner.py       # tentative Subagent 1 - JD + Resume to Questionnaire
-│   ├── interview_loop.py      # tentative Subagent 2 - Interview FSM Controller
-│   ├── scorer_summary.py      # tentative Subagent 3 - Evaluation and summary
-│   └── session_manager.py     # tentative Subagent 4 - Orchestrates session lifecycle
-├── fsm/
-│   ├── __init__.py
-│   └── interview_states.py    # FSM states for the main interview loop
-├── services/
-│   ├── __init__.py
-│   ├── audio_service.py       # STT and TTS services (Whisper, Coqui, etc.)
-│   ├── llm_interface.py       # Wrapper around LLaMA model (vLLM or transformers)
-│   ├── vector_store.py        # Resume/JD embeddings + context memory
-│   └── livekit_client.py      # Interface to LiveKit video/audio session control
-├── data/
-│   ├── prompts/               # Prompt templates for each agent
-│   └── examples/              # Sample JDs, resumes, transcripts
+│   ├── interview_agent.py      # Manages session and invokes coordinator agent
+│   ├── feedback.py             # Feedback Agent to generate
+│   ├── resume_pdf_parser.py    # Resume Parser Agent
+│   ├── jd_resume_matcher.py    # JD <-> Candidate's Resume Matcher Agent
+│   ├── interview_planner.py    # Interview Planner Agent
+│   └── coordinator.py          # Coordinator Agent that Orchestrates and conducts interview
+
+├── prompts/                   # Prompt templates for each agent
 ├── ui/
 │   ├── web_client/            # React/Next.js web client for LiveKit frontend
-│       └── components/            # Chat bubbles, code editor, mic controls
+│       └── components/        # Chat bubbles, code editor, mic controls
 └── utils/
-    ├── __init__.py
-    ├── logger.py              # Unified logger
-    ├── schema.py              # Dataclasses or Pydantic models for Q&A, Plan, Report
-    └── helpers.py             # Misc utilities
+│   ├── __init__.py
+│   ├── session.py             # interview session utility
+│   ├── memory.py              # interview conversation memory
+│   └── llm.py                 # LLM calls utility
 │
 ├── pre_training/              # Directory containing pre-training files 
 │   └── README.md              # Read me info specific for pretrainig part
@@ -50,7 +89,6 @@ IntervueAI_Capstone/
 
 
 ```
-
 
 ---
 
@@ -101,10 +139,10 @@ pnpm dev
 Frontend will run at:
 ```📍 http://localhost:3000```
 
-### 🗣️ 4. LiveKit Server – Local Development Setup (Optional)
+### 🗣️ 4. LiveKit Server – Local Development Setup
 
 This project uses [LiveKit](https://livekit.io/) to enable real-time voice communication for interview agents. You can ignore this step and
-use livekit cloud by Signig up here [Livekit Cloud](https://livekit.io) 
+use livekit cloud (FREEMIUM) by Signig up here [Livekit Cloud](https://livekit.io) 
 
 #### 🔧 Install LiveKit Server Self-hosting (locally)
 
@@ -145,6 +183,7 @@ LIVEKIT_API_SECRET=secret
 AWS_ACCESS_KEY_ID=<aws_access_key>
 AWS_SECRET_ACCESS_KEY=<aws_access_key_secret>
 AWS_REGION=<aws_region>
+GOOGLE_API_KEYS=[<list_of_google_api_keys_selected_based_on_rotation]
 GOOGLE_API_KEY=<google_api_key_for_running_llm>
 ```
 
