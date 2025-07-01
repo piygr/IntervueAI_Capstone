@@ -11,8 +11,12 @@ def load_config(path="configs/config.yaml"):
 
 def load_process_yaml(path="configs/process.yaml"):
     process = {}
-    with open(path, "r") as f:
-        process = yaml.safe_load(f, Loader=yaml.FullLoader)
+    try:
+        with open(path, "r") as f:
+            process = yaml.safe_load(f, Loader=yaml.FullLoader)
+    except Exception as e:
+        print(e)
+        
     return process
 
 
