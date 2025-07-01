@@ -163,6 +163,7 @@ class Coordinator(Agent):
                     google_api_key = google_api_keys[0]
                     google_api_key_index = 1 % len(google_api_keys)
 
+                logger.info(f"Updated GOOGLE_API_KEY_INDEX: {google_api_key_index}")
                 proc['google_api_key_index'] = google_api_key_index
                 save_process_yaml(proc)
 
