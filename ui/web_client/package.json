@@ -11,8 +11,11 @@
     "format:write": "prettier --write ."
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
     "@livekit/components-react": "^2.9.3",
     "@livekit/components-styles": "^1.1.4",
+    "@mui/material": "^7.1.2",
     "@uiw/react-textarea-code-editor": "^3.1.1",
     "framer-motion": "^11.18.0",
     "livekit-client": "^2.8.0",
@@ -28,7 +31,7 @@
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
     "@types/lodash": "^4.17.18",
     "@types/node": "^20.17.13",
-    "@types/react": "^18.3.18",
+    "@types/react": "^18.3.22",
     "@types/react-dom": "^18.3.5",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.29",
