@@ -139,10 +139,10 @@ pnpm dev
 Frontend will run at:
 ```📍 http://localhost:3000```
 
-### 🗣️ 4. LiveKit Server – Local Development Setup (Optional)
+### 🗣️ 4. LiveKit Server – Local Development Setup
 
 This project uses [LiveKit](https://livekit.io/) to enable real-time voice communication for interview agents. You can ignore this step and
-use livekit cloud by Signig up here [Livekit Cloud](https://livekit.io) 
+use livekit cloud (FREEMIUM) by Signig up here [Livekit Cloud](https://livekit.io) 
 
 #### 🔧 Install LiveKit Server Self-hosting (locally)
 
