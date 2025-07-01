@@ -21,7 +21,6 @@ from livekit.plugins import (
 #from livekit.plugins.turn_detector.english import EnglishModel
 
 from agents.feedback_agent import FeedbackAgent
-from utils.session import fetch_session
 from utils.memory import MemoryManager, ConversationItem, InterviewPlan
 
 import os
@@ -29,7 +28,7 @@ import random
 import time
 
 from livekit.agents import UserInputTranscribedEvent
-from utils.session import load_config
+from utils.session import load_config, load_process_yaml, save_process_yaml
 
 from dataclasses import dataclass, field
 
@@ -38,17 +37,6 @@ from livekit.api import LiveKitAPI, ListParticipantsRequest, RoomParticipantIden
 logger = logging.getLogger(__name__)
 load_dotenv(dotenv_path=".env.local")
 config = load_config()
-
-llm_model = None
-if config.get('model', {}).get('type', '') == 'gemini':
-    llm_model = google.LLM(
-            model=config.get('model', {}).get('name', ''),
-        )
-elif config.get('model', {}).get('type', '') == 'ollama':
-    llm_model = openai.LLM.with_ollama(
-        model=config.get('model', {}).get('name', ''),
-        base_url=config.get('model', {}).get('url', ''),
-    )
     
 stt = aws.STT()
 tts = aws.TTS(
@@ -136,6 +124,8 @@ class Coordinator(Agent):
         self.prompt = self.system_prompt.format(interview_plan=interview_plan,
                                                 **interview_context)
 
+        llm_model = self.load_llm_model()
+
         super().__init__(
             instructions=self.prompt,
             stt=stt,
@@ -153,11 +143,53 @@ class Coordinator(Agent):
         self.silence_watchdog_task = None
         self._cancel_interview_task = None
         self._lock = asyncio.Lock()
+        self._user_disconnected = False
         
+
+    def load_llm_model(self):
+        
+        llm_model = None
+        if config.get('model', {}).get('type', '') == 'gemini':
+            google_api_keys = os.getenv("GOOGLE_API_KEYS")
+            google_api_key = ''
+            
+            if google_api_keys and isinstance(google_api_keys, list):
+                proc = load_process_yaml()
+                if proc and proc.get('google_api_key_index'):
+                    google_api_key = google_api_keys[proc.get('google_api_key_index')]
+                    google_api_key_index = (proc.get('google_api_key_index') + 1) % len(google_api_keys)
+                else:
+                    google_api_key = google_api_keys[0]
+                    google_api_key_index = 1 % len(google_api_keys)
+
+                proc['google_api_key_index'] = google_api_key_index
+                save_process_yaml(proc)
+                
+            else:
+                if google_api_keys and isinstance(google_api_keys, str):
+                    google_api_key = google_api_keys
+                else:
+                    google_api_key = os.getenv('GOOGLE_API_KEY')
+                
+            
+            llm_model = google.LLM(
+                    model=config.get('model', {}).get('name', ''),
+                    api_key=google_api_key
+                )
+            
+        elif config.get('model', {}).get('type', '') == 'ollama':
+            llm_model = openai.LLM.with_ollama(
+                model=config.get('model', {}).get('name', ''),
+                base_url=config.get('model', {}).get('url', ''),
+            )
+
+        return llm_model
+    
 
     async def on_enter(self):
         self.session.userdata.user_last_conversation = time.time()
         self.session.on("user_input_transcribed", self.user_input_transcribed)
+        self.session._room_io._room.on("participant_disconnected", self.user_disconnected)
         self.silence_watchdog_task = asyncio.create_task(self._monitor_silence())
         self.session.userdata.interview_plan = self.interview_plan
         self.session.userdata.user_last_conversation = time.time()
@@ -176,6 +208,10 @@ class Coordinator(Agent):
                     response=event.transcript,
                     timestamp=time.time()
                 )
+
+    def user_disconnected(self):
+        self._user_disconnected = True
+
 
     async def _monitor_silence(self):
         logger.info(f"👂 Started monitor silence")
@@ -217,6 +253,11 @@ class Coordinator(Agent):
                             cancel_message = "Looks like you are away, I am cancelling the interview for now. Please connect again later."
                             self._cancel_interview_task = await self._cancel_interview(cancel_message)
                             break
+
+                if self._user_disconnected:
+                    cancel_message = "Looks like you are away, I am cancelling the interview for now. Please connect again later."
+                    self._cancel_interview_task = await self._cancel_interview(cancel_message)
+                    break
                         
         except Exception as e:
             logger.error(f"Error in _monitor_silence {e}")

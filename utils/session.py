@@ -9,6 +9,23 @@ def load_config(path="configs/config.yaml"):
     return config
 
 
+def load_process_yaml(path="configs/process.yaml"):
+    process = {}
+    with open(path, "r") as f:
+        process = yaml.safe_load(f, Loader=yaml.FullLoader)
+    return process
+
+
+def save_process_yaml(data, path="configs/process.yaml"):
+    try:
+        with open(path, 'w') as f:
+            f.write( yaml.dump(data, default_flow_style=False))
+            return True
+    except Exception as e:
+        print(e)
+        return False
+
+
 def update_session(session_id, new_data):
     folder_path = "logs/sessions"
     filename = f"{session_id}.json"
