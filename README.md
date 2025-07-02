@@ -50,6 +50,12 @@ At the end of each interview, the system generates a structured, rubric-based fe
 
 **Noise Cancellation:** Currently, it captures noise coming from the background converting into random words. Needs to implement noise cancellation to avoid this.
 
+**Screen sharing & Live video:** The agent currently does not support video or screen sharing. For full interview experience it is important to have screen sharing and live video.
+
+**Proctoring:** For fair interview when used by recruiters, it is important that the candidate is not using unfair means. To prevent this protoring is important. 
+
+**Fowl language detection:** It is important that agent is able to detect any kind of fowl language used and take suitable action like warning the candidate or termination of interview.
+
 ---
 
 ## 🧱 Project Structure
