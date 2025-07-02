@@ -221,3 +221,4 @@ test.*
 .env*
 *.env
 .env.local*
+process.yaml

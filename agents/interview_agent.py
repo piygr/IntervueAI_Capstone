@@ -28,7 +28,7 @@ from livekit.plugins import (
     aws,
     google
 )
-#from livekit.plugins.turn_detector.english import EnglishModel
+from livekit.plugins.turn_detector.english import EnglishModel
 
 from utils.session import fetch_session
 from agents.coordinator import Coordinator, InterviewContext
@@ -136,6 +136,7 @@ async def entrypoint(ctx: JobContext):
     
     session = AgentSession[InterviewContext](
         vad=ctx.proc.userdata["vad"],
+        turn_detection=EnglishModel(),
         # minimum delay for endpointing, used when turn detector believes the user is done with their turn
         min_endpointing_delay=1,
         # maximum delay for endpointing, used when turn detector does not believe the user is done with their turn

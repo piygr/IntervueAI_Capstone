@@ -58,7 +58,7 @@ For **each question**, you must:
    - `strengths`: What the candidate did well
    - `weaknesses`: What was incorrect, weak, or superficial
    - `missing`: What should have been included or explored further
-4. Assign a **score from 1.0 to 5.0 (with decimals)** for the following dimensions:
+4. Assign a **score from 0.0 to 5.0 (with decimals)** for the following dimensions:
    - `clarity_of_response`: Was the explanation structured, understandable?
    - `technical_depth`: Did it show insight, experience, or depth of knowledge?
    - `communication_skills`: How effectively did the candidate express themselves?
@@ -68,7 +68,7 @@ For **each question**, you must:
 After all questions are analyzed:
 1. Reflect across all answers.
 2. Write a **neutral, professional interview summary** with no fluff.
-3. Assign an **overall_score** (1.0 to 5.0, with decimals) reflecting performance, fit, and confidence.
+3. Assign an **overall_score** (0.0 to 5.0, with decimals) reflecting performance, fit, and confidence.
 
 ---
 

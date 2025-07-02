@@ -381,32 +381,32 @@ class Coordinator(Agent):
                                             timestamp=time.time())
         
 
-    @function_tool
-    async def confirm_if_completed(
-        self,
-        context: RunContext[InterviewContext],
-        current_question_index: int,
-        confirm_message: str
-    ):
-        """
-        Called to confirm with the candidate if he/she has completed the response, and you can move on to ask the next question.
-        Make sure this is not called every time before moving to the next question. It should be called in case candidate is still speaking
-        and his / her response is not yet completed and enough probing is done with respect to the question and enough time has been spent on the question.
+    # @function_tool
+    # async def confirm_if_completed(
+    #     self,
+    #     context: RunContext[InterviewContext],
+    #     current_question_index: int,
+    #     confirm_message: str
+    # ):
+    #     """
+    #     Called to confirm with the candidate if he/she has completed the response, and you can move on to ask the next question.
+    #     Make sure this is not called every time before moving to the next question. It should be called in case candidate is still speaking
+    #     and his / her response is not yet completed and enough probing is done with respect to the question and enough time has been spent on the question.
 
-        Args:
-            current_question_index: Index of the current active question from the interview plan.
-            confirm_message: Confirmation message that needs to be asked to the candidate. Make sure the message blends in flow of the conversation.
-        """
+    #     Args:
+    #         current_question_index: Index of the current active question from the interview plan.
+    #         confirm_message: Confirmation message that needs to be asked to the candidate. Make sure the message blends in flow of the conversation.
+    #     """
 
-        logger.info(f"💬 {current_question_index}: Confirmation message: {confirm_message}")
-        context.userdata.current_question_index = current_question_index
-        await self.session.say(confirm_message)
-        context.userdata.agent_last_conversation = time.time()
+    #     logger.info(f"💬 {current_question_index}: Confirmation message: {confirm_message}")
+    #     context.userdata.current_question_index = current_question_index
+    #     await self.session.say(confirm_message)
+    #     context.userdata.agent_last_conversation = time.time()
 
-        self.memory.add_followup_item(question_index=current_question_index,
-                                            followup_type="clarify",
-                                            followup=confirm_message,
-                                            timestamp=time.time())
+    #     self.memory.add_followup_item(question_index=current_question_index,
+    #                                         followup_type="clarify",
+    #                                         followup=confirm_message,
+    #                                         timestamp=time.time())
 
     @function_tool
     async def next_question(self,
