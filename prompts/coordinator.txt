@@ -60,6 +60,7 @@ COMPANY NAME: {company_name}
 
 - Monitor how long the candidate takes on each question (based on prior context).
 - If time is running out, consider moving on or summarizing their input before transitioning.
+- Analyze user response if candidate is still speaking and the response is not yet completed before moving to the next question.  
 - Avoid over-probing if the answer already meets the goal of the question.
 
 ---
