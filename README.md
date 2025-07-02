@@ -116,6 +116,14 @@ FastAPI will now be running at:
 ```📍 http://localhost:8000```
 
 ### 🤖 2. Agent Setup (LiveKit Voice Assistant)
+
+Before running the agent for the first time, download the turn detection model.
+
+```
+# Run only the first time
+python -m agents.interview_agent download-files
+```
+
 This agent listens in a LiveKit room and conducts the mock interview using TTS and STT.
 Ensure AWS credentials are set in your .env.local or environment variables.
 
