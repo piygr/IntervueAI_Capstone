@@ -36,8 +36,10 @@ async def call_llm_with_timeout(client, prompt, timeout=30):
         logger.error("LLM generation timed out!")
         raise
     except Exception as e:
-        logger.error(f"Error in LLM generation: {str(e)}")
-        raise
+        err = str(e)
+        logger.error(f"Error in LLM generation: {err}")
+        if "429 RESOURCE_EXHAUSTED" in err:
+            raise e
 
 
 def extract_json_string(raw_output: str) -> str:

@@ -24,13 +24,13 @@ class FollowupItem(BaseModel):
     agent: str
     type: str
     timestamp: float
-    candidate: Optional["CandidateResponseItem"] = {}
+    candidate: Optional["CandidateResponseItem"] = None
 
 
 class CandidateResponseItem(BaseModel):
     response: str
     timestamp: float
-    followup: Optional[FollowupItem] = {}
+    followup: Optional[FollowupItem] = None
 
 
 class ConversationItem(BaseModel):
@@ -41,7 +41,7 @@ class ConversationItem(BaseModel):
     timestamp: float
     question_status: str
     question_remarks: str
-    candidate: Optional[CandidateResponseItem] = {}
+    candidate: Optional[CandidateResponseItem] = None
 
 '''
 {
@@ -169,7 +169,8 @@ class MemoryManager:
                 else:
                     new_candidate_response = CandidateResponseItem(
                         response=response,
-                        timestamp=timestamp
+                        timestamp=timestamp,
+                        followup=None
                     )
                     item.followup.candidate = new_candidate_response
                     return new_candidate_response
@@ -194,7 +195,8 @@ class MemoryManager:
                 else:
                     new_candidate_response = CandidateResponseItem(
                         response=response,
-                        timestamp=timestamp
+                        timestamp=timestamp,
+                        followup=None
                     )
                     item.candidate = new_candidate_response
                     candidate_response = new_candidate_response
@@ -216,7 +218,8 @@ class MemoryManager:
                     new_followup = FollowupItem(
                             agent=followup,
                             type=followup_type,
-                            timestamp=timestamp
+                            timestamp=timestamp,
+                            candidate=None
                         )
                     item.candidate.followup = new_followup
             else:
@@ -226,7 +229,8 @@ class MemoryManager:
                         followup=FollowupItem(
                             agent=followup,
                             type=followup_type,
-                            timestamp=timestamp
+                            timestamp=timestamp,
+                            candidate=None
                         )
                     )
                 item.candidate = new_candidate_response
@@ -244,7 +248,8 @@ class MemoryManager:
                         new_followup = FollowupItem(
                             agent=followup,
                             type=followup_type,
-                            timestamp=timestamp
+                            timestamp=timestamp,
+                            candidate=None
                         )
                         item.candidate.followup = new_followup
                 else:
@@ -255,7 +260,8 @@ class MemoryManager:
                         followup=FollowupItem(
                             agent=followup,
                             type=followup_type,
-                            timestamp=timestamp
+                            timestamp=timestamp,
+                            candidate=None
                         )
                     )
                     item.candidate = new_candidate_response

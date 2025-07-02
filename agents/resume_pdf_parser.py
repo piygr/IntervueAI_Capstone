@@ -10,16 +10,20 @@ from dotenv import load_dotenv
 from google import genai
 import re, json
 from utils.llm import call_llm_with_timeout
+from utils.session import get_google_api_key
 
 logger = logging.getLogger("resume_pdf_parser")
 
 load_dotenv(dotenv_path=".env.local")
 
-api_key = os.getenv("GOOGLE_API_KEY")
+#api_key = get_google_api_key()
 #client = genai.Client(api_key=api_key)
 
 class ResumePDFParser:
     def __init__(self, prompt_file_path="prompts/resume_pdf_parser.txt") -> None:
+        api_key, api_key_index = get_google_api_key()
+        self.api_key_index = api_key_index
+        
         self.client = genai.Client(api_key=api_key)
         
         self.system_prompt = ""

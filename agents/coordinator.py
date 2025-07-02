@@ -29,7 +29,7 @@ import time
 import json
 
 from livekit.agents import UserInputTranscribedEvent
-from utils.session import load_config, load_process_yaml, save_process_yaml
+from utils.session import load_config, get_google_api_key
 
 from dataclasses import dataclass, field
 
@@ -54,6 +54,7 @@ class InterviewContext:
     interview_plan: InterviewPlan = None
     response_summary: list[dict] = field(default_factory=list)
     current_question_index: int = -1
+    last_question_index: int = -1
     timetracker: dict = field(default_factory=dict)
     agent_last_conversation: int = 0
     user_last_conversation: int = 0
@@ -151,29 +152,8 @@ class Coordinator(Agent):
         
         llm_model = None
         if config.get('model', {}).get('type', '') == 'gemini':
-            google_api_key = ''
-            try:
-                google_api_keys = json.loads(os.getenv("GOOGLE_API_KEYS", "[]"))
-                if len(google_api_keys) > 0:
-                    proc = load_process_yaml()
-                    if proc and proc.get('google_api_key_index', None) is not None:
-                        google_api_key = google_api_keys[proc.get('google_api_key_index')]
-                        google_api_key_index = (proc.get('google_api_key_index') + 1) % len(google_api_keys)
-                    else:
-                        google_api_key = google_api_keys[0]
-                        google_api_key_index = 1 % len(google_api_keys)
-
-                    logger.info(f"Updated GOOGLE_API_KEY_INDEX: {google_api_key_index}")
-                    proc['google_api_key_index'] = google_api_key_index
-                    save_process_yaml(proc)
-
-                else:
-                    google_api_key = os.getenv('GOOGLE_API_KEY')
-
-            except Exception as e:
-                logger.error(f"Error parsing GOOGLE_API_KEYS {e}")
-                google_api_key = os.getenv('GOOGLE_API_KEY')
             
+            google_api_key, _ = get_google_api_key()
             llm_model = google.LLM(
                     model=config.get('model', {}).get('name', ''),
                     api_key=google_api_key
@@ -225,8 +205,10 @@ class Coordinator(Agent):
                 
                 async with self._lock:
                     question_index = self.session.userdata.current_question_index
-                    if question_index > 0:
-                        time_spent_so_far = "{:.2f}".format( (now - self.session.userdata.timetracker[question_index]) / 60.0)
+                    current_question_start_time = self.session.userdata.timetracker.get(question_index, 0)
+                    if question_index >= 0 and current_question_start_time > 0:
+                        time_spent_so_far = "{:.2f}".format( (now - current_question_start_time) / 60.0)
+                        logger.info(f"moitor_silence: time_spent_so_far - {time_spent_so_far}")
                         self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Ongoing Question (Question Index: {question_index} ) so far = ** {time_spent_so_far} minutes **")
                    
                 logger.info(f"⌛️ agent_last_conversation: {self.session.userdata.agent_last_conversation}, user_last_conversation: {self.session.userdata.user_last_conversation}")
@@ -425,9 +407,10 @@ class Coordinator(Agent):
 
         now = time.time()
         logger.info(f"💬 {question_index}: Next Question message: {question_message}")
+        context.userdata.last_question_index = context.userdata.current_question_index
         context.userdata.current_question_index = question_index
         if question_index > 0:
-            context.userdata.response_summary.append(dict(question_index=question_index, 
+            context.userdata.response_summary.append(dict(question_index=context.userdata.last_question_index, 
                                                           user_response_summary=previous_question_user_response_summary))
             
         context.userdata.current_question_requires_coding = use_code_editor
@@ -452,9 +435,10 @@ class Coordinator(Agent):
 
         async with self._lock:
             self.session.userdata.timetracker[question_index] = now
-            if question_index > 0:
-                time_spent_last_question =  "{:.2f}".format( (now - self.session.userdata.timetracker[question_index - 1]) / 60.0)
-                self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Last Question (Question Index: {question_index - 1} ) = ** {time_spent_last_question} minutes **")
+            if context.userdata.last_question_index >= 0:
+                last_question_start_time = self.session.userdata.timetracker[context.userdata.last_question_index]
+                time_spent_last_question =  "{:.2f}".format( (now - last_question_start_time) / 60.0)
+                self.session._chat_ctx.add_message(role="system", content=f"⏱Total Time spent on Last Question (Question Index: {context.userdata.last_question_index} ) = ** {time_spent_last_question} minutes **")
 
 
     @function_tool

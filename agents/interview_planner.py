@@ -4,19 +4,21 @@ from dotenv import load_dotenv
 from google import genai
 import re
 import json
-
+from utils.session import get_google_api_key
 from utils.llm import call_llm_with_timeout
 
 logger = logging.getLogger(__name__)
 
 load_dotenv(dotenv_path=".env.local")
 
-api_key = os.getenv("GOOGLE_API_KEY")
+
 #client = genai.Client(api_key=api_key)
 
 
 class InterviewPlanner:
     def __init__(self, prompt_file_path="prompts/interview_planner.txt") -> None:
+        api_key, api_key_index = get_google_api_key()
+        self.api_key_index = api_key_index
         self.client = genai.Client(api_key=api_key)
         
         self.system_prompt = ""
@@ -51,5 +53,7 @@ class InterviewPlanner:
             return response
 
         except Exception as e:
-            logger.info(f"⚠️ llm failed to create intervue plan: {e}")
+            err = str(e)
+            logger.info(f"⚠️ llm failed to create intervue plan: {err}")
+
             return ""
