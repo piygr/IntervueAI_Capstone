@@ -202,3 +202,9 @@ GOOGLE_API_KEY=<google_api_key_for_running_llm>
 - pyenv — for managing Python versions
 - pnpm — faster, disk-efficient alternative to npm
 - LiveKit — real-time voice and video infrastructure
+
+## ⏯️ Demo
+
+Watch the demo of the interiew agent conducting a live interview.
+
+[![Interview Demo](https://img.youtube.com/vi/7Oq_AYLpVG8/0.jpg)](https://youtu.be/7Oq_AYLpVG8)
