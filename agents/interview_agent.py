@@ -26,8 +26,7 @@ from livekit.plugins import (
     openai,
     silero,
     aws,
-    google,
-    noise_cancellation
+    google
 )
 #from livekit.plugins.turn_detector.english import EnglishModel
 
