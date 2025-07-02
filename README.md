@@ -48,6 +48,8 @@ At the end of each interview, the system generates a structured, rubric-based fe
 
 **Latency and Agent Responsiveness:** Still tuning for natural response pacing and reducing perceived lag in turn-taking.
 
+**Noise Cancellation:** Currently, it captures noise coming from the background converting into random words. Needs to implement noise cancellation to avoid this.
+
 ---
 
 ## 🧱 Project Structure
